@@ -13,6 +13,7 @@ import { getDb } from "../db";
 import { reportRequests } from "../../drizzle/schema";
 import { eq } from "drizzle-orm";
 import { notifyOwner } from "./notification";
+import { sendSMSNotification } from "../sms";
 
 const stripe = new Stripe(ENV.stripeSecretKey || "", {
   apiVersion: "2025-11-17.clover",
@@ -105,6 +106,15 @@ async function startServer() {
 
 **Status:** Paid - Ready for Scheduling
                 `.trim(),
+              });
+
+              // Send SMS notification to owner
+              await sendSMSNotification({
+                customerName: request.fullName,
+                customerPhone: request.phone,
+                address: `${request.address}, ${request.cityStateZip}`,
+                isPaid: true,
+                amount: session.amount_total || 19900,
               });
             }
           }

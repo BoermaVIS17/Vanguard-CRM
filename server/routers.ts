@@ -7,6 +7,7 @@ import { getDb } from "./db";
 import { reportRequests } from "../drizzle/schema";
 import { PRODUCTS, validatePromoCode } from "./products";
 import { notifyOwner } from "./_core/notification";
+import { sendSMSNotification } from "./sms";
 import Stripe from "stripe";
 import { ENV } from "./_core/env";
 import { eq } from "drizzle-orm";
@@ -99,6 +100,15 @@ export const appRouter = router({
             `.trim(),
           });
 
+          // Send SMS notification to owner
+          await sendSMSNotification({
+            customerName: input.fullName,
+            customerPhone: input.phone,
+            address: `${input.address}, ${input.cityStateZip}`,
+            isPaid: false,
+            promoCode: input.promoCode?.toUpperCase(),
+          });
+
           return {
             success: true,
             requiresPayment: false,
@@ -149,7 +159,9 @@ export const appRouter = router({
               request_id: requestId.toString(),
               customer_name: input.fullName,
               customer_email: input.email,
+              customer_phone: input.phone,
               address: input.address,
+              city_state_zip: input.cityStateZip,
             },
           });
 

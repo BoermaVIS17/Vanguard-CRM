@@ -12,3 +12,4 @@
 - [x] Email notification to owner on form submission
 - [x] Update frontend form to handle payment flow
 - [x] Test payment flow (promo code validation tests passing)
+- [x] Integrate Twilio SMS notifications for new report requests (code ready, awaiting credentials)
