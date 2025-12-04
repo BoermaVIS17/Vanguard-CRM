@@ -60,8 +60,9 @@ export const appRouter = router({
         }
 
         // Check if promo code is valid
-        const promoResult = input.promoCode ? validatePromoCode(input.promoCode) : { valid: false, discountPercent: 0 };
+        const promoResult = input.promoCode ? validatePromoCode(input.promoCode) : { valid: false, discountPercent: 0, salesRep: undefined };
         const isFree = promoResult.valid && promoResult.discountPercent === 100;
+        const salesRepAttribution = promoResult.salesRep || "Direct/No Code";
 
         // Format hands-on inspection for notifications
         const handsOnText = input.handsOnInspection ? "✅ YES - Requested" : "No";
@@ -111,6 +112,8 @@ ${concernsText}
 - Promo Code: ${input.promoCode?.toUpperCase()}
 - Amount: $0.00 (Fee Waived)
 
+**📋 Sales Rep Attribution:** ${salesRepAttribution}
+
 **Status:** Pending Scheduling
             `.trim(),
           });
@@ -122,6 +125,7 @@ ${concernsText}
             address: `${input.address}, ${input.cityStateZip}`,
             isPaid: false,
             promoCode: input.promoCode?.toUpperCase(),
+            salesRep: salesRepAttribution,
           });
 
           return {

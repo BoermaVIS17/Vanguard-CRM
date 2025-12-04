@@ -19,6 +19,7 @@ interface SMSNotificationParams {
   isPaid: boolean;
   amount?: number;
   promoCode?: string;
+  salesRep?: string;
 }
 
 /**
@@ -33,13 +34,15 @@ export async function sendSMSNotification(params: SMSNotificationParams): Promis
   try {
     const paymentInfo = params.isPaid 
       ? `PAID $${((params.amount || 19900) / 100).toFixed(2)}`
-      : `FREE (Code: ${params.promoCode || "N/A"})`;
+      : `FREE (${params.promoCode || "N/A"})`;
+    
+    const repInfo = params.salesRep ? `\n👤 Rep: ${params.salesRep}` : "";
 
     const message = `🏠 NEW REPORT REQUEST
 ${params.customerName}
 📍 ${params.address}
 📞 ${params.customerPhone}
-💰 ${paymentInfo}`;
+💰 ${paymentInfo}${repInfo}`;
 
     await twilioClient.messages.create({
       body: message,
