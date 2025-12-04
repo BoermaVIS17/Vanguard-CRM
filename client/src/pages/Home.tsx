@@ -33,6 +33,7 @@ import {
   Loader2,
 } from "lucide-react";
 import { useState, useEffect } from "react";
+import { useLocation } from "wouter";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -65,6 +66,7 @@ export default function Home() {
   const [isPromoValid, setIsPromoValid] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [, setLocation] = useLocation();
 
   // Check URL params for success/cancelled
   useEffect(() => {
@@ -158,12 +160,19 @@ export default function Home() {
         toast.info("Redirecting to secure payment...");
         window.open(result.checkoutUrl, "_blank");
       } else {
-        // Free submission successful
-        toast.success("Request received! We will contact you shortly to schedule your inspection.");
+        // Free submission successful - store data and redirect to thank you page
+        sessionStorage.setItem("submissionName", values.fullName);
+        sessionStorage.setItem("submissionEmail", values.email);
+        sessionStorage.setItem("submissionPaid", "false");
+        sessionStorage.setItem("submissionHandsOn", values.handsOnInspection ? "true" : "false");
+        
         form.reset();
         setPromoCode("");
         setIsPromoApplied(false);
         setIsPromoValid(false);
+        
+        // Redirect to thank you page
+        setLocation("/thank-you");
       }
     } catch (err: any) {
       console.error("Error submitting form:", err);

@@ -20,3 +20,6 @@
 - [x] Remove promo code hint from form
 - [x] Add proper backlink to Nextdoorextroofing.com in footer
 - [x] Make checkboxes more visible against dark background
+- [x] Create Thank You page after form submission
+- [x] Redirect to Thank You page after successful submission
+- [x] Add route for Thank You page in App.tsx
