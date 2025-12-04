@@ -19,3 +19,4 @@
 - [x] Update backend to handle new fields
 - [x] Remove promo code hint from form
 - [x] Add proper backlink to Nextdoorextroofing.com in footer
+- [x] Make checkboxes more visible against dark background

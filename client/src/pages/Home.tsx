@@ -701,6 +701,7 @@ export default function Home() {
                           <Checkbox
                             checked={field.value}
                             onCheckedChange={field.onChange}
+                            className="border-2 border-primary bg-background/50 data-[state=checked]:bg-primary data-[state=checked]:border-primary"
                           />
                         </FormControl>
                         <div className="space-y-1 leading-none">
@@ -777,6 +778,7 @@ export default function Home() {
                           <Checkbox
                             checked={field.value}
                             onCheckedChange={field.onChange}
+                            className="border-2 border-primary bg-background/50 data-[state=checked]:bg-primary data-[state=checked]:border-primary"
                           />
                         </FormControl>
                         <div className="space-y-1 leading-none">
