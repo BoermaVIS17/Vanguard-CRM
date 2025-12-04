@@ -830,24 +830,24 @@ export default function Home() {
           <Accordion type="single" collapsible className="w-full space-y-4">
             {[
               {
-                q: "Is this report really free with the promo code?",
-                a: "Yes, the promo code provided on your door hanger (NEIGHBOR25) makes the $199 Storm Documentation Report completely free during our neighborhood survey period."
+                q: "Is this report really free with a promo code?",
+                a: "Yes, if you received a door hanger with a promo code during our neighborhood survey period, the $199 Storm Documentation Report is completely free. The code waives the fee while we are conducting inspections in your area."
               },
               {
                 q: "Does this start an insurance claim?",
                 a: "No. This report is for your personal documentation and maintenance planning only. It is not an insurance claim, nor does it constitute insurance advice."
               },
               {
-                q: "Do I need to be home during the drone flyover?",
-                a: "No, you do not need to be home. Our licensed drone pilots operate externally and will not need access to your property."
+                q: "Do I need to be home during the inspection?",
+                a: "Yes, for insurance purposes you must be home during the inspection. If you used a promo code, your inspection is scheduled when we are already in your neighborhood. Call 727-318-0006 for exact scheduling information."
               },
               {
                 q: "How long does it take to get my report?",
-                a: "You will typically receive your PDF report via email within 24-48 hours after the drone flyover is completed."
+                a: "Paid customers receive their PDF report within 48 hours. If you used a promo code, your report timing is subject to when we complete the neighborhood survey. Call 727-318-0006 if you're curious about the schedule."
               },
               {
-                q: "Will a drone definitely fly over my home?",
-                a: "We will make every effort to include your home in our flight plan. However, factors like weather, FAA restrictions, or accessibility may occasionally prevent a flyover."
+                q: "Will a drone fly over my home?",
+                a: "A drone will only fly over your home if you opt-in by submitting a request. If you do not want to be included in the survey or have a drone near your home, please call 727-318-0006 to request exclusion."
               }
             ].map((item, index) => (
               <AccordionItem key={index} value={`item-${index}`} className="border border-white/10 bg-card px-4 rounded-lg">

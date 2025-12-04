@@ -23,3 +23,4 @@
 - [x] Create Thank You page after form submission
 - [x] Redirect to Thank You page after successful submission
 - [x] Add route for Thank You page in App.tsx
+- [x] Update FAQ: remove promo code mention, add home requirement, update scheduling info, add drone opt-in policy
