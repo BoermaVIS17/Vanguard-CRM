@@ -1,3 +1,4 @@
+import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -7,7 +8,6 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   Select,
@@ -24,13 +24,12 @@ import {
   FileText,
   Wind,
   MapPin,
-  Clock,
   Menu,
   X,
   ArrowRight,
   Plane,
-  BarChart3,
   AlertTriangle,
+  Loader2,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
@@ -38,6 +37,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { toast } from "sonner";
+import { trpc } from "@/lib/trpc";
 
 // --- Schema Definition ---
 const formSchema = z.object({
@@ -54,10 +54,32 @@ const formSchema = z.object({
 });
 
 export default function Home() {
+  const { user, loading, error, isAuthenticated, logout } = useAuth();
+
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [promoCode, setPromoCode] = useState("");
   const [isPromoApplied, setIsPromoApplied] = useState(false);
+  const [isPromoValid, setIsPromoValid] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Check URL params for success/cancelled
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("success") === "true") {
+      toast.success("Payment successful! Your report request has been received. We will contact you shortly.");
+      // Clear the URL params
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+    if (params.get("cancelled") === "true") {
+      toast.error("Payment was cancelled. Please try again when you're ready.");
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  }, []);
+
+  // tRPC mutations
+  const validatePromoMutation = trpc.report.validatePromo.useMutation();
+  const submitReportMutation = trpc.report.submit.useMutation();
 
   // Form handling
   const form = useForm<z.infer<typeof formSchema>>({
@@ -83,28 +105,65 @@ export default function Home() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Handle promo code application
-  const handleApplyPromo = () => {
-    if (promoCode.trim().length > 0) {
-      setIsPromoApplied(true);
-      form.setValue("promoCode", promoCode);
-      toast.success("Promo code applied! Price updated to $0.");
-      
-      // Scroll to form
-      const formElement = document.getElementById("request-form");
-      if (formElement) {
-        formElement.scrollIntoView({ behavior: "smooth" });
+  // Handle promo code validation
+  const handleValidatePromo = async (code: string) => {
+    if (code.trim().length === 0) {
+      setIsPromoApplied(false);
+      setIsPromoValid(false);
+      return;
+    }
+
+    try {
+      const result = await validatePromoMutation.mutateAsync({ code: code.trim() });
+      if (result.valid) {
+        setIsPromoApplied(true);
+        setIsPromoValid(true);
+        form.setValue("promoCode", code.toUpperCase());
+        toast.success("Promo code applied! Fee will be waived.");
+      } else {
+        setIsPromoApplied(false);
+        setIsPromoValid(false);
+        toast.error("Invalid promo code. Standard $199 fee applies.");
       }
-    } else {
-      toast.error("Please enter a valid promo code.");
+    } catch (err) {
+      console.error("Error validating promo:", err);
+      setIsPromoApplied(false);
+      setIsPromoValid(false);
     }
   };
 
   // Handle form submission
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
-    toast.success("Request received! We will contact you shortly.");
-    // In a real app, this would submit to an API
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    setIsSubmitting(true);
+    try {
+      const result = await submitReportMutation.mutateAsync({
+        fullName: values.fullName,
+        email: values.email,
+        phone: values.phone,
+        address: values.address,
+        cityStateZip: values.cityStateZip,
+        roofAge: values.roofAge,
+        promoCode: values.promoCode,
+      });
+
+      if (result.requiresPayment && result.checkoutUrl) {
+        // Redirect to Stripe checkout
+        toast.info("Redirecting to secure payment...");
+        window.open(result.checkoutUrl, "_blank");
+      } else {
+        // Free submission successful
+        toast.success("Request received! We will contact you shortly to schedule your inspection.");
+        form.reset();
+        setPromoCode("");
+        setIsPromoApplied(false);
+        setIsPromoValid(false);
+      }
+    } catch (err: any) {
+      console.error("Error submitting form:", err);
+      toast.error(err.message || "Something went wrong. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   const scrollToSection = (id: string) => {
@@ -265,9 +324,6 @@ export default function Home() {
               
               <div className="relative aspect-video bg-black">
                 <img src="/images/noaa-data-viz.jpg" alt="Data Viz" className="w-full h-full object-cover opacity-80" />
-                
-                {/* Scanner Line Animation */}
-                <div className="scanner-line"></div>
                 
                 {/* Data Points Overlay */}
                 <div className="absolute top-1/4 left-1/4 p-2 border border-primary/50 bg-black/60 backdrop-blur text-[10px] font-mono text-primary">
@@ -502,6 +558,9 @@ export default function Home() {
             <div className="bg-primary/10 p-6 border-b border-white/10 text-center">
               <h2 className="text-2xl md:text-3xl font-heading font-bold text-white">Order Your Report</h2>
               <p className="text-sm text-muted-foreground mt-2">Complete the form below to schedule your inspection.</p>
+              <div className="mt-3 text-lg font-heading font-bold text-primary">
+                {isPromoValid ? "FREE (Promo Applied)" : "$199.00"}
+              </div>
             </div>
             
             <div className="p-6 md:p-8">
@@ -624,25 +683,35 @@ export default function Home() {
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel className="text-xs uppercase tracking-wider text-primary">Enter Promo Code</FormLabel>
-                          <div className="relative">
+                          <div className="flex gap-2">
                             <FormControl>
                               <Input 
                                 placeholder="Ex: NEIGHBOR25" 
                                 {...field} 
+                                value={promoCode}
                                 onChange={(e) => {
-                                  field.onChange(e);
-                                  setPromoCode(e.target.value);
-                                  if (e.target.value.length > 0) handleApplyPromo();
+                                  const value = e.target.value.toUpperCase();
+                                  setPromoCode(value);
+                                  field.onChange(value);
                                 }}
-                                className={`bg-background/50 font-mono uppercase ${isPromoApplied ? "border-primary text-primary" : ""}`}
+                                className={`bg-background/50 font-mono uppercase ${isPromoValid ? "border-primary text-primary" : ""}`}
                               />
                             </FormControl>
-                            {isPromoApplied && (
-                              <div className="absolute right-3 top-1/2 -translate-y-1/2 text-primary flex items-center gap-1 text-xs font-bold">
-                                <CheckCircle2 className="w-4 h-4" /> FEE WAIVED
-                              </div>
-                            )}
+                            <Button 
+                              type="button"
+                              variant="outline"
+                              onClick={() => handleValidatePromo(promoCode)}
+                              disabled={validatePromoMutation.isPending || promoCode.length === 0}
+                              className="border-primary text-primary hover:bg-primary/10"
+                            >
+                              {validatePromoMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : "Apply"}
+                            </Button>
                           </div>
+                          {isPromoValid && (
+                            <div className="text-primary flex items-center gap-1 text-xs font-bold mt-2">
+                              <CheckCircle2 className="w-4 h-4" /> FEE WAIVED - $0.00
+                            </div>
+                          )}
                           <FormMessage />
                         </FormItem>
                       )}
@@ -670,8 +739,18 @@ export default function Home() {
                     )}
                   />
                   
-                  <Button type="submit" className="w-full h-12 text-lg font-heading font-bold bg-primary text-primary-foreground hover:bg-primary/90 shadow-[0_0_20px_rgba(0,255,240,0.2)]">
-                    Submit & Schedule My Report
+                  <Button 
+                    type="submit" 
+                    disabled={isSubmitting}
+                    className="w-full h-12 text-lg font-heading font-bold bg-primary text-primary-foreground hover:bg-primary/90 shadow-[0_0_20px_rgba(0,255,240,0.2)]"
+                  >
+                    {isSubmitting ? (
+                      <><Loader2 className="w-5 h-5 animate-spin mr-2" /> Processing...</>
+                    ) : isPromoValid ? (
+                      "Submit Free Request"
+                    ) : (
+                      "Pay $199 & Schedule Report"
+                    )}
                   </Button>
                 </form>
               </Form>
@@ -691,7 +770,7 @@ export default function Home() {
             {[
               {
                 q: "Is this report really free with the promo code?",
-                a: "Yes, the promo code provided on your door hanger makes the $199 Storm Documentation Report completely free during our neighborhood survey period."
+                a: "Yes, the promo code provided on your door hanger (NEIGHBOR25) makes the $199 Storm Documentation Report completely free during our neighborhood survey period."
               },
               {
                 q: "Does this start an insurance claim?",
@@ -758,7 +837,7 @@ export default function Home() {
             <div>
               <h4 className="font-heading font-bold text-white mb-4">Contact</h4>
               <ul className="space-y-2 text-sm text-muted-foreground">
-                <li>Nextdoorextroofing.com</li>
+                <li><a href="https://nextdoorextroofing.com" target="_blank" rel="noopener noreferrer" className="hover:text-primary">Nextdoorextroofing.com</a></li>
                 <li>info@nextdoorextroofing.com</li>
               </ul>
             </div>

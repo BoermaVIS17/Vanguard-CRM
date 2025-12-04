@@ -1,0 +1,14 @@
+# Project TODO
+
+- [x] Basic landing page with hero, features, pricing, form
+- [x] Dark theme with cyan accents (Precision & Trust design)
+- [x] Responsive navigation
+- [x] FAQ section
+- [x] Trust indicators (license, FAA compliant)
+- [x] Upgrade to web-db-user for backend capabilities
+- [x] Database schema for report requests
+- [x] Stripe payment integration ($199 report)
+- [x] Promo code "neighbor25" logic to waive fee
+- [x] Email notification to owner on form submission
+- [x] Update frontend form to handle payment flow
+- [x] Test payment flow (promo code validation tests passing)
