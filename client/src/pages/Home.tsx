@@ -279,9 +279,9 @@ export default function Home() {
             </h1>
             
             <p className="text-lg md:text-xl text-muted-foreground max-w-xl leading-relaxed">
-              Secure your property with a comprehensive $199 documentation package. Includes high-resolution drone imagery, official NOAA storm data, and a certified contractor's condition summary.
+              Secure your property with documentation. Includes high-resolution drone imagery, official NOAA storm data, and a certified contractor's condition summary.
               <span className="text-white font-medium block mt-2">
-                Don't wait for a claim denial—get the proof you need today.
+                Don't wait for a claim denial, get the proof you need today.
               </span>
             </p>
 
@@ -458,7 +458,7 @@ export default function Home() {
                 <ul className="space-y-4 mb-8">
                   <li className="flex items-center gap-3">
                     <CheckCircle2 className="w-5 h-5 text-primary" />
-                    <span className="text-white">FAA-Licensed Drone Inspection</span>
+                    <span className="text-white">Drone Inspection</span>
                   </li>
                   <li className="flex items-center gap-3">
                     <CheckCircle2 className="w-5 h-5 text-primary" />
@@ -533,7 +533,7 @@ export default function Home() {
                 { 
                   step: "04", 
                   title: "Delivery", 
-                  desc: "Your PDF report arrives in your inbox within 24-48 hours." 
+                  desc: "Your PDF report arrives in your inbox within 48 hours." 
                 }
               ].map((item, index) => (
                 <div key={index} className="bg-card border border-white/5 p-6 rounded-xl relative group hover:-translate-y-2 transition-transform duration-300">
