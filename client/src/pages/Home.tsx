@@ -1,25 +1,771 @@
 import { Button } from "@/components/ui/button";
-import { Loader2 } from "lucide-react";
-import { Streamdown } from 'streamdown';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Separator } from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge";
+import {
+  CheckCircle2,
+  ShieldCheck,
+  FileText,
+  Wind,
+  MapPin,
+  Clock,
+  Menu,
+  X,
+  ArrowRight,
+  Plane,
+  BarChart3,
+  AlertTriangle,
+} from "lucide-react";
+import { useState, useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { toast } from "sonner";
 
-/**
- * All content in this page are only for example, replace with your own feature implementation
- * When building pages, remember your instructions in Frontend Best Practices, Design Guide and Common Pitfalls
- */
+// --- Schema Definition ---
+const formSchema = z.object({
+  fullName: z.string().min(2, { message: "Name must be at least 2 characters." }),
+  address: z.string().min(5, { message: "Address is required." }),
+  cityStateZip: z.string().min(5, { message: "City, State, ZIP is required." }),
+  email: z.string().email({ message: "Invalid email address." }),
+  phone: z.string().min(10, { message: "Phone number is required." }),
+  promoCode: z.string().optional(),
+  roofAge: z.string().optional(),
+  disclaimer: z.boolean().refine((val) => val === true, {
+    message: "You must acknowledge the disclaimer.",
+  }),
+});
+
 export default function Home() {
-  // If theme is switchable in App.tsx, we can implement theme toggling like this:
-  // const { theme, toggleTheme } = useTheme();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [promoCode, setPromoCode] = useState("");
+  const [isPromoApplied, setIsPromoApplied] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  // Form handling
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      fullName: "",
+      address: "",
+      cityStateZip: "",
+      email: "",
+      phone: "",
+      promoCode: "",
+      roofAge: "",
+      disclaimer: false,
+    },
+  });
+
+  // Handle scroll effect for navbar
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 50);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  // Handle promo code application
+  const handleApplyPromo = () => {
+    if (promoCode.trim().length > 0) {
+      setIsPromoApplied(true);
+      form.setValue("promoCode", promoCode);
+      toast.success("Promo code applied! Price updated to $0.");
+      
+      // Scroll to form
+      const formElement = document.getElementById("request-form");
+      if (formElement) {
+        formElement.scrollIntoView({ behavior: "smooth" });
+      }
+    } else {
+      toast.error("Please enter a valid promo code.");
+    }
+  };
+
+  // Handle form submission
+  function onSubmit(values: z.infer<typeof formSchema>) {
+    console.log(values);
+    toast.success("Request received! We will contact you shortly.");
+    // In a real app, this would submit to an API
+  }
+
+  const scrollToSection = (id: string) => {
+    const element = document.getElementById(id);
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth" });
+      setIsMenuOpen(false);
+    }
+  };
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <main>
-        {/* Example: lucide-react for icons */}
-        <Loader2 className="animate-spin" />
-        Example Page
-        {/* Example: Streamdown for markdown rendering */}
-        <Streamdown>Any **markdown** content</Streamdown>
-        <Button variant="default">Example Button</Button>
-      </main>
+    <div className="min-h-screen bg-background text-foreground font-body selection:bg-primary selection:text-primary-foreground overflow-x-hidden">
+      {/* --- Navigation --- */}
+      <nav
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 border-b ${
+          scrolled
+            ? "bg-background/95 backdrop-blur-md border-border py-3"
+            : "bg-transparent border-transparent py-5"
+        }`}
+      >
+        <div className="container flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="relative w-10 h-10 overflow-hidden rounded-full border border-primary/50 shadow-[0_0_15px_rgba(0,255,240,0.3)]">
+              <img src="/images/logo.jpg" alt="NextDoor Logo" className="object-cover w-full h-full" />
+            </div>
+            <span className="font-heading font-bold text-xl tracking-wider uppercase text-white">
+              NextDoor <span className="text-primary">Exterior</span>
+            </span>
+          </div>
+
+          {/* Desktop Nav */}
+          <div className="hidden md:flex items-center gap-8">
+            <button onClick={() => scrollToSection("features")} className="text-sm font-medium hover:text-primary transition-colors">
+              What's Included
+            </button>
+            <button onClick={() => scrollToSection("how-it-works")} className="text-sm font-medium hover:text-primary transition-colors">
+              Process
+            </button>
+            <button onClick={() => scrollToSection("faq")} className="text-sm font-medium hover:text-primary transition-colors">
+              FAQ
+            </button>
+            <Button 
+              onClick={() => scrollToSection("request-form")}
+              className="bg-primary text-primary-foreground hover:bg-primary/90 font-heading font-bold tracking-wide"
+            >
+              Get Report
+            </Button>
+          </div>
+
+          {/* Mobile Menu Toggle */}
+          <button
+            className="md:hidden text-foreground"
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+          >
+            {isMenuOpen ? <X /> : <Menu />}
+          </button>
+        </div>
+
+        {/* Mobile Menu */}
+        {isMenuOpen && (
+          <div className="md:hidden absolute top-full left-0 right-0 bg-background border-b border-border p-4 flex flex-col gap-4 animate-in slide-in-from-top-5">
+            <button onClick={() => scrollToSection("features")} className="text-left py-2 hover:text-primary">
+              What's Included
+            </button>
+            <button onClick={() => scrollToSection("how-it-works")} className="text-left py-2 hover:text-primary">
+              Process
+            </button>
+            <button onClick={() => scrollToSection("faq")} className="text-left py-2 hover:text-primary">
+              FAQ
+            </button>
+            <Button onClick={() => scrollToSection("request-form")} className="w-full font-heading font-bold">
+              Get Report
+            </Button>
+          </div>
+        )}
+      </nav>
+
+      {/* --- Hero Section --- */}
+      <section className="relative min-h-screen flex items-center pt-20 overflow-hidden">
+        {/* Background Image with Overlay */}
+        <div className="absolute inset-0 z-0">
+          <img
+            src="/images/hero-drone-scan.jpg"
+            alt="Drone scanning roof"
+            className="w-full h-full object-cover opacity-60"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-background via-background/80 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent" />
+          
+          {/* Grid Overlay Effect */}
+          <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay"></div>
+        </div>
+
+        <div className="container relative z-10 grid lg:grid-cols-2 gap-12 items-center">
+          <div className="space-y-6 animate-in slide-in-from-left-10 duration-700 fade-in">
+            <Badge variant="outline" className="border-primary text-primary px-4 py-1 text-sm font-mono tracking-widest uppercase bg-primary/10 backdrop-blur-sm">
+              <span className="w-2 h-2 rounded-full bg-primary mr-2 animate-pulse"></span>
+              Active Survey Zone
+            </Badge>
+            
+            <h1 className="text-5xl md:text-6xl lg:text-7xl font-heading font-bold leading-tight text-white">
+              STORM <br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-cyan-600">
+                DOCUMENTATION
+              </span>
+            </h1>
+            
+            <p className="text-lg md:text-xl text-muted-foreground max-w-xl leading-relaxed">
+              Get high-resolution drone images, NOAA storm data, and a roof condition summary. 
+              <span className="text-white font-medium block mt-2">
+                Enter your promo code to receive the <span className="line-through text-muted-foreground">$199</span> report for <span className="text-primary font-bold">FREE</span>.
+              </span>
+            </p>
+
+            <div className="flex flex-col sm:flex-row gap-4 pt-4">
+              <Button 
+                size="lg" 
+                onClick={() => scrollToSection("request-form")}
+                className="bg-primary text-primary-foreground hover:bg-primary/90 font-heading font-bold text-lg px-8 h-14 shadow-[0_0_20px_rgba(0,255,240,0.3)] hover:shadow-[0_0_30px_rgba(0,255,240,0.5)] transition-all"
+              >
+                Get My Storm Report <ArrowRight className="ml-2 w-5 h-5" />
+              </Button>
+              <Button 
+                variant="outline" 
+                size="lg"
+                onClick={() => scrollToSection("how-it-works")}
+                className="border-white/20 text-white hover:bg-white/10 h-14 font-heading"
+              >
+                How It Works
+              </Button>
+            </div>
+            
+            <div className="flex items-center gap-4 pt-4 text-sm text-muted-foreground">
+              <div className="flex items-center gap-1">
+                <ShieldCheck className="w-4 h-4 text-primary" />
+                <span>Licensed Contractor</span>
+              </div>
+              <Separator orientation="vertical" className="h-4 bg-white/20" />
+              <div className="flex items-center gap-1">
+                <Plane className="w-4 h-4 text-primary" />
+                <span>FAA Compliant</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Right Side Visual - "Scanner" Card */}
+          <div className="hidden lg:block relative animate-in slide-in-from-right-10 duration-1000 fade-in delay-200">
+            <div className="relative rounded-xl overflow-hidden border border-white/10 bg-black/40 backdrop-blur-md shadow-2xl">
+              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary to-transparent opacity-50"></div>
+              
+              <div className="p-6 border-b border-white/10 flex justify-between items-center">
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full bg-red-500 animate-pulse"></div>
+                  <span className="font-mono text-xs text-primary tracking-widest">LIVE FEED // DRONE-01</span>
+                </div>
+                <span className="font-mono text-xs text-muted-foreground">LAT: 28.5383 N | LON: 81.3792 W</span>
+              </div>
+              
+              <div className="relative aspect-video bg-black">
+                <img src="/images/noaa-data-viz.jpg" alt="Data Viz" className="w-full h-full object-cover opacity-80" />
+                
+                {/* Scanner Line Animation */}
+                <div className="scanner-line"></div>
+                
+                {/* Data Points Overlay */}
+                <div className="absolute top-1/4 left-1/4 p-2 border border-primary/50 bg-black/60 backdrop-blur text-[10px] font-mono text-primary">
+                  WIND: 45 MPH
+                </div>
+                <div className="absolute bottom-1/3 right-1/4 p-2 border border-primary/50 bg-black/60 backdrop-blur text-[10px] font-mono text-primary">
+                  HAIL: DETECTED
+                </div>
+              </div>
+              
+              <div className="p-4 grid grid-cols-3 gap-4 text-center border-t border-white/10 bg-white/5">
+                <div>
+                  <div className="text-xs text-muted-foreground font-mono uppercase">Wind Speed</div>
+                  <div className="text-xl font-heading font-bold text-white">High</div>
+                </div>
+                <div>
+                  <div className="text-xs text-muted-foreground font-mono uppercase">Hail Risk</div>
+                  <div className="text-xl font-heading font-bold text-primary">Elevated</div>
+                </div>
+                <div>
+                  <div className="text-xs text-muted-foreground font-mono uppercase">Status</div>
+                  <div className="text-xl font-heading font-bold text-white">Active</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* --- Features Section --- */}
+      <section id="features" className="py-24 bg-background relative">
+        <div className="container">
+          <div className="text-center max-w-3xl mx-auto mb-16">
+            <h2 className="text-3xl md:text-4xl font-heading font-bold mb-4">
+              Comprehensive <span className="text-primary">Storm Intelligence</span>
+            </h2>
+            <p className="text-muted-foreground text-lg">
+              We combine advanced aerial technology with official meteorological data to provide a complete picture of your property's condition.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {/* Feature 1 */}
+            <Card className="bg-card border-white/5 hover:border-primary/50 transition-all duration-300 group">
+              <CardHeader>
+                <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
+                  <Plane className="w-6 h-6 text-primary" />
+                </div>
+                <CardTitle className="font-heading text-xl">Drone Imagery</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground text-sm leading-relaxed">
+                  High-resolution 4K aerial photos of your entire roof system, captured safely using FAA-compliant drone operations.
+                </p>
+              </CardContent>
+            </Card>
+
+            {/* Feature 2 */}
+            <Card className="bg-card border-white/5 hover:border-primary/50 transition-all duration-300 group">
+              <CardHeader>
+                <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
+                  <Wind className="w-6 h-6 text-primary" />
+                </div>
+                <CardTitle className="font-heading text-xl">NOAA Data</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground text-sm leading-relaxed">
+                  Verified storm event history for your specific location, including wind speeds, storm paths, and hail signatures.
+                </p>
+              </CardContent>
+            </Card>
+
+            {/* Feature 3 */}
+            <Card className="bg-card border-white/5 hover:border-primary/50 transition-all duration-300 group">
+              <CardHeader>
+                <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
+                  <FileText className="w-6 h-6 text-primary" />
+                </div>
+                <CardTitle className="font-heading text-xl">Expert Analysis</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground text-sm leading-relaxed">
+                  Visual condition notes from a licensed Florida roofing contractor (CCC-1334600) for maintenance planning.
+                </p>
+              </CardContent>
+            </Card>
+
+            {/* Feature 4 */}
+            <Card className="bg-card border-white/5 hover:border-primary/50 transition-all duration-300 group">
+              <CardHeader>
+                <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
+                  <ShieldCheck className="w-6 h-6 text-primary" />
+                </div>
+                <CardTitle className="font-heading text-xl">Digital Report</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground text-sm leading-relaxed">
+                  A complete, time-stamped PDF documentation packet delivered directly to your email inbox for your records.
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
+
+      {/* --- Price Anchor Section --- */}
+      <section className="py-20 bg-secondary/30 border-y border-white/5">
+        <div className="container">
+          <div className="bg-gradient-to-br from-card to-background border border-white/10 rounded-2xl p-8 md:p-12 relative overflow-hidden">
+            {/* Decorative Elements */}
+            <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
+            
+            <div className="grid lg:grid-cols-2 gap-12 items-center relative z-10">
+              <div>
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-bold uppercase tracking-wider mb-6">
+                  <Clock className="w-3 h-3" /> Limited Time Offer
+                </div>
+                <h2 className="text-3xl md:text-4xl font-heading font-bold mb-4">
+                  $199 Value — <span className="text-primary">FREE</span> With Code
+                </h2>
+                <p className="text-muted-foreground text-lg mb-8">
+                  This professional documentation package normally costs $199. Homes in our active neighborhood survey zone can enter the promo code from your door hanger to receive the full report at no charge.
+                </p>
+                
+                <div className="flex flex-col sm:flex-row gap-4 max-w-md">
+                  <div className="relative flex-grow">
+                    <Input 
+                      type="text" 
+                      placeholder="Enter Promo Code" 
+                      className="h-12 bg-background border-white/20 focus:border-primary font-mono uppercase tracking-widest"
+                      value={promoCode}
+                      onChange={(e) => setPromoCode(e.target.value)}
+                    />
+                  </div>
+                  <Button 
+                    onClick={handleApplyPromo}
+                    className="h-12 px-8 bg-white text-black hover:bg-gray-200 font-heading font-bold"
+                  >
+                    Apply Code
+                  </Button>
+                </div>
+              </div>
+              
+              <div className="relative">
+                <img 
+                  src="/images/report-mockup.jpg" 
+                  alt="Report Preview" 
+                  className="rounded-lg shadow-2xl border border-white/10 transform rotate-2 hover:rotate-0 transition-transform duration-500"
+                />
+                <div className="absolute -bottom-6 -left-6 bg-background border border-white/10 p-4 rounded-lg shadow-xl flex items-center gap-4">
+                  <div className="text-right">
+                    <div className="text-xs text-muted-foreground uppercase font-mono">Standard Price</div>
+                    <div className="text-lg font-bold line-through text-muted-foreground">$199.00</div>
+                  </div>
+                  <div className="h-8 w-px bg-white/20"></div>
+                  <div>
+                    <div className="text-xs text-primary uppercase font-mono font-bold">Your Price</div>
+                    <div className="text-2xl font-bold text-white">$0.00</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* --- How It Works --- */}
+      <section id="how-it-works" className="py-24 bg-background">
+        <div className="container">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-heading font-bold mb-4">Streamlined Process</h2>
+            <p className="text-muted-foreground">Four simple steps to secure your property documentation.</p>
+          </div>
+
+          <div className="relative">
+            {/* Connecting Line (Desktop) */}
+            <div className="hidden md:block absolute top-1/2 left-0 w-full h-0.5 bg-white/10 -translate-y-1/2 z-0"></div>
+
+            <div className="grid md:grid-cols-4 gap-8 relative z-10">
+              {[
+                { 
+                  step: "01", 
+                  title: "Request Report", 
+                  desc: "Submit your address and promo code through our secure form." 
+                },
+                { 
+                  step: "02", 
+                  title: "Tech Review", 
+                  desc: "We confirm your address and add you to the flight plan." 
+                },
+                { 
+                  step: "03", 
+                  title: "Drone Capture", 
+                  desc: "Our team gathers aerial images and aligns them with NOAA data." 
+                },
+                { 
+                  step: "04", 
+                  title: "Delivery", 
+                  desc: "Your PDF report arrives in your inbox within 24-48 hours." 
+                }
+              ].map((item, index) => (
+                <div key={index} className="bg-card border border-white/5 p-6 rounded-xl relative group hover:-translate-y-2 transition-transform duration-300">
+                  <div className="w-10 h-10 rounded-full bg-secondary border border-white/10 flex items-center justify-center font-mono font-bold text-primary mb-4 group-hover:bg-primary group-hover:text-black transition-colors">
+                    {item.step}
+                  </div>
+                  <h3 className="font-heading font-bold text-xl mb-2">{item.title}</h3>
+                  <p className="text-sm text-muted-foreground">{item.desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+          
+          <div className="text-center mt-12">
+            <p className="text-sm text-muted-foreground bg-secondary/50 inline-block px-4 py-2 rounded-full border border-white/5">
+              <ShieldCheck className="w-4 h-4 inline mr-2 text-primary" />
+              No obligation. This documentation is for your information and maintenance planning.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* --- Form Section --- */}
+      <section id="request-form" className="py-24 bg-secondary/20 relative">
+        <div className="absolute inset-0 bg-[url('/images/drone-operator.jpg')] bg-cover bg-center opacity-10 mix-blend-overlay fixed-bg"></div>
+        
+        <div className="container relative z-10">
+          <div className="max-w-2xl mx-auto bg-card/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl overflow-hidden">
+            <div className="bg-primary/10 p-6 border-b border-white/10 text-center">
+              <h2 className="text-2xl md:text-3xl font-heading font-bold text-white">Request Your Report</h2>
+              <p className="text-sm text-muted-foreground mt-2">Secure your spot in the neighborhood survey.</p>
+            </div>
+            
+            <div className="p-6 md:p-8">
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                  <FormField
+                    control={form.control}
+                    name="fullName"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Full Name</FormLabel>
+                        <FormControl>
+                          <Input placeholder="John Doe" {...field} className="bg-background/50" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={form.control}
+                    name="address"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Street Address</FormLabel>
+                        <FormControl>
+                          <Input placeholder="123 Palm Ave" {...field} className="bg-background/50" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <FormField
+                      control={form.control}
+                      name="cityStateZip"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>City, State, ZIP</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Orlando, FL 32801" {...field} className="bg-background/50" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={form.control}
+                      name="roofAge"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Approx. Roof Age (Optional)</FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                              <SelectTrigger className="bg-background/50">
+                                <SelectValue placeholder="Select age range" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="0-5">0-5 Years</SelectItem>
+                              <SelectItem value="6-10">6-10 Years</SelectItem>
+                              <SelectItem value="11-15">11-15 Years</SelectItem>
+                              <SelectItem value="15+">15+ Years</SelectItem>
+                              <SelectItem value="unknown">Unknown</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <FormField
+                      control={form.control}
+                      name="email"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Email Address</FormLabel>
+                          <FormControl>
+                            <Input placeholder="john@example.com" {...field} className="bg-background/50" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={form.control}
+                      name="phone"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Phone Number</FormLabel>
+                          <FormControl>
+                            <Input placeholder="(555) 123-4567" {...field} className="bg-background/50" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                  
+                  <FormField
+                    control={form.control}
+                    name="promoCode"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Promo Code</FormLabel>
+                        <div className="relative">
+                          <FormControl>
+                            <Input 
+                              placeholder="Enter code from door hanger" 
+                              {...field} 
+                              className={`bg-background/50 font-mono uppercase ${isPromoApplied ? "border-primary text-primary" : ""}`}
+                            />
+                          </FormControl>
+                          {isPromoApplied && (
+                            <div className="absolute right-3 top-1/2 -translate-y-1/2 text-primary flex items-center gap-1 text-xs font-bold">
+                              <CheckCircle2 className="w-4 h-4" /> APPLIED
+                            </div>
+                          )}
+                        </div>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={form.control}
+                    name="disclaimer"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border border-white/10 p-4 bg-secondary/30">
+                        <FormControl>
+                          <Checkbox
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                        <div className="space-y-1 leading-none">
+                          <FormLabel className="text-xs text-muted-foreground font-normal leading-relaxed block">
+                            I understand this report is for documentation and maintenance purposes only and does not constitute an insurance claim or coverage decision.
+                          </FormLabel>
+                          <FormMessage />
+                        </div>
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <Button type="submit" className="w-full h-12 text-lg font-heading font-bold bg-primary text-primary-foreground hover:bg-primary/90 shadow-[0_0_20px_rgba(0,255,240,0.2)]">
+                    Submit & Schedule My Report
+                  </Button>
+                </form>
+              </Form>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* --- FAQ Section --- */}
+      <section id="faq" className="py-24 bg-background">
+        <div className="container max-w-3xl">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-heading font-bold mb-4">Frequently Asked Questions</h2>
+          </div>
+          
+          <Accordion type="single" collapsible className="w-full space-y-4">
+            {[
+              {
+                q: "Is this report really free with the promo code?",
+                a: "Yes, the promo code provided on your door hanger makes the $199 Storm Documentation Report completely free during our neighborhood survey period."
+              },
+              {
+                q: "Does this start an insurance claim?",
+                a: "No. This report is for your personal documentation and maintenance planning only. It is not an insurance claim, nor does it constitute insurance advice."
+              },
+              {
+                q: "Do I need to be home during the drone flyover?",
+                a: "No, you do not need to be home. Our licensed drone pilots operate externally and will not need access to your property."
+              },
+              {
+                q: "How long does it take to get my report?",
+                a: "You will typically receive your PDF report via email within 24-48 hours after the drone flyover is completed."
+              },
+              {
+                q: "Will a drone definitely fly over my home?",
+                a: "We will make every effort to include your home in our flight plan. However, factors like weather, FAA restrictions, or accessibility may occasionally prevent a flyover."
+              }
+            ].map((item, index) => (
+              <AccordionItem key={index} value={`item-${index}`} className="border border-white/10 bg-card px-4 rounded-lg">
+                <AccordionTrigger className="hover:text-primary text-left font-medium">{item.q}</AccordionTrigger>
+                <AccordionContent className="text-muted-foreground">
+                  {item.a}
+                </AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
+        </div>
+      </section>
+
+      {/* --- Trust Strip --- */}
+      <section className="py-8 bg-secondary border-t border-white/5">
+        <div className="container flex flex-wrap justify-center gap-8 md:gap-16 text-muted-foreground text-sm font-medium uppercase tracking-wider">
+          <div className="flex items-center gap-2">
+            <ShieldCheck className="w-5 h-5 text-primary" />
+            Licensed & Insured
+          </div>
+          <div className="flex items-center gap-2">
+            <FileText className="w-5 h-5 text-primary" />
+            CCC-1334600
+          </div>
+          <div className="flex items-center gap-2">
+            <MapPin className="w-5 h-5 text-primary" />
+            Serving Central Florida
+          </div>
+        </div>
+      </section>
+
+      {/* --- Footer --- */}
+      <footer className="bg-black py-12 border-t border-white/10">
+        <div className="container">
+          <div className="grid md:grid-cols-4 gap-8 mb-12">
+            <div className="col-span-1 md:col-span-2">
+              <div className="flex items-center gap-2 mb-4">
+                <div className="w-8 h-8 rounded-full border border-primary/50 overflow-hidden">
+                   <img src="/images/logo.jpg" alt="Logo" className="w-full h-full object-cover" />
+                </div>
+                <span className="font-heading font-bold text-lg text-white">NextDoor Exterior Solutions</span>
+              </div>
+              <p className="text-muted-foreground text-sm max-w-xs">
+                Providing professional storm documentation and roofing services to Florida homeowners using advanced technology.
+              </p>
+            </div>
+            
+            <div>
+              <h4 className="font-heading font-bold text-white mb-4">Contact</h4>
+              <ul className="space-y-2 text-sm text-muted-foreground">
+                <li>Nextdoorextroofing.com</li>
+                <li>info@nextdoorextroofing.com</li>
+              </ul>
+            </div>
+            
+            <div>
+              <h4 className="font-heading font-bold text-white mb-4">Legal</h4>
+              <ul className="space-y-2 text-sm text-muted-foreground">
+                <li>Privacy Policy</li>
+                <li>Terms of Service</li>
+              </ul>
+            </div>
+          </div>
+          
+          <Separator className="bg-white/10 mb-8" />
+          
+          <div className="text-xs text-muted-foreground space-y-4">
+            <div className="flex items-start gap-2 p-4 bg-secondary/20 rounded-lg border border-white/5">
+              <AlertTriangle className="w-4 h-4 text-yellow-500 shrink-0 mt-0.5" />
+              <p>
+                <strong>Compliance Disclaimer:</strong> Storm documentation services are provided by Next Door Exterior Solutions, a licensed Florida roofing contractor. All observations are visual and based on publicly available NOAA data. This report is for informational and maintenance purposes only and does not constitute insurance advice, a coverage determination, or public adjusting services.
+              </p>
+            </div>
+            
+            <div className="text-center pt-4">
+              &copy; {new Date().getFullYear()} Next Door Exterior Solutions. All Rights Reserved.
+            </div>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
