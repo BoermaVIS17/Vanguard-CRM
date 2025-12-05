@@ -172,3 +172,7 @@
 - [x] Replace Admin role with Field Crew role (limited to viewing scope of work and uploading photos)
 - [x] Fix portal status field to only update when Enter is pressed
 - [x] Add customer messages display in Notes/Messages section of job detail
+
+## Job Detail Enhancements
+- [x] Add Team Lead assignment section (Owners can also be team leads)
+- [x] Make job details section editable (status, deal type, priority, scheduled date, etc.)

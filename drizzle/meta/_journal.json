@@ -71,6 +71,13 @@
       "when": 1764974026100,
       "tag": "0009_typical_lilandra",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "5",
+      "when": 1764974524060,
+      "tag": "0010_smart_chamber",
+      "breakpoints": true
     }
   ]
 }

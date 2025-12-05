@@ -59,6 +59,7 @@ export const reportRequests = mysqlTable("report_requests", {
   
   // CRM fields
   assignedTo: int("assignedTo"), // FK to users.id (sales rep)
+  teamLeadId: int("teamLeadId"), // FK to users.id (team lead or owner overseeing this job)
   salesRepCode: varchar("salesRepCode", { length: 50 }), // Attribution from promo code
   leadSource: varchar("leadSource", { length: 100 }).default("website"), // website, referral, door_hanger, etc.
   

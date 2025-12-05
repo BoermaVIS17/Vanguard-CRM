@@ -490,6 +490,7 @@ export const appRouter = router({
         dealType: z.enum(["insurance", "cash", "financed"]).optional(),
         priority: z.string().optional(),
         assignedTo: z.number().optional(),
+        teamLeadId: z.number().nullable().optional(),
         internalNotes: z.string().optional(),
         scheduledDate: z.string().optional(),
         customerStatusMessage: z.string().optional(),
@@ -550,6 +551,10 @@ export const appRouter = router({
         if (input.assignedTo !== undefined && input.assignedTo !== currentLead.assignedTo) {
           updateData.assignedTo = input.assignedTo;
           await logEditHistory(db, input.id, user!.id, "assignedTo", String(currentLead.assignedTo || ""), String(input.assignedTo), "assign", ctx);
+        }
+        if (input.teamLeadId !== undefined && input.teamLeadId !== currentLead.teamLeadId) {
+          updateData.teamLeadId = input.teamLeadId;
+          await logEditHistory(db, input.id, user!.id, "teamLeadId", String(currentLead.teamLeadId || ""), String(input.teamLeadId || ""), "assign", ctx);
         }
         if (input.internalNotes !== undefined && input.internalNotes !== currentLead.internalNotes) {
           updateData.internalNotes = input.internalNotes;
@@ -905,7 +910,7 @@ export const appRouter = router({
         };
       }),
 
-    // Get team leads for assignment dropdown
+    // Get team leads for assignment dropdown (includes owners)
     getTeamLeads: protectedProcedure.query(async () => {
       const db = await getDb();
       if (!db) throw new Error("Database not available");
@@ -914,9 +919,10 @@ export const appRouter = router({
         id: users.id,
         name: users.name,
         email: users.email,
+        role: users.role,
       })
       .from(users)
-      .where(eq(users.role, "team_lead"));
+      .where(or(eq(users.role, "team_lead"), eq(users.role, "owner")));
 
       return teamLeads;
     }),

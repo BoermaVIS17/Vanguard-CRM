@@ -215,6 +215,7 @@ export default function JobDetail() {
     { enabled: searchQuery.length > 2 }
   );
   const { data: team } = trpc.crm.getTeam.useQuery();
+  const { data: teamLeads } = trpc.crm.getTeamLeads.useQuery();
   const { data: editHistoryData } = trpc.crm.getEditHistory.useQuery(
     { jobId, limit: 100 },
     { enabled: jobId > 0 && permissions?.canViewEditHistory }
@@ -666,18 +667,44 @@ export default function JobDetail() {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
+                    {/* Status */}
                     <div>
-                      <p className="text-sm text-slate-400">Status</p>
-                      <p className="font-medium text-white">{statusConfig.label}</p>
+                      <p className="text-sm text-slate-400 mb-1">Status</p>
+                      {canEdit ? (
+                        <Select
+                          value={job.status}
+                          onValueChange={(value) => updateLead.mutate({ id: jobId, status: value as any })}
+                        >
+                          <SelectTrigger className="bg-slate-700 border-slate-600 text-white h-8">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent className="bg-slate-700 border-slate-600">
+                            <SelectItem value="lead" className="text-white hover:bg-slate-600">Lead</SelectItem>
+                            <SelectItem value="appointment_set" className="text-white hover:bg-slate-600">Appointment Set</SelectItem>
+                            <SelectItem value="prospect" className="text-white hover:bg-slate-600">Prospect</SelectItem>
+                            <SelectItem value="approved" className="text-white hover:bg-slate-600">Approved</SelectItem>
+                            <SelectItem value="project_scheduled" className="text-white hover:bg-slate-600">Project Scheduled</SelectItem>
+                            <SelectItem value="completed" className="text-white hover:bg-slate-600">Completed</SelectItem>
+                            <SelectItem value="invoiced" className="text-white hover:bg-slate-600">Invoiced</SelectItem>
+                            <SelectItem value="lien_legal" className="text-white hover:bg-slate-600">Lien Legal</SelectItem>
+                            <SelectItem value="closed_deal" className="text-white hover:bg-slate-600">Closed Deal</SelectItem>
+                            <SelectItem value="closed_lost" className="text-white hover:bg-slate-600">Closed Lost</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      ) : (
+                        <p className="font-medium text-white">{statusConfig.label}</p>
+                      )}
                     </div>
+
+                    {/* Priority */}
                     <div>
-                      <p className="text-sm text-slate-400">Priority</p>
+                      <p className="text-sm text-slate-400 mb-1">Priority</p>
                       {canEdit ? (
                         <Select
                           value={job.priority}
                           onValueChange={(value) => updateLead.mutate({ id: jobId, priority: value })}
                         >
-                          <SelectTrigger className="bg-slate-700 border-slate-600 text-white h-8 mt-1">
+                          <SelectTrigger className="bg-slate-700 border-slate-600 text-white h-8">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent className="bg-slate-700 border-slate-600">
@@ -691,35 +718,81 @@ export default function JobDetail() {
                         <p className="font-medium text-white capitalize">{job.priority}</p>
                       )}
                     </div>
+
+                    {/* Deal Type */}
+                    <div>
+                      <p className="text-sm text-slate-400 mb-1">Deal Type</p>
+                      {canEdit ? (
+                        <Select
+                          value={job.dealType || "not_set"}
+                          onValueChange={(value) => updateLead.mutate({ id: jobId, dealType: value === "not_set" ? undefined : value as any })}
+                        >
+                          <SelectTrigger className="bg-slate-700 border-slate-600 text-white h-8">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent className="bg-slate-700 border-slate-600">
+                            <SelectItem value="not_set" className="text-white hover:bg-slate-600">Not Set</SelectItem>
+                            <SelectItem value="insurance" className="text-white hover:bg-slate-600">Insurance</SelectItem>
+                            <SelectItem value="cash" className="text-white hover:bg-slate-600">Cash</SelectItem>
+                            <SelectItem value="financed" className="text-white hover:bg-slate-600">Financed</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      ) : (
+                        <p className="font-medium text-white capitalize">{job.dealType || "Not Set"}</p>
+                      )}
+                    </div>
+
+                    {/* Scheduled Date */}
+                    <div>
+                      <p className="text-sm text-slate-400 mb-1">Scheduled Date</p>
+                      {canEdit ? (
+                        <Input
+                          type="datetime-local"
+                          value={job.scheduledDate ? new Date(job.scheduledDate).toISOString().slice(0, 16) : ""}
+                          onChange={(e) => {
+                            if (e.target.value) {
+                              updateLead.mutate({ id: jobId, scheduledDate: new Date(e.target.value).toISOString() });
+                            }
+                          }}
+                          className="bg-slate-700 border-slate-600 text-white h-8"
+                        />
+                      ) : (
+                        <p className="font-medium text-white">
+                          {job.scheduledDate ? new Date(job.scheduledDate).toLocaleString() : "Not scheduled"}
+                        </p>
+                      )}
+                    </div>
+
+                    {/* Roof Age */}
                     <div>
                       <p className="text-sm text-slate-400">Roof Age</p>
                       <p className="font-medium text-white">{job.roofAge || "Not specified"}</p>
                     </div>
+
+                    {/* Hands-On Inspection */}
                     <div>
                       <p className="text-sm text-slate-400">Hands-On Inspection</p>
                       <p className="font-medium text-white">{job.handsOnInspection ? "Yes" : "No"}</p>
                     </div>
+
+                    {/* Lead Source */}
                     <div>
                       <p className="text-sm text-slate-400">Lead Source</p>
                       <p className="font-medium text-white capitalize">{job.leadSource || "Website"}</p>
                     </div>
+
+                    {/* Amount Paid */}
                     <div>
                       <p className="text-sm text-slate-400">Amount Paid</p>
                       <p className="font-medium text-white">${((job.amountPaid || 0) / 100).toFixed(2)}</p>
                     </div>
                   </div>
+
+                  {/* Roof Concerns */}
                   {job.roofConcerns && (
                     <div className="pt-4 border-t border-slate-700">
                       <p className="text-sm text-slate-400 mb-2">Roof Concerns</p>
                       <p className="text-slate-300">{job.roofConcerns}</p>
-                    </div>
-                  )}
-                  {job.scheduledDate && (
-                    <div className="pt-4 border-t border-slate-700">
-                      <p className="text-sm text-slate-400 mb-2">Scheduled Date</p>
-                      <p className="text-white font-medium">
-                        {new Date(job.scheduledDate).toLocaleString()}
-                      </p>
                     </div>
                   )}
                 </CardContent>
@@ -742,6 +815,49 @@ export default function JobDetail() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
+                  {/* Team Lead Assignment */}
+                  <div>
+                    <p className="text-sm text-slate-400 mb-2">Team Lead / Overseer</p>
+                    {canEdit ? (
+                      <Select
+                        value={job.teamLeadId?.toString() || "none"}
+                        onValueChange={(value) => updateLead.mutate({ 
+                          id: jobId, 
+                          teamLeadId: value === "none" ? null : parseInt(value) 
+                        })}
+                      >
+                        <SelectTrigger className="bg-slate-700 border-slate-600 text-white">
+                          <SelectValue placeholder="Select team lead" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-slate-700 border-slate-600">
+                          <SelectItem value="none" className="text-white hover:bg-slate-600">
+                            No Team Lead
+                          </SelectItem>
+                          {teamLeads?.map((lead) => (
+                            <SelectItem key={lead.id} value={lead.id.toString()} className="text-white hover:bg-slate-600">
+                              <span className="flex items-center gap-2">
+                                {lead.name || lead.email}
+                                {lead.role === "owner" && (
+                                  <span className="text-xs bg-purple-500/20 text-purple-400 px-1.5 py-0.5 rounded">Owner</span>
+                                )}
+                                {lead.role === "team_lead" && (
+                                  <span className="text-xs bg-green-500/20 text-green-400 px-1.5 py-0.5 rounded">Team Lead</span>
+                                )}
+                              </span>
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    ) : (
+                      <p className="text-white">
+                        {teamLeads?.find(l => l.id === job.teamLeadId)?.name || 
+                         teamLeads?.find(l => l.id === job.teamLeadId)?.email || 
+                         "No Team Lead"}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Assigned To */}
                   <div>
                     <p className="text-sm text-slate-400 mb-2">Assigned To</p>
                     {canEdit ? (
