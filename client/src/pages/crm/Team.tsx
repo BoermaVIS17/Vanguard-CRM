@@ -10,11 +10,11 @@ import CRMLayout from "@/components/crm/CRMLayout";
 
 const ROLE_OPTIONS = [
   { value: "owner", label: "Owner", description: "Full access to all features", color: "bg-[#00d4aa]/20 text-[#00d4aa]" },
-  { value: "admin", label: "Admin", description: "Full access except billing", color: "bg-purple-100 text-purple-700" },
-  { value: "office", label: "Office Staff", description: "Lead management & reports", color: "bg-blue-100 text-blue-700" },
-  { value: "sales_rep", label: "Sales Rep", description: "View & update assigned leads", color: "bg-green-100 text-green-700" },
-  { value: "project_manager", label: "Project Manager", description: "Production & scheduling", color: "bg-orange-100 text-orange-700" },
-  { value: "user", label: "User", description: "Basic access", color: "bg-gray-100 text-gray-700" },
+  { value: "admin", label: "Admin", description: "Full access except billing", color: "bg-purple-500/20 text-purple-400" },
+  { value: "office", label: "Office Staff", description: "Lead management & reports", color: "bg-blue-500/20 text-blue-400" },
+  { value: "sales_rep", label: "Sales Rep", description: "View & update assigned leads", color: "bg-green-500/20 text-green-400" },
+  { value: "project_manager", label: "Project Manager", description: "Production & scheduling", color: "bg-orange-500/20 text-orange-400" },
+  { value: "user", label: "User", description: "Basic access", color: "bg-slate-600/50 text-slate-300" },
 ];
 
 export default function CRMTeam() {
@@ -33,7 +33,7 @@ export default function CRMTeam() {
   const [editingMember, setEditingMember] = useState<any>(null);
 
   const getRoleColor = (role: string) => {
-    return ROLE_OPTIONS.find(r => r.value === role)?.color || "bg-gray-100 text-gray-700";
+    return ROLE_OPTIONS.find(r => r.value === role)?.color || "bg-slate-600/50 text-slate-300";
   };
 
   const canEditRoles = currentUser?.role === "owner" || currentUser?.role === "admin";
@@ -41,7 +41,7 @@ export default function CRMTeam() {
   if (isLoading) {
     return (
       <CRMLayout>
-        <div className="flex items-center justify-center h-96">
+        <div className="flex items-center justify-center h-96 bg-slate-900">
           <div className="animate-spin w-8 h-8 border-2 border-[#00d4aa] border-t-transparent rounded-full" />
         </div>
       </CRMLayout>
@@ -50,19 +50,19 @@ export default function CRMTeam() {
 
   return (
     <CRMLayout>
-      <div className="p-6">
+      <div className="p-6 bg-slate-900 min-h-screen">
         {/* Page Header */}
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Team Management</h1>
-            <p className="text-sm text-gray-500">Manage team members and their roles</p>
+            <h1 className="text-2xl font-bold text-white">Team Management</h1>
+            <p className="text-sm text-slate-400">Manage team members and their roles</p>
           </div>
           <div className="flex items-center gap-3">
-            <span className="text-sm text-gray-500 flex items-center gap-1">
+            <span className="text-sm text-slate-400 flex items-center gap-1">
               <Users className="w-4 h-4" />
               {team?.length || 0} team members
             </span>
-            <Button className="bg-[#00d4aa] hover:bg-[#00b894] text-black">
+            <Button className="bg-[#00d4aa] hover:bg-[#00b894] text-black font-semibold">
               <Plus className="w-4 h-4 mr-2" />
               Invite Member
             </Button>
@@ -70,9 +70,9 @@ export default function CRMTeam() {
         </div>
 
         {/* Role Legend */}
-        <Card className="mb-6 shadow-sm">
+        <Card className="mb-6 shadow-sm bg-slate-800 border-slate-700">
           <CardHeader>
-            <CardTitle className="text-sm text-gray-600">Role Permissions</CardTitle>
+            <CardTitle className="text-sm text-slate-400">Role Permissions</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
@@ -81,7 +81,7 @@ export default function CRMTeam() {
                   <span className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${role.color}`}>
                     {role.label}
                   </span>
-                  <p className="text-xs text-gray-500 mt-1">{role.description}</p>
+                  <p className="text-xs text-slate-400 mt-1">{role.description}</p>
                 </div>
               ))}
             </div>
@@ -91,7 +91,7 @@ export default function CRMTeam() {
         {/* Team Members Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {team?.map((member) => (
-            <Card key={member.id} className="shadow-sm hover:shadow-md transition-shadow">
+            <Card key={member.id} className="shadow-sm hover:shadow-md transition-shadow bg-slate-800 border-slate-700">
               <CardContent className="pt-6">
                 <div className="flex items-start gap-4">
                   <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#00d4aa] to-[#00b894] flex items-center justify-center flex-shrink-0">
@@ -101,7 +101,7 @@ export default function CRMTeam() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between">
-                      <h3 className="font-semibold text-gray-900 truncate">
+                      <h3 className="font-semibold text-white truncate">
                         {member.name || "Unnamed User"}
                       </h3>
                       {canEditRoles && member.id !== currentUser?.id && (
@@ -110,34 +110,35 @@ export default function CRMTeam() {
                             <Button 
                               variant="ghost" 
                               size="sm"
+                              className="text-slate-400 hover:text-white hover:bg-slate-700"
                               onClick={() => setEditingMember(member)}
                             >
                               <Edit2 className="w-4 h-4" />
                             </Button>
                           </DialogTrigger>
-                          <DialogContent className="bg-white">
+                          <DialogContent className="bg-slate-800 border-slate-700">
                             <DialogHeader>
-                              <DialogTitle className="text-gray-900">Edit Team Member</DialogTitle>
+                              <DialogTitle className="text-white">Edit Team Member</DialogTitle>
                             </DialogHeader>
                             <div className="space-y-4 pt-4">
                               <div>
-                                <p className="text-sm text-gray-500 mb-1">Name</p>
-                                <p className="font-medium text-gray-900">{member.name || member.email}</p>
+                                <p className="text-sm text-slate-400 mb-1">Name</p>
+                                <p className="font-medium text-white">{member.name || member.email}</p>
                               </div>
                               <div>
-                                <p className="text-sm text-gray-500 mb-2">Role</p>
+                                <p className="text-sm text-slate-400 mb-2">Role</p>
                                 <Select 
                                   defaultValue={member.role}
                                   onValueChange={(value) => {
                                     updateMember.mutate({ userId: member.id, role: value as "owner" | "admin" | "office" | "sales_rep" | "project_manager" | "user" });
                                   }}
                                 >
-                                  <SelectTrigger className="bg-white border-gray-200">
+                                  <SelectTrigger className="bg-slate-700 border-slate-600 text-white">
                                     <SelectValue />
                                   </SelectTrigger>
-                                  <SelectContent>
+                                  <SelectContent className="bg-slate-700 border-slate-600">
                                     {ROLE_OPTIONS.map((role) => (
-                                      <SelectItem key={role.value} value={role.value}>
+                                      <SelectItem key={role.value} value={role.value} className="text-white hover:bg-slate-600">
                                         {role.label}
                                       </SelectItem>
                                     ))}
@@ -149,7 +150,7 @@ export default function CRMTeam() {
                         </Dialog>
                       )}
                     </div>
-                    <p className="text-sm text-gray-500 flex items-center gap-1 mt-1">
+                    <p className="text-sm text-slate-400 flex items-center gap-1 mt-1">
                       <Mail className="w-3 h-3" />
                       {member.email}
                     </p>
@@ -158,7 +159,7 @@ export default function CRMTeam() {
                         {ROLE_OPTIONS.find(r => r.value === member.role)?.label || member.role}
                       </span>
                       {member.id === currentUser?.id && (
-                        <span className="px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600">
+                        <span className="px-2 py-1 rounded-full text-xs font-medium bg-slate-600/50 text-slate-300">
                           You
                         </span>
                       )}
@@ -170,8 +171,8 @@ export default function CRMTeam() {
           ))}
 
           {(!team || team.length === 0) && (
-            <Card className="col-span-full shadow-sm">
-              <CardContent className="py-12 text-center text-gray-500">
+            <Card className="col-span-full shadow-sm bg-slate-800 border-slate-700">
+              <CardContent className="py-12 text-center text-slate-400">
                 <Users className="w-12 h-12 mx-auto mb-3 opacity-50" />
                 <p>No team members yet</p>
                 <p className="text-sm mt-1">Team members will appear here after they log in</p>
@@ -181,26 +182,26 @@ export default function CRMTeam() {
         </div>
 
         {/* Access Info */}
-        <Card className="mt-6 shadow-sm">
+        <Card className="mt-6 shadow-sm bg-slate-800 border-slate-700">
           <CardHeader>
-            <CardTitle className="text-lg text-gray-900 flex items-center gap-2">
+            <CardTitle className="text-lg text-white flex items-center gap-2">
               <Shield className="w-5 h-5 text-[#00d4aa]" />
               CRM Access Information
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4 text-sm text-gray-600">
+            <div className="space-y-4 text-sm text-slate-300">
               <p>
-                <strong>How to add team members:</strong> Share the CRM login link with your team. 
+                <strong className="text-white">How to add team members:</strong> Share the CRM login link with your team. 
                 Once they log in with their Manus account, they'll appear here and you can assign their role.
               </p>
               <p>
-                <strong>Role assignment:</strong> Only Owners and Admins can change team member roles. 
+                <strong className="text-white">Role assignment:</strong> Only Owners and Admins can change team member roles. 
                 New users start with "User" role by default.
               </p>
               <div className="bg-[#00d4aa]/10 p-4 rounded-lg border border-[#00d4aa]/20">
                 <p className="font-medium text-[#00d4aa]">CRM Access URL:</p>
-                <code className="text-gray-700">{window.location.origin}/crm</code>
+                <code className="text-white">{window.location.origin}/crm</code>
               </div>
             </div>
           </CardContent>

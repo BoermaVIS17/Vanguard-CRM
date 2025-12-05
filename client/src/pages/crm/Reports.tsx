@@ -167,19 +167,19 @@ export default function Reports() {
 
   return (
     <CRMLayout>
-      <div className="p-6">
+      <div className="p-6 bg-slate-900 min-h-screen">
         {/* Page Header */}
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Reports & Analytics</h1>
-            <p className="text-sm text-gray-500">Export data and view performance metrics</p>
+            <h1 className="text-2xl font-bold text-white">Reports & Analytics</h1>
+            <p className="text-sm text-slate-400">Export data and view performance metrics</p>
           </div>
           <div className="flex items-center gap-3">
-            <Button onClick={exportToCSV} variant="outline" className="border-[#00d4aa] text-[#00d4aa]">
+            <Button onClick={exportToCSV} variant="outline" className="border-[#00d4aa] text-[#00d4aa] hover:bg-[#00d4aa]/10 bg-transparent">
               <FileSpreadsheet className="w-4 h-4 mr-2" />
               Export CSV
             </Button>
-            <Button onClick={exportToPDF} className="bg-[#00d4aa] hover:bg-[#00b894] text-black">
+            <Button onClick={exportToPDF} className="bg-[#00d4aa] hover:bg-[#00b894] text-black font-semibold">
               <FileText className="w-4 h-4 mr-2" />
               Export PDF
             </Button>
@@ -188,59 +188,59 @@ export default function Reports() {
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          <Card className="shadow-sm">
+          <Card className="shadow-sm bg-slate-800 border-slate-700">
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-500">Total Leads</p>
-                  <p className="text-3xl font-bold text-gray-900">{stats?.totalLeads || 0}</p>
+                  <p className="text-sm text-slate-400">Total Leads</p>
+                  <p className="text-3xl font-bold text-white">{stats?.totalLeads || 0}</p>
                 </div>
-                <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
-                  <Users className="w-6 h-6 text-blue-600" />
+                <div className="w-12 h-12 rounded-full bg-blue-500/20 flex items-center justify-center">
+                  <Users className="w-6 h-6 text-blue-400" />
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="shadow-sm">
+          <Card className="shadow-sm bg-slate-800 border-slate-700">
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-500">Revenue</p>
-                  <p className="text-3xl font-bold text-gray-900">${stats?.totalRevenue?.toFixed(2) || "0.00"}</p>
+                  <p className="text-sm text-slate-400">Revenue</p>
+                  <p className="text-3xl font-bold text-white">${stats?.totalRevenue?.toFixed(2) || "0.00"}</p>
                 </div>
-                <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center">
-                  <DollarSign className="w-6 h-6 text-green-600" />
+                <div className="w-12 h-12 rounded-full bg-green-500/20 flex items-center justify-center">
+                  <DollarSign className="w-6 h-6 text-green-400" />
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="shadow-sm">
+          <Card className="shadow-sm bg-slate-800 border-slate-700">
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-500">Conversion Rate</p>
-                  <p className="text-3xl font-bold text-gray-900">{Number(stats?.conversionRate || 0).toFixed(1)}%</p>
+                  <p className="text-sm text-slate-400">Conversion Rate</p>
+                  <p className="text-3xl font-bold text-white">{Number(stats?.conversionRate || 0).toFixed(1)}%</p>
                 </div>
-                <div className="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center">
-                  <TrendingUp className="w-6 h-6 text-purple-600" />
+                <div className="w-12 h-12 rounded-full bg-purple-500/20 flex items-center justify-center">
+                  <TrendingUp className="w-6 h-6 text-purple-400" />
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="shadow-sm">
+          <Card className="shadow-sm bg-slate-800 border-slate-700">
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-500">Avg. Value</p>
-                  <p className="text-3xl font-bold text-gray-900">
+                  <p className="text-sm text-slate-400">Avg. Value</p>
+                  <p className="text-3xl font-bold text-white">
                     ${stats?.totalLeads ? (stats.totalRevenue / stats.totalLeads).toFixed(2) : "0.00"}
                   </p>
                 </div>
-                <div className="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center">
-                  <BarChart3 className="w-6 h-6 text-orange-600" />
+                <div className="w-12 h-12 rounded-full bg-orange-500/20 flex items-center justify-center">
+                  <BarChart3 className="w-6 h-6 text-orange-400" />
                 </div>
               </div>
             </CardContent>
@@ -248,53 +248,53 @@ export default function Reports() {
         </div>
 
         {/* Filters */}
-        <Card className="mb-6 shadow-sm">
+        <Card className="mb-6 shadow-sm bg-slate-800 border-slate-700">
           <CardHeader>
-            <CardTitle className="text-lg text-gray-900">Filter Data</CardTitle>
+            <CardTitle className="text-lg text-white">Filter Data</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div>
-                <Label className="text-gray-700">Start Date</Label>
+                <Label className="text-slate-300">Start Date</Label>
                 <Input 
                   type="date" 
                   value={startDate} 
                   onChange={(e) => setStartDate(e.target.value)}
-                  className="bg-white border-gray-200"
+                  className="bg-slate-700 border-slate-600 text-white"
                 />
               </div>
               <div>
-                <Label className="text-gray-700">End Date</Label>
+                <Label className="text-slate-300">End Date</Label>
                 <Input 
                   type="date" 
                   value={endDate} 
                   onChange={(e) => setEndDate(e.target.value)}
-                  className="bg-white border-gray-200"
+                  className="bg-slate-700 border-slate-600 text-white"
                 />
               </div>
               <div>
-                <Label className="text-gray-700">Status</Label>
+                <Label className="text-slate-300">Status</Label>
                 <Select value={statusFilter} onValueChange={setStatusFilter}>
-                  <SelectTrigger className="bg-white border-gray-200">
+                  <SelectTrigger className="bg-slate-700 border-slate-600 text-white">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="bg-slate-700 border-slate-600">
                     {STATUS_OPTIONS.map(opt => (
-                      <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+                      <SelectItem key={opt.value} value={opt.value} className="text-white hover:bg-slate-600">{opt.label}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </div>
               <div>
-                <Label className="text-gray-700">Sales Rep</Label>
+                <Label className="text-slate-300">Sales Rep</Label>
                 <Select value={repFilter} onValueChange={setRepFilter}>
-                  <SelectTrigger className="bg-white border-gray-200">
+                  <SelectTrigger className="bg-slate-700 border-slate-600 text-white">
                     <SelectValue placeholder="All Reps" />
                   </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Reps</SelectItem>
+                  <SelectContent className="bg-slate-700 border-slate-600">
+                    <SelectItem value="all" className="text-white hover:bg-slate-600">All Reps</SelectItem>
                     {team?.filter(m => m.role === "sales_rep").map(rep => (
-                      <SelectItem key={rep.id} value={rep.name || rep.email || ''}>
+                      <SelectItem key={rep.id} value={rep.name || rep.email || 'unknown'} className="text-white hover:bg-slate-600">
                         {rep.name || rep.email}
                       </SelectItem>
                     ))}
@@ -306,9 +306,9 @@ export default function Reports() {
         </Card>
 
         {/* Data Table */}
-        <Card className="shadow-sm">
+        <Card className="shadow-sm bg-slate-800 border-slate-700">
           <CardHeader>
-            <CardTitle className="text-lg text-gray-900">
+            <CardTitle className="text-lg text-white">
               Lead Data ({leads?.length || 0} records)
             </CardTitle>
           </CardHeader>
@@ -316,35 +316,35 @@ export default function Reports() {
             <div className="overflow-x-auto">
               <Table>
                 <TableHeader>
-                  <TableRow className="bg-gray-50">
-                    <TableHead className="font-semibold">Name</TableHead>
-                    <TableHead className="font-semibold">Email</TableHead>
-                    <TableHead className="font-semibold">Phone</TableHead>
-                    <TableHead className="font-semibold">Status</TableHead>
-                    <TableHead className="font-semibold">Sales Rep</TableHead>
-                    <TableHead className="font-semibold">Amount</TableHead>
-                    <TableHead className="font-semibold">Date</TableHead>
+                  <TableRow className="bg-slate-700/50 border-slate-600">
+                    <TableHead className="font-semibold text-slate-300">Name</TableHead>
+                    <TableHead className="font-semibold text-slate-300">Email</TableHead>
+                    <TableHead className="font-semibold text-slate-300">Phone</TableHead>
+                    <TableHead className="font-semibold text-slate-300">Status</TableHead>
+                    <TableHead className="font-semibold text-slate-300">Sales Rep</TableHead>
+                    <TableHead className="font-semibold text-slate-300">Amount</TableHead>
+                    <TableHead className="font-semibold text-slate-300">Date</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {leads?.map(lead => (
-                    <TableRow key={lead.id} className="hover:bg-gray-50">
-                      <TableCell className="font-medium">{lead.fullName}</TableCell>
-                      <TableCell>{lead.email}</TableCell>
-                      <TableCell>{lead.phone}</TableCell>
+                    <TableRow key={lead.id} className="hover:bg-slate-700/50 border-slate-700">
+                      <TableCell className="font-medium text-white">{lead.fullName}</TableCell>
+                      <TableCell className="text-slate-300">{lead.email}</TableCell>
+                      <TableCell className="text-slate-300">{lead.phone}</TableCell>
                       <TableCell>
-                        <span className="px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700">
+                        <span className="px-2 py-1 rounded-full text-xs font-medium bg-slate-600/50 text-slate-300">
                           {lead.status}
                         </span>
                       </TableCell>
-                      <TableCell>{lead.salesRepCode || "Direct"}</TableCell>
-                      <TableCell>${(lead.amountPaid / 100).toFixed(2)}</TableCell>
-                      <TableCell>{new Date(lead.createdAt).toLocaleDateString()}</TableCell>
+                      <TableCell className="text-slate-300">{lead.salesRepCode || "Direct"}</TableCell>
+                      <TableCell className="text-white">${(lead.amountPaid / 100).toFixed(2)}</TableCell>
+                      <TableCell className="text-slate-300">{new Date(lead.createdAt).toLocaleDateString()}</TableCell>
                     </TableRow>
                   ))}
                   {(!leads || leads.length === 0) && (
                     <TableRow>
-                      <TableCell colSpan={7} className="text-center py-8 text-gray-500">
+                      <TableCell colSpan={7} className="text-center py-8 text-slate-400">
                         No data found for the selected filters
                       </TableCell>
                     </TableRow>

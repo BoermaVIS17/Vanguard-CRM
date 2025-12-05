@@ -5,12 +5,12 @@ import CRMLayout from "@/components/crm/CRMLayout";
 import { Card } from "@/components/ui/card";
 
 const PIPELINE_STAGES = [
-  { key: "new_lead", label: "New Leads", color: "bg-orange-500", lightBg: "bg-orange-50" },
-  { key: "contacted", label: "Contacted", color: "bg-yellow-500", lightBg: "bg-yellow-50" },
-  { key: "appointment_set", label: "Scheduled", color: "bg-blue-500", lightBg: "bg-blue-50" },
-  { key: "inspection_complete", label: "Inspected", color: "bg-purple-500", lightBg: "bg-purple-50" },
-  { key: "report_sent", label: "Report Sent", color: "bg-teal-500", lightBg: "bg-teal-50" },
-  { key: "closed_won", label: "Closed Won", color: "bg-green-500", lightBg: "bg-green-50" },
+  { key: "new_lead", label: "New Leads", color: "bg-orange-500", borderColor: "border-orange-500" },
+  { key: "contacted", label: "Contacted", color: "bg-yellow-500", borderColor: "border-yellow-500" },
+  { key: "appointment_set", label: "Scheduled", color: "bg-blue-500", borderColor: "border-blue-500" },
+  { key: "inspection_complete", label: "Inspected", color: "bg-purple-500", borderColor: "border-purple-500" },
+  { key: "report_sent", label: "Report Sent", color: "bg-teal-500", borderColor: "border-teal-500" },
+  { key: "closed_won", label: "Closed Won", color: "bg-green-500", borderColor: "border-green-500" },
 ];
 
 export default function CRMPipeline() {
@@ -43,7 +43,7 @@ export default function CRMPipeline() {
   if (isLoading) {
     return (
       <CRMLayout>
-        <div className="flex items-center justify-center h-96">
+        <div className="flex items-center justify-center h-96 bg-slate-900">
           <div className="animate-spin w-8 h-8 border-2 border-[#00d4aa] border-t-transparent rounded-full" />
         </div>
       </CRMLayout>
@@ -57,11 +57,11 @@ export default function CRMPipeline() {
 
   return (
     <CRMLayout>
-      <div className="p-6">
+      <div className="p-6 bg-slate-900 min-h-screen">
         {/* Page Header */}
         <div className="mb-6">
-          <h1 className="text-2xl font-bold text-gray-900">Sales Pipeline</h1>
-          <p className="text-sm text-gray-500">Drag and drop jobs between stages to update their status</p>
+          <h1 className="text-2xl font-bold text-white">Sales Pipeline</h1>
+          <p className="text-sm text-slate-400">Drag and drop jobs between stages to update their status</p>
         </div>
 
         {/* Kanban Board */}
@@ -78,15 +78,15 @@ export default function CRMPipeline() {
                 onDrop={(e) => handleDrop(e, stage.key)}
               >
                 {/* Column Header */}
-                <div className={`${stage.lightBg} rounded-t-lg p-3 border-t-4 ${stage.color.replace('bg-', 'border-')}`}>
+                <div className={`bg-slate-800 rounded-t-lg p-3 border-t-4 ${stage.borderColor}`}>
                   <div className="flex items-center justify-between">
-                    <h3 className="font-semibold text-gray-900">{stage.label}</h3>
+                    <h3 className="font-semibold text-white">{stage.label}</h3>
                     <span className={`${stage.color} text-white text-xs font-bold px-2 py-1 rounded-full`}>
                       {(leads as any[]).length}
                     </span>
                   </div>
                   {totalValue > 0 && (
-                    <div className="flex items-center gap-1 mt-1 text-sm text-gray-600">
+                    <div className="flex items-center gap-1 mt-1 text-sm text-slate-400">
                       <DollarSign className="w-3 h-3" />
                       {totalValue.toFixed(2)}
                     </div>
@@ -94,16 +94,16 @@ export default function CRMPipeline() {
                 </div>
 
                 {/* Cards Container */}
-                <div className="bg-gray-100 rounded-b-lg p-2 min-h-[500px] space-y-2">
+                <div className="bg-slate-800/50 rounded-b-lg p-2 min-h-[500px] space-y-2 border border-t-0 border-slate-700">
                   {(leads as any[]).map((lead: any) => (
                     <Card
                       key={lead.id}
                       draggable
                       onDragStart={(e) => handleDragStart(e, lead.id)}
-                      className="p-3 bg-white cursor-grab active:cursor-grabbing hover:shadow-md transition-shadow border border-gray-200"
+                      className="p-3 bg-slate-700 cursor-grab active:cursor-grabbing hover:bg-slate-600 transition-colors border border-slate-600"
                     >
                       <div className="flex items-start gap-2">
-                        <GripVertical className="w-4 h-4 text-gray-300 mt-1 flex-shrink-0" />
+                        <GripVertical className="w-4 h-4 text-slate-500 mt-1 flex-shrink-0" />
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 mb-1">
                             <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#00d4aa] to-[#00b894] flex items-center justify-center flex-shrink-0">
@@ -111,10 +111,10 @@ export default function CRMPipeline() {
                                 {lead.fullName?.charAt(0) || "?"}
                               </span>
                             </div>
-                            <p className="font-medium text-gray-900 truncate">{lead.fullName}</p>
+                            <p className="font-medium text-white truncate">{lead.fullName}</p>
                           </div>
                           
-                          <div className="space-y-1 text-xs text-gray-500">
+                          <div className="space-y-1 text-xs text-slate-400">
                             <div className="flex items-center gap-1">
                               <MapPin className="w-3 h-3" />
                               <span className="truncate">{lead.address}</span>
@@ -127,14 +127,14 @@ export default function CRMPipeline() {
 
                           {lead.salesRepCode && (
                             <div className="mt-2">
-                              <span className="inline-block px-2 py-0.5 bg-[#00d4aa]/10 text-[#00d4aa] text-xs rounded font-medium">
+                              <span className="inline-block px-2 py-0.5 bg-[#00d4aa]/20 text-[#00d4aa] text-xs rounded font-medium">
                                 Rep: {lead.salesRepCode}
                               </span>
                             </div>
                           )}
 
                           {lead.amountPaid > 0 && (
-                            <div className="mt-2 text-xs font-medium text-green-600">
+                            <div className="mt-2 text-xs font-medium text-green-400">
                               ${(lead.amountPaid / 100).toFixed(2)} paid
                             </div>
                           )}
@@ -144,7 +144,7 @@ export default function CRMPipeline() {
                   ))}
 
                   {(leads as any[]).length === 0 && (
-                    <div className="text-center py-8 text-gray-400 text-sm">
+                    <div className="text-center py-8 text-slate-500 text-sm">
                       Drop jobs here
                     </div>
                   )}

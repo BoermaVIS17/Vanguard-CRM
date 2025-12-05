@@ -64,3 +64,10 @@
 - [x] Update Reports page with export functionality
 - [x] Update Team page with member management
 - [x] Add status badges and color coding
+
+## CRM Color Scheme Update
+- [x] Replace black backgrounds (#0a0a0a, #111, black) with dark blue (slate-800/slate-900)
+- [x] Change gray text to white for better readability
+- [x] Update CRMLayout component colors
+- [x] Update Dashboard page colors
+- [x] Update Leads, Pipeline, Calendar, Reports, Team page colors

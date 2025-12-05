@@ -27,12 +27,12 @@ const pipelineStages = [
 
 // Action items configuration
 const actionItems = [
-  { key: "unassigned", label: "Unassigned Leads", icon: Users, color: "text-orange-500" },
-  { key: "follow_up", label: "Needs Follow-up", icon: Phone, color: "text-yellow-500" },
-  { key: "pending_inspection", label: "Pending Inspection", icon: Calendar, color: "text-blue-500" },
-  { key: "report_pending", label: "Reports Pending", icon: FileText, color: "text-purple-500" },
-  { key: "watch_list", label: "Watch List", icon: Eye, color: "text-red-500" },
-  { key: "overdue", label: "Overdue Tasks", icon: AlertCircle, color: "text-red-600" },
+  { key: "unassigned", label: "Unassigned Leads", icon: Users, color: "text-orange-400" },
+  { key: "follow_up", label: "Needs Follow-up", icon: Phone, color: "text-yellow-400" },
+  { key: "pending_inspection", label: "Pending Inspection", icon: Calendar, color: "text-blue-400" },
+  { key: "report_pending", label: "Reports Pending", icon: FileText, color: "text-purple-400" },
+  { key: "watch_list", label: "Watch List", icon: Eye, color: "text-red-400" },
+  { key: "overdue", label: "Overdue Tasks", icon: AlertCircle, color: "text-red-500" },
 ];
 
 export default function CRMDashboard() {
@@ -70,13 +70,13 @@ export default function CRMDashboard() {
 
   return (
     <CRMLayout>
-      <div className="p-6">
+      <div className="p-6 bg-slate-900 min-h-screen">
         {/* Page Header */}
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
+          <h1 className="text-2xl font-bold text-white">Dashboard</h1>
           <div className="flex items-center gap-3">
             <Link href="/crm/leads?new=true">
-              <Button className="bg-[#00d4aa] hover:bg-[#00b894] text-black">
+              <Button className="bg-[#00d4aa] hover:bg-[#00b894] text-black font-semibold">
                 <Plus className="w-4 h-4 mr-2" />
                 New Job
               </Button>
@@ -88,11 +88,11 @@ export default function CRMDashboard() {
           {/* Main Content - 3 columns */}
           <div className="lg:col-span-3 space-y-6">
             {/* Current Pipeline - AccuLynx Style */}
-            <Card>
+            <Card className="bg-slate-800 border-slate-700">
               <CardHeader className="pb-2">
                 <div className="flex items-center justify-between">
-                  <CardTitle className="text-lg font-semibold">Current Pipeline</CardTitle>
-                  <span className="text-sm text-muted-foreground">
+                  <CardTitle className="text-lg font-semibold text-white">Current Pipeline</CardTitle>
+                  <span className="text-sm text-slate-300">
                     {stats?.totalLeads || 0} Active Jobs
                   </span>
                 </div>
@@ -111,10 +111,10 @@ export default function CRMDashboard() {
                               {stage.short}
                             </span>
                           </div>
-                          <span className="mt-2 text-sm font-medium text-gray-600">
+                          <span className="mt-2 text-sm font-medium text-slate-300">
                             {stage.label}
                           </span>
-                          <span className="text-xl font-bold text-gray-900">{count}</span>
+                          <span className="text-xl font-bold text-white">{count}</span>
                         </div>
                       </Link>
                     );
@@ -122,13 +122,13 @@ export default function CRMDashboard() {
                 </div>
 
                 {/* Quick Action Buttons */}
-                <div className="flex flex-wrap justify-center gap-3 pt-4 border-t mt-4">
-                  <Button variant="outline" className="border-[#00d4aa] text-[#00d4aa] hover:bg-[#00d4aa]/10">
+                <div className="flex flex-wrap justify-center gap-3 pt-4 border-t border-slate-700 mt-4">
+                  <Button variant="outline" className="border-[#00d4aa] text-[#00d4aa] hover:bg-[#00d4aa]/10 bg-transparent">
                     <FileText className="w-4 h-4 mr-2" />
                     Generate Report
                   </Button>
                   <Link href="/crm/calendar">
-                    <Button variant="outline" className="border-blue-500 text-blue-500 hover:bg-blue-50">
+                    <Button variant="outline" className="border-blue-400 text-blue-400 hover:bg-blue-400/10 bg-transparent">
                       <Calendar className="w-4 h-4 mr-2" />
                       Schedule Inspection
                     </Button>
@@ -138,9 +138,9 @@ export default function CRMDashboard() {
             </Card>
 
             {/* Action Items Grid - AccuLynx Style */}
-            <Card>
+            <Card className="bg-slate-800 border-slate-700">
               <CardHeader className="pb-2">
-                <CardTitle className="text-lg font-semibold">
+                <CardTitle className="text-lg font-semibold text-white">
                   Action Items ({stats?.newLeads || 0})
                 </CardTitle>
               </CardHeader>
@@ -151,11 +151,11 @@ export default function CRMDashboard() {
                                   item.key === "pending_inspection" ? (stats?.scheduledLeads || 0) : 0;
                     return (
                       <Link key={item.key} href={`/crm/leads?filter=${item.key}`}>
-                        <div className="flex items-center gap-3 p-3 rounded-lg border hover:bg-gray-50 cursor-pointer transition-colors">
+                        <div className="flex items-center gap-3 p-3 rounded-lg border border-slate-600 hover:bg-slate-700 cursor-pointer transition-colors">
                           <item.icon className={`w-5 h-5 ${item.color}`} />
                           <div className="flex-1 min-w-0">
-                            <p className="text-sm text-gray-600 truncate">{item.label}</p>
-                            <p className="text-lg font-bold text-gray-900">{count}</p>
+                            <p className="text-sm text-slate-300 truncate">{item.label}</p>
+                            <p className="text-lg font-bold text-white">{count}</p>
                           </div>
                         </div>
                       </Link>
@@ -166,15 +166,15 @@ export default function CRMDashboard() {
             </Card>
 
             {/* Today's Schedule */}
-            <Card>
+            <Card className="bg-slate-800 border-slate-700">
               <CardHeader className="pb-2">
                 <div className="flex items-center justify-between">
-                  <CardTitle className="text-lg font-semibold flex items-center gap-2">
-                    <Calendar className="w-5 h-5" />
+                  <CardTitle className="text-lg font-semibold text-white flex items-center gap-2">
+                    <Calendar className="w-5 h-5 text-[#00d4aa]" />
                     Today
                   </CardTitle>
                   <Link href="/crm/calendar">
-                    <Button variant="ghost" size="sm">
+                    <Button variant="ghost" size="sm" className="text-slate-300 hover:text-white hover:bg-slate-700">
                       View Calendar
                       <ChevronRight className="w-4 h-4 ml-1" />
                     </Button>
@@ -187,26 +187,26 @@ export default function CRMDashboard() {
                     {appointments.slice(0, 5).map((apt: any) => (
                       <div
                         key={apt.id}
-                        className="flex items-center gap-3 p-3 rounded-lg border-l-4 border-l-[#00d4aa] bg-gray-50"
+                        className="flex items-center gap-3 p-3 rounded-lg border-l-4 border-l-[#00d4aa] bg-slate-700/50"
                       >
                         <div className="w-10 h-10 rounded-full bg-[#00d4aa]/20 flex items-center justify-center">
                           <Calendar className="w-5 h-5 text-[#00d4aa]" />
                         </div>
                         <div className="flex-1">
-                          <p className="font-medium text-gray-900">{apt.title}</p>
-                          <p className="text-sm text-gray-500">
+                          <p className="font-medium text-white">{apt.title}</p>
+                          <p className="text-sm text-slate-400">
                             {new Date(apt.scheduledDate).toLocaleTimeString([], {
                               hour: "2-digit",
                               minute: "2-digit",
                             })}
                           </p>
                         </div>
-                        <ChevronRight className="w-5 h-5 text-gray-400" />
+                        <ChevronRight className="w-5 h-5 text-slate-500" />
                       </div>
                     ))}
                   </div>
                 ) : (
-                  <div className="text-center py-8 text-gray-500">
+                  <div className="text-center py-8 text-slate-400">
                     <Calendar className="w-12 h-12 mx-auto mb-3 opacity-50" />
                     <p>No appointments scheduled for today</p>
                     <Link href="/crm/calendar">
@@ -222,9 +222,9 @@ export default function CRMDashboard() {
 
           {/* Activity Feed - Right Sidebar */}
           <div className="lg:col-span-1">
-            <Card className="sticky top-20">
+            <Card className="sticky top-20 bg-slate-800 border-slate-700">
               <CardHeader className="pb-2">
-                <CardTitle className="text-lg font-semibold">Activity Feed</CardTitle>
+                <CardTitle className="text-lg font-semibold text-white">Activity Feed</CardTitle>
               </CardHeader>
               <CardContent className="max-h-[600px] overflow-y-auto">
                 {recentLeads && recentLeads.length > 0 ? (
@@ -232,7 +232,7 @@ export default function CRMDashboard() {
                     {recentLeads.map((lead: any) => (
                       <div
                         key={lead.id}
-                        className="flex gap-3 pb-4 border-b last:border-0"
+                        className="flex gap-3 pb-4 border-b border-slate-700 last:border-0"
                       >
                         <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#00d4aa] to-[#00b894] flex items-center justify-center flex-shrink-0">
                           <span className="text-black font-semibold text-sm">
@@ -242,16 +242,16 @@ export default function CRMDashboard() {
                         <div className="flex-1 min-w-0">
                           <p className="text-sm">
                             <span className="font-medium text-[#00d4aa]">New Lead:</span>{" "}
-                            <span className="font-medium text-gray-900">{lead.name || lead.fullName}</span>
+                            <span className="font-medium text-white">{lead.name || lead.fullName}</span>
                           </p>
-                          <p className="text-xs text-gray-500 truncate">
+                          <p className="text-xs text-slate-400 truncate">
                             {lead.address}
                           </p>
-                          <p className="text-xs text-gray-400 mt-1">
+                          <p className="text-xs text-slate-500 mt-1">
                             {new Date(lead.createdAt).toLocaleDateString()}
                           </p>
                           {lead.promoCode && (
-                            <span className="inline-block mt-1 px-2 py-0.5 bg-green-100 text-green-700 text-xs rounded">
+                            <span className="inline-block mt-1 px-2 py-0.5 bg-green-900/50 text-green-400 text-xs rounded">
                               Via: {lead.salesRepCode || lead.promoCode}
                             </span>
                           )}
@@ -260,7 +260,7 @@ export default function CRMDashboard() {
                     ))}
                   </div>
                 ) : (
-                  <div className="text-center py-8 text-gray-500">
+                  <div className="text-center py-8 text-slate-400">
                     <Clock className="w-12 h-12 mx-auto mb-3 opacity-50" />
                     <p className="text-sm">No recent activity</p>
                   </div>
