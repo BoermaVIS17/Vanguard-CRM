@@ -191,6 +191,7 @@ export default function JobDetail() {
   const [newMessage, setNewMessage] = useState("");
   const [isUploading, setIsUploading] = useState(false);
   const [isEditingCustomer, setIsEditingCustomer] = useState(false);
+  const [previewDocument, setPreviewDocument] = useState<{ url: string; name: string; type: string } | null>(null);
   const [customerForm, setCustomerForm] = useState({
     fullName: "",
     email: "",
@@ -945,22 +946,37 @@ export default function JobDetail() {
               {filteredDocuments.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {filteredDocuments.map((doc) => (
-                    <Card key={doc.id} className="bg-slate-800 border-slate-700 hover:border-slate-600 transition-colors">
+                    <Card 
+                      key={doc.id} 
+                      className="bg-slate-800 border-slate-700 hover:border-[#00d4aa] transition-colors cursor-pointer group"
+                      onClick={() => setPreviewDocument({ url: doc.fileUrl, name: doc.fileName, type: doc.fileType || '' })}
+                    >
                       <CardContent className="pt-4">
                         <div className="flex items-start gap-3">
-                          <div className="w-10 h-10 rounded-lg bg-blue-500/20 flex items-center justify-center flex-shrink-0">
-                            <FileText className="w-5 h-5 text-blue-400" />
+                          <div className="w-10 h-10 rounded-lg bg-blue-500/20 flex items-center justify-center flex-shrink-0 group-hover:bg-[#00d4aa]/20 transition-colors">
+                            <FileText className="w-5 h-5 text-blue-400 group-hover:text-[#00d4aa] transition-colors" />
                           </div>
                           <div className="flex-1 min-w-0">
-                            <p className="font-medium text-white truncate">{doc.fileName}</p>
+                            <p className="font-medium text-white truncate group-hover:text-[#00d4aa] transition-colors">{doc.fileName}</p>
                             <p className="text-sm text-slate-400">
                               {doc.fileSize ? `${(doc.fileSize / 1024).toFixed(1)} KB` : "Unknown size"}
                             </p>
                             <p className="text-xs text-slate-500 mt-1">
                               {new Date(doc.createdAt).toLocaleDateString()}
                             </p>
+                            <p className="text-xs text-[#00d4aa] mt-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                              Click to view
+                            </p>
                           </div>
-                          <div className="flex items-center gap-1">
+                          <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
+                            <Button 
+                              variant="ghost" 
+                              size="sm" 
+                              className="text-slate-400 hover:text-white hover:bg-slate-700"
+                              onClick={() => setPreviewDocument({ url: doc.fileUrl, name: doc.fileName, type: doc.fileType || '' })}
+                            >
+                              <Eye className="w-4 h-4" />
+                            </Button>
                             <a href={doc.fileUrl} target="_blank" rel="noopener noreferrer">
                               <Button variant="ghost" size="sm" className="text-slate-400 hover:text-white hover:bg-slate-700">
                                 <Download className="w-4 h-4" />
@@ -1319,6 +1335,80 @@ export default function JobDetail() {
           )}
         </div>
       </div>
+
+      {/* Document Preview Modal */}
+      {previewDocument && (
+        <div 
+          className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4"
+          onClick={() => setPreviewDocument(null)}
+        >
+          <div 
+            className="bg-slate-900 rounded-lg max-w-5xl w-full max-h-[90vh] flex flex-col"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div className="flex items-center justify-between p-4 border-b border-slate-700">
+              <div className="flex items-center gap-3">
+                <FileText className="w-5 h-5 text-[#00d4aa]" />
+                <h3 className="font-semibold text-white truncate max-w-md">{previewDocument.name}</h3>
+              </div>
+              <div className="flex items-center gap-2">
+                <a href={previewDocument.url} target="_blank" rel="noopener noreferrer">
+                  <Button variant="outline" size="sm" className="text-slate-300 border-slate-600 hover:bg-slate-700">
+                    <ExternalLink className="w-4 h-4 mr-2" />
+                    Open in New Tab
+                  </Button>
+                </a>
+                <a href={previewDocument.url} download>
+                  <Button variant="outline" size="sm" className="text-slate-300 border-slate-600 hover:bg-slate-700">
+                    <Download className="w-4 h-4 mr-2" />
+                    Download
+                  </Button>
+                </a>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={() => setPreviewDocument(null)}
+                  className="text-slate-400 hover:text-white hover:bg-slate-700"
+                >
+                  <X className="w-5 h-5" />
+                </Button>
+              </div>
+            </div>
+            
+            {/* Modal Content */}
+            <div className="flex-1 overflow-auto p-4 bg-slate-800">
+              {previewDocument.type.includes('pdf') ? (
+                <iframe 
+                  src={previewDocument.url} 
+                  className="w-full h-[70vh] rounded border border-slate-700"
+                  title={previewDocument.name}
+                />
+              ) : previewDocument.type.includes('image') ? (
+                <div className="flex items-center justify-center h-[70vh]">
+                  <img 
+                    src={previewDocument.url} 
+                    alt={previewDocument.name}
+                    className="max-w-full max-h-full object-contain rounded"
+                  />
+                </div>
+              ) : (
+                <div className="flex flex-col items-center justify-center h-[70vh] text-center">
+                  <FileText className="w-16 h-16 text-slate-500 mb-4" />
+                  <p className="text-slate-400 mb-2">Preview not available for this file type</p>
+                  <p className="text-sm text-slate-500 mb-4">{previewDocument.type || 'Unknown type'}</p>
+                  <a href={previewDocument.url} target="_blank" rel="noopener noreferrer">
+                    <Button className="bg-[#00d4aa] hover:bg-[#00b894] text-black">
+                      <ExternalLink className="w-4 h-4 mr-2" />
+                      Open File
+                    </Button>
+                  </a>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </CRMLayout>
   );
 }

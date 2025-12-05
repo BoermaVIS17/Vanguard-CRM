@@ -179,3 +179,6 @@
 
 ## Edit History Management
 - [x] Allow owners to delete edit history entries
+
+## Document Management
+- [x] Make uploaded documents viewable when clicked
