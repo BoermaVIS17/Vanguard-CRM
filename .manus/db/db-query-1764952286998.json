@@ -1,0 +1,9 @@
+{
+  "query": "ALTER TABLE report_requests \nADD COLUMN IF NOT EXISTS assignedTo INT NULL,\nADD COLUMN IF NOT EXISTS salesRepCode VARCHAR(50) NULL,\nADD COLUMN IF NOT EXISTS leadSource VARCHAR(100) DEFAULT 'website',\nADD COLUMN IF NOT EXISTS paymentStatus ENUM('pending', 'paid', 'refunded') DEFAULT 'pending' NOT NULL,\nADD COLUMN IF NOT EXISTS priority ENUM('low', 'medium', 'high', 'urgent') DEFAULT 'medium' NOT NULL,\nADD COLUMN IF NOT EXISTS internalNotes TEXT NULL,\nADD COLUMN IF NOT EXISTS scheduledDate TIMESTAMP NULL,\nADD COLUMN IF NOT EXISTS completedDate TIMESTAMP NULL;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3LkhXw7W2NLietY.root --database a7GnrUTuzTDTFdbLnSt79K --execute ALTER TABLE report_requests \nADD COLUMN IF NOT EXISTS assignedTo INT NULL,\nADD COLUMN IF NOT EXISTS salesRepCode VARCHAR(50) NULL,\nADD COLUMN IF NOT EXISTS leadSource VARCHAR(100) DEFAULT 'website',\nADD COLUMN IF NOT EXISTS paymentStatus ENUM('pending', 'paid', 'refunded') DEFAULT 'pending' NOT NULL,\nADD COLUMN IF NOT EXISTS priority ENUM('low', 'medium', 'high', 'urgent') DEFAULT 'medium' NOT NULL,\nADD COLUMN IF NOT EXISTS internalNotes TEXT NULL,\nADD COLUMN IF NOT EXISTS scheduledDate TIMESTAMP NULL,\nADD COLUMN IF NOT EXISTS completedDate TIMESTAMP NULL;",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 2297
+}

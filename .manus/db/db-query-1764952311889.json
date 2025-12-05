@@ -1,0 +1,9 @@
+{
+  "query": "ALTER TABLE report_requests MODIFY COLUMN status ENUM('pending', 'new_lead', 'contacted', 'appointment_set', 'inspection_scheduled', 'inspection_complete', 'report_sent', 'follow_up', 'closed_won', 'closed_lost', 'cancelled') DEFAULT 'new_lead' NOT NULL;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3LkhXw7W2NLietY.root --database a7GnrUTuzTDTFdbLnSt79K --execute ALTER TABLE report_requests MODIFY COLUMN status ENUM('pending', 'new_lead', 'contacted', 'appointment_set', 'inspection_scheduled', 'inspection_complete', 'report_sent', 'follow_up', 'closed_won', 'closed_lost', 'cancelled') DEFAULT 'new_lead' NOT NULL;",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 176
+}

@@ -1,0 +1,82 @@
+{
+  "query": "DESCRIBE documents;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3LkhXw7W2NLietY.root --database a7GnrUTuzTDTFdbLnSt79K --execute DESCRIBE documents;",
+  "rows": [
+    {
+      "Field": "id",
+      "Type": "int(11)",
+      "Null": "NO",
+      "Key": "PRI",
+      "Default": "NULL",
+      "Extra": "auto_increment"
+    },
+    {
+      "Field": "reportRequestId",
+      "Type": "int(11)",
+      "Null": "NO",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "uploadedBy",
+      "Type": "int(11)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "fileName",
+      "Type": "varchar(255)",
+      "Null": "NO",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "fileUrl",
+      "Type": "varchar(1000)",
+      "Null": "NO",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "fileType",
+      "Type": "varchar(100)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "fileSize",
+      "Type": "int(11)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "category",
+      "Type": "enum('drone_photo','inspection_photo','report','contract','invoice','other')",
+      "Null": "NO",
+      "Key": "",
+      "Default": "other",
+      "Extra": ""
+    },
+    {
+      "Field": "createdAt",
+      "Type": "timestamp",
+      "Null": "NO",
+      "Key": "",
+      "Default": "CURRENT_TIMESTAMP",
+      "Extra": ""
+    }
+  ],
+  "messages": [],
+  "stdout": "Field\tType\tNull\tKey\tDefault\tExtra\nid\tint(11)\tNO\tPRI\tNULL\tauto_increment\nreportRequestId\tint(11)\tNO\t\tNULL\t\nuploadedBy\tint(11)\tYES\t\tNULL\t\nfileName\tvarchar(255)\tNO\t\tNULL\t\nfileUrl\tvarchar(1000)\tNO\t\tNULL\t\nfileType\tvarchar(100)\tYES\t\tNULL\t\nfileSize\tint(11)\tYES\t\tNULL\t\ncategory\tenum('drone_photo','inspection_photo','report','contract','invoice','other')\tNO\t\tother\t\ncreatedAt\ttimestamp\tNO\t\tCURRENT_TIMESTAMP\t\n",
+  "stderr": "",
+  "execution_time_ms": 61
+}

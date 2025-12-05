@@ -74,7 +74,7 @@ async function startServer() {
             // Update the report request status
             await db.update(reportRequests)
               .set({
-                status: "paid",
+                paymentStatus: "paid",
                 amountPaid: session.amount_total || 19900,
                 stripePaymentIntentId: session.payment_intent as string,
               })

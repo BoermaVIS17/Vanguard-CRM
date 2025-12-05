@@ -1,0 +1,146 @@
+{
+  "query": "DESCRIBE report_requests;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3LkhXw7W2NLietY.root --database a7GnrUTuzTDTFdbLnSt79K --execute DESCRIBE report_requests;",
+  "rows": [
+    {
+      "Field": "id",
+      "Type": "int(11)",
+      "Null": "NO",
+      "Key": "PRI",
+      "Default": "NULL",
+      "Extra": "auto_increment"
+    },
+    {
+      "Field": "fullName",
+      "Type": "varchar(255)",
+      "Null": "NO",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "email",
+      "Type": "varchar(320)",
+      "Null": "NO",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "phone",
+      "Type": "varchar(50)",
+      "Null": "NO",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "address",
+      "Type": "varchar(500)",
+      "Null": "NO",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "cityStateZip",
+      "Type": "varchar(255)",
+      "Null": "NO",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "roofAge",
+      "Type": "varchar(50)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "promoCode",
+      "Type": "varchar(50)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "promoApplied",
+      "Type": "tinyint(1)",
+      "Null": "NO",
+      "Key": "",
+      "Default": "0",
+      "Extra": ""
+    },
+    {
+      "Field": "amountPaid",
+      "Type": "int(11)",
+      "Null": "NO",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "stripePaymentIntentId",
+      "Type": "varchar(255)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "stripeCheckoutSessionId",
+      "Type": "varchar(255)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "status",
+      "Type": "enum('pending','new_lead','contacted','appointment_set','inspection_scheduled','inspection_complete','report_sent','follow_up','closed_won','closed_lost','cancelled')",
+      "Null": "NO",
+      "Key": "",
+      "Default": "new_lead",
+      "Extra": ""
+    },
+    {
+      "Field": "createdAt",
+      "Type": "timestamp",
+      "Null": "NO",
+      "Key": "",
+      "Default": "CURRENT_TIMESTAMP",
+      "Extra": ""
+    },
+    {
+      "Field": "updatedAt",
+      "Type": "timestamp",
+      "Null": "NO",
+      "Key": "",
+      "Default": "CURRENT_TIMESTAMP",
+      "Extra": "DEFAULT_GENERATED on update CURRENT_TIMESTAMP"
+    },
+    {
+      "Field": "roofConcerns",
+      "Type": "text",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "handsOnInspection",
+      "Type": "tinyint(1)",
+      "Null": "NO",
+      "Key": "",
+      "Default": "0",
+      "Extra": ""
+    }
+  ],
+  "messages": [],
+  "stdout": "Field\tType\tNull\tKey\tDefault\tExtra\nid\tint(11)\tNO\tPRI\tNULL\tauto_increment\nfullName\tvarchar(255)\tNO\t\tNULL\t\nemail\tvarchar(320)\tNO\t\tNULL\t\nphone\tvarchar(50)\tNO\t\tNULL\t\naddress\tvarchar(500)\tNO\t\tNULL\t\ncityStateZip\tvarchar(255)\tNO\t\tNULL\t\nroofAge\tvarchar(50)\tYES\t\tNULL\t\npromoCode\tvarchar(50)\tYES\t\tNULL\t\npromoApplied\ttinyint(1)\tNO\t\t0\t\namountPaid\tint(11)\tNO\t\tNULL\t\nstripePaymentIntentId\tvarchar(255)\tYES\t\tNULL\t\nstripeCheckoutSessionId\tvarchar(255)\tYES\t\tNULL\t\nstatus\tenum('pending','new_lead','contacted','appointment_set','inspection_scheduled','inspection_complete','report_sent','follow_up','closed_won','closed_lost','cancelled')\tNO\t\tnew_lead\t\ncreatedAt\ttimestamp\tNO\t\tCURRENT_TIMESTAMP\t\nupdatedAt\ttimestamp\tNO\t\tCURRENT_TIMESTAMP\tDEFAULT_GENERATED on update CURRENT_TIMESTAMP\nroofConcerns\ttext\tYES\t\tNULL\t\nhandsOnInspection\ttinyint(1)\tNO\t\t0\t\n",
+  "stderr": "",
+  "execution_time_ms": 59
+}

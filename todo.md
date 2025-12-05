@@ -28,3 +28,15 @@
 - [x] Include sales rep attribution in email notifications
 - [x] Update promo code validation to support rep-specific codes
 - [x] Update promo code system to accept any code ending in S26 (e.g., MJS26, STS26)
+
+## CRM Development (Phase 1)
+- [x] Update database schema for CRM (users, roles, leads, jobs, activities)
+- [x] Create user roles system (Owner, Office Staff, Sales Rep, Project Manager)
+- [x] Build CRM login page
+- [x] Create protected CRM routes
+- [x] Build CRM dashboard with lead overview
+- [x] Create leads management table with filtering/sorting
+- [x] Build job pipeline kanban board
+- [x] Create customer profile pages (via lead detail modal)
+- [x] Add activity log functionality
+- [x] Build team/user management (Owner only)
