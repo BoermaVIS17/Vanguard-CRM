@@ -221,6 +221,9 @@ export default function Home() {
             <button onClick={() => scrollToSection("faq")} className="text-sm font-medium hover:text-primary transition-colors">
               FAQ
             </button>
+            <a href="/portal" className="text-sm font-medium hover:text-primary transition-colors">
+              Check Job Status
+            </a>
             <Button 
               onClick={() => scrollToSection("request-form")}
               className="bg-primary text-primary-foreground hover:bg-primary/90 font-heading font-bold tracking-wide"
@@ -250,6 +253,9 @@ export default function Home() {
             <button onClick={() => scrollToSection("faq")} className="text-left py-2 hover:text-primary">
               FAQ
             </button>
+            <a href="/portal" className="text-left py-2 hover:text-primary block">
+              Check Job Status
+            </a>
             <Button onClick={() => scrollToSection("request-form")} className="w-full font-heading font-bold">
               Get Report
             </Button>
@@ -909,6 +915,7 @@ export default function Home() {
                 <li><button onClick={() => toast.info("Visit nextdoorextroofing.com for our full story")} className="hover:text-primary transition-colors text-left">Our Story</button></li>
                 <li><button onClick={() => toast.info("Visit nextdoorextroofing.com for our full services")} className="hover:text-primary transition-colors text-left">Full Services</button></li>
                 <li><button onClick={() => scrollToSection("request-form")} className="hover:text-primary transition-colors text-left">Contact Us</button></li>
+                <li><a href="/portal" className="hover:text-primary transition-colors">Check Job Status</a></li>
               </ul>
             </div>
           </div>
