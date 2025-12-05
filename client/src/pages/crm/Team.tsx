@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { trpc } from "@/lib/trpc";
-import { User, Mail, Shield, Edit2, UserCheck, Users, Plus, ChevronRight } from "lucide-react";
+import { User, Mail, Shield, Edit2, UserCheck, Users, Plus, Copy, Check } from "lucide-react";
 import { toast } from "sonner";
 import CRMLayout from "@/components/crm/CRMLayout";
 
@@ -14,8 +15,6 @@ const ROLE_OPTIONS = [
   { value: "team_lead", label: "Team Lead", description: "View own + team members' jobs", color: "bg-green-500/20 text-green-400" },
   { value: "sales_rep", label: "Sales Rep", description: "View & edit assigned jobs only", color: "bg-cyan-500/20 text-cyan-400" },
   { value: "office", label: "Office Staff", description: "Same as Admin", color: "bg-blue-500/20 text-blue-400" },
-  { value: "project_manager", label: "Project Manager", description: "Same as Sales Rep", color: "bg-orange-500/20 text-orange-400" },
-  { value: "user", label: "User", description: "Basic access", color: "bg-slate-600/50 text-slate-300" },
 ];
 
 export default function CRMTeam() {
@@ -34,9 +33,29 @@ export default function CRMTeam() {
     },
   });
 
+  const createAccount = trpc.crm.createTeamAccount.useMutation({
+    onSuccess: (data) => {
+      toast.success("Account created successfully");
+      setCreatedAccount(data);
+      refetch();
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+  });
+
   const [editingMember, setEditingMember] = useState<any>(null);
   const [selectedRole, setSelectedRole] = useState<string>("");
   const [selectedTeamLead, setSelectedTeamLead] = useState<string>("");
+  
+  // Create account form state
+  const [showCreateDialog, setShowCreateDialog] = useState(false);
+  const [newAccountName, setNewAccountName] = useState("");
+  const [newAccountEmail, setNewAccountEmail] = useState("");
+  const [newAccountRole, setNewAccountRole] = useState<string>("sales_rep");
+  const [newAccountTeamLead, setNewAccountTeamLead] = useState<string>("none");
+  const [createdAccount, setCreatedAccount] = useState<any>(null);
+  const [copied, setCopied] = useState(false);
 
   const getRoleColor = (role: string) => {
     return ROLE_OPTIONS.find(r => r.value === role)?.color || "bg-slate-600/50 text-slate-300";
@@ -61,6 +80,38 @@ export default function CRMTeam() {
     setSelectedTeamLead(member.teamLeadId?.toString() || "none");
   };
 
+  const handleCreateAccount = () => {
+    if (!newAccountName.trim() || !newAccountEmail.trim()) {
+      toast.error("Please fill in all required fields");
+      return;
+    }
+    
+    createAccount.mutate({
+      name: newAccountName,
+      email: newAccountEmail,
+      role: newAccountRole as any,
+      teamLeadId: newAccountTeamLead === "none" ? undefined : parseInt(newAccountTeamLead),
+    });
+  };
+
+  const resetCreateForm = () => {
+    setNewAccountName("");
+    setNewAccountEmail("");
+    setNewAccountRole("sales_rep");
+    setNewAccountTeamLead("none");
+    setCreatedAccount(null);
+    setShowCreateDialog(false);
+  };
+
+  const copyCredentials = () => {
+    if (!createdAccount) return;
+    const text = `CRM Account Created\n\nName: ${createdAccount.name}\nEmail: ${createdAccount.email}\nRole: ${ROLE_OPTIONS.find(r => r.value === createdAccount.role)?.label}\n\nLogin URL: ${window.location.origin}/crm\n\nPlease log in using your Manus account with the email above.`;
+    navigator.clipboard.writeText(text);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+    toast.success("Credentials copied to clipboard");
+  };
+
   if (isLoading) {
     return (
       <CRMLayout>
@@ -76,7 +127,6 @@ export default function CRMTeam() {
   const admins = team?.filter(m => m.role === "admin" || m.role === "office") || [];
   const teamLeadsList = team?.filter(m => m.role === "team_lead") || [];
   const salesReps = team?.filter(m => m.role === "sales_rep" || m.role === "project_manager") || [];
-  const users = team?.filter(m => m.role === "user") || [];
 
   return (
     <CRMLayout>
@@ -85,80 +135,164 @@ export default function CRMTeam() {
         <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="text-2xl font-bold text-white">Team Management</h1>
-            <p className="text-sm text-slate-400">Manage team members, roles, and team assignments</p>
+            <p className="text-sm text-slate-400">Manage team members and their roles</p>
           </div>
           <div className="flex items-center gap-3">
             <span className="text-sm text-slate-400 flex items-center gap-1">
               <Users className="w-4 h-4" />
               {team?.length || 0} team members
             </span>
-            <Button className="bg-[#00d4aa] hover:bg-[#00b894] text-black font-semibold">
-              <Plus className="w-4 h-4 mr-2" />
-              Invite Member
-            </Button>
+            {canEditRoles && (
+              <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
+                <DialogTrigger asChild>
+                  <Button className="bg-[#00d4aa] hover:bg-[#00b894] text-black font-semibold">
+                    <Plus className="w-4 h-4 mr-2" />
+                    Create Account
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="bg-slate-800 border-slate-700">
+                  <DialogHeader>
+                    <DialogTitle className="text-white">
+                      {createdAccount ? "Account Created" : "Create Team Account"}
+                    </DialogTitle>
+                  </DialogHeader>
+                  
+                  {createdAccount ? (
+                    <div className="space-y-4 pt-4">
+                      <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-4">
+                        <p className="text-green-400 font-medium mb-2">Account created successfully!</p>
+                        <p className="text-sm text-slate-300">Share the following details with the team member:</p>
+                      </div>
+                      
+                      <div className="bg-slate-700 rounded-lg p-4 space-y-2">
+                        <div>
+                          <p className="text-xs text-slate-400">Name</p>
+                          <p className="text-white font-medium">{createdAccount.name}</p>
+                        </div>
+                        <div>
+                          <p className="text-xs text-slate-400">Email</p>
+                          <p className="text-white font-medium">{createdAccount.email}</p>
+                        </div>
+                        <div>
+                          <p className="text-xs text-slate-400">Role</p>
+                          <p className="text-white font-medium">
+                            {ROLE_OPTIONS.find(r => r.value === createdAccount.role)?.label}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-xs text-slate-400">Login URL</p>
+                          <code className="text-[#00d4aa] text-sm">{window.location.origin}/crm</code>
+                        </div>
+                      </div>
+                      
+                      <div className="flex gap-2">
+                        <Button 
+                          onClick={copyCredentials}
+                          className="flex-1 bg-slate-700 hover:bg-slate-600 text-white"
+                        >
+                          {copied ? <Check className="w-4 h-4 mr-2" /> : <Copy className="w-4 h-4 mr-2" />}
+                          {copied ? "Copied!" : "Copy Details"}
+                        </Button>
+                        <Button 
+                          onClick={resetCreateForm}
+                          className="flex-1 bg-[#00d4aa] hover:bg-[#00b894] text-black"
+                        >
+                          Done
+                        </Button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="space-y-4 pt-4">
+                      <div>
+                        <label className="text-sm text-slate-400 mb-2 block">Full Name *</label>
+                        <Input
+                          value={newAccountName}
+                          onChange={(e) => setNewAccountName(e.target.value)}
+                          placeholder="John Smith"
+                          className="bg-slate-700 border-slate-600 text-white"
+                        />
+                      </div>
+                      
+                      <div>
+                        <label className="text-sm text-slate-400 mb-2 block">Email Address *</label>
+                        <Input
+                          type="email"
+                          value={newAccountEmail}
+                          onChange={(e) => setNewAccountEmail(e.target.value)}
+                          placeholder="john@example.com"
+                          className="bg-slate-700 border-slate-600 text-white"
+                        />
+                        <p className="text-xs text-slate-500 mt-1">
+                          This email will be used to log in via Manus
+                        </p>
+                      </div>
+                      
+                      <div>
+                        <label className="text-sm text-slate-400 mb-2 block">Role *</label>
+                        <Select value={newAccountRole} onValueChange={setNewAccountRole}>
+                          <SelectTrigger className="bg-slate-700 border-slate-600 text-white">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent className="bg-slate-700 border-slate-600">
+                            {ROLE_OPTIONS.map((role) => (
+                              <SelectItem key={role.value} value={role.value} className="text-white hover:bg-slate-600">
+                                <div className="flex items-center gap-2">
+                                  <span className={`w-2 h-2 rounded-full ${role.color.split(" ")[0].replace("/20", "")}`} />
+                                  {role.label}
+                                </div>
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <p className="text-xs text-slate-500 mt-1">
+                          {ROLE_OPTIONS.find(r => r.value === newAccountRole)?.description}
+                        </p>
+                      </div>
+                      
+                      {(newAccountRole === "sales_rep") && teamLeads && teamLeads.length > 0 && (
+                        <div>
+                          <label className="text-sm text-slate-400 mb-2 block">Assign to Team Lead</label>
+                          <Select value={newAccountTeamLead} onValueChange={setNewAccountTeamLead}>
+                            <SelectTrigger className="bg-slate-700 border-slate-600 text-white">
+                              <SelectValue placeholder="Select team lead" />
+                            </SelectTrigger>
+                            <SelectContent className="bg-slate-700 border-slate-600">
+                              <SelectItem value="none" className="text-white hover:bg-slate-600">
+                                No Team Lead
+                              </SelectItem>
+                              {teamLeads.map((lead) => (
+                                <SelectItem key={lead.id} value={lead.id.toString()} className="text-white hover:bg-slate-600">
+                                  {lead.name || lead.email}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      )}
+                      
+                      <div className="flex justify-end gap-2 pt-4">
+                        <Button 
+                          variant="ghost" 
+                          onClick={() => setShowCreateDialog(false)}
+                          className="text-slate-400 hover:text-white hover:bg-slate-700"
+                        >
+                          Cancel
+                        </Button>
+                        <Button 
+                          onClick={handleCreateAccount}
+                          disabled={createAccount.isPending || !newAccountName.trim() || !newAccountEmail.trim()}
+                          className="bg-[#00d4aa] hover:bg-[#00b894] text-black"
+                        >
+                          {createAccount.isPending ? "Creating..." : "Create Account"}
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                </DialogContent>
+              </Dialog>
+            )}
           </div>
         </div>
-
-        {/* Role Hierarchy */}
-        <Card className="mb-6 shadow-sm bg-slate-800 border-slate-700">
-          <CardHeader>
-            <CardTitle className="text-sm text-slate-400 flex items-center gap-2">
-              <Shield className="w-4 h-4" />
-              Role Hierarchy & Permissions
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center justify-center gap-2 flex-wrap">
-              <div className="flex items-center gap-2">
-                <span className="px-3 py-1.5 rounded-full text-xs font-medium bg-purple-500/20 text-purple-400">
-                  Owner
-                </span>
-                <ChevronRight className="w-4 h-4 text-slate-500" />
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="px-3 py-1.5 rounded-full text-xs font-medium bg-blue-500/20 text-blue-400">
-                  Admin
-                </span>
-                <ChevronRight className="w-4 h-4 text-slate-500" />
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="px-3 py-1.5 rounded-full text-xs font-medium bg-green-500/20 text-green-400">
-                  Team Lead
-                </span>
-                <ChevronRight className="w-4 h-4 text-slate-500" />
-              </div>
-              <span className="px-3 py-1.5 rounded-full text-xs font-medium bg-cyan-500/20 text-cyan-400">
-                Sales Rep
-              </span>
-            </div>
-            <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-4 text-xs text-slate-400">
-              <div className="text-center">
-                <p className="font-medium text-purple-400">Owner</p>
-                <p>View, Edit, Delete all</p>
-                <p>View edit history</p>
-                <p>Manage team</p>
-              </div>
-              <div className="text-center">
-                <p className="font-medium text-blue-400">Admin</p>
-                <p>View, Edit all</p>
-                <p>View edit history</p>
-                <p>Cannot delete</p>
-              </div>
-              <div className="text-center">
-                <p className="font-medium text-green-400">Team Lead</p>
-                <p>View own + team's jobs</p>
-                <p>Edit own + team's jobs</p>
-                <p>Cannot delete</p>
-              </div>
-              <div className="text-center">
-                <p className="font-medium text-cyan-400">Sales Rep</p>
-                <p>View assigned only</p>
-                <p>Edit assigned only</p>
-                <p>Cannot delete</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
 
         {/* Team Members by Role */}
         <div className="space-y-6">
@@ -184,12 +318,12 @@ export default function CRMTeam() {
             </div>
           )}
 
-          {/* Admins */}
+          {/* Admins / Office Staff */}
           {admins.length > 0 && (
             <div>
               <h2 className="text-lg font-semibold text-white mb-3 flex items-center gap-2">
                 <span className="w-3 h-3 rounded-full bg-blue-500" />
-                Admins ({admins.length})
+                Admins / Office Staff ({admins.length})
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {admins.map((member) => (
@@ -252,34 +386,12 @@ export default function CRMTeam() {
             </div>
           )}
 
-          {/* Basic Users */}
-          {users.length > 0 && (
-            <div>
-              <h2 className="text-lg font-semibold text-white mb-3 flex items-center gap-2">
-                <span className="w-3 h-3 rounded-full bg-slate-500" />
-                Users ({users.length})
-              </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {users.map((member) => (
-                  <TeamMemberCard
-                    key={member.id}
-                    member={member}
-                    currentUser={currentUser}
-                    canEditRoles={canEditRoles}
-                    getRoleColor={getRoleColor}
-                    onEdit={openEditDialog}
-                  />
-                ))}
-              </div>
-            </div>
-          )}
-
           {(!team || team.length === 0) && (
             <Card className="shadow-sm bg-slate-800 border-slate-700">
               <CardContent className="py-12 text-center text-slate-400">
                 <Users className="w-12 h-12 mx-auto mb-3 opacity-50" />
                 <p>No team members yet</p>
-                <p className="text-sm mt-1">Team members will appear here after they log in</p>
+                <p className="text-sm mt-1">Click "Create Account" to add your first team member</p>
               </CardContent>
             </Card>
           )}
@@ -323,7 +435,7 @@ export default function CRMTeam() {
                 </div>
                 
                 {/* Team Lead Assignment (for Sales Reps) */}
-                {(selectedRole === "sales_rep" || selectedRole === "project_manager") && (
+                {(selectedRole === "sales_rep") && (
                   <div>
                     <p className="text-sm text-slate-400 mb-2">Assign to Team Lead</p>
                     <Select 
@@ -344,9 +456,6 @@ export default function CRMTeam() {
                         ))}
                       </SelectContent>
                     </Select>
-                    <p className="text-xs text-slate-500 mt-1">
-                      Team leads can view and edit jobs assigned to their team members
-                    </p>
                   </div>
                 )}
 
@@ -370,34 +479,6 @@ export default function CRMTeam() {
             )}
           </DialogContent>
         </Dialog>
-
-        {/* Access Info */}
-        <Card className="mt-6 shadow-sm bg-slate-800 border-slate-700">
-          <CardHeader>
-            <CardTitle className="text-lg text-white flex items-center gap-2">
-              <Shield className="w-5 h-5 text-[#00d4aa]" />
-              CRM Access Information
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4 text-sm text-slate-300">
-              <p>
-                <strong className="text-white">How to add team members:</strong> Share the CRM login link with your team. 
-                Once they log in with their Manus account, they'll appear here and you can assign their role.
-              </p>
-              <p>
-                <strong className="text-white">Role assignment:</strong> Only Owners can change team member roles and assign team leads.
-              </p>
-              <p>
-                <strong className="text-white">Team Lead assignment:</strong> Assign Sales Reps to Team Leads so Team Leads can view and manage their team's jobs.
-              </p>
-              <div className="bg-[#00d4aa]/10 p-4 rounded-lg border border-[#00d4aa]/20">
-                <p className="font-medium text-[#00d4aa]">CRM Access URL:</p>
-                <code className="text-white">{window.location.origin}/crm</code>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
       </div>
     </CRMLayout>
   );
@@ -427,8 +508,6 @@ function TeamMemberCard({
     { value: "team_lead", label: "Team Lead" },
     { value: "sales_rep", label: "Sales Rep" },
     { value: "office", label: "Office Staff" },
-    { value: "project_manager", label: "Project Manager" },
-    { value: "user", label: "User" },
   ];
 
   return (

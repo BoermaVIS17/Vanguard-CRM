@@ -1,0 +1,17 @@
+{
+  "query": "SELECT id, name, email, role, LEFT(openId, 50) as openId_prefix FROM users;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3LkhXw7W2NLietY.root --database a7GnrUTuzTDTFdbLnSt79K --execute SELECT id, name, email, role, LEFT(openId, 50) as openId_prefix FROM users;",
+  "rows": [
+    {
+      "id": "1",
+      "name": "Nextdoor Exteriors",
+      "email": "nextdoorextsolutions@gmail.com",
+      "role": "owner",
+      "openId_prefix": "6LwwxHSVbVMsfvKtzuxCAi"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\temail\trole\topenId_prefix\n1\tNextdoor Exteriors\tnextdoorextsolutions@gmail.com\towner\t6LwwxHSVbVMsfvKtzuxCAi\n",
+  "stderr": "",
+  "execution_time_ms": 51
+}

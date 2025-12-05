@@ -1,0 +1,18 @@
+{
+  "query": "SELECT COUNT(*) as total, role FROM users GROUP BY role;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3LkhXw7W2NLietY.root --database a7GnrUTuzTDTFdbLnSt79K --execute SELECT COUNT(*) as total, role FROM users GROUP BY role;",
+  "rows": [
+    {
+      "total": "7",
+      "role": "admin"
+    },
+    {
+      "total": "1",
+      "role": "owner"
+    }
+  ],
+  "messages": [],
+  "stdout": "total\trole\n7\tadmin\n1\towner\n",
+  "stderr": "",
+  "execution_time_ms": 50
+}

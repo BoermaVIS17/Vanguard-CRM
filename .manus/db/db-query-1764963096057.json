@@ -1,0 +1,26 @@
+{
+  "query": "SELECT * FROM users;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3LkhXw7W2NLietY.root --database a7GnrUTuzTDTFdbLnSt79K --execute SELECT * FROM users;",
+  "rows": [
+    {
+      "id": "1",
+      "openId": "6LwwxHSVbVMsfvKtzuxCAi",
+      "name": "Nextdoor Exteriors",
+      "email": "nextdoorextsolutions@gmail.com",
+      "loginMethod": "google",
+      "role": "owner",
+      "createdAt": "2025-12-05 19:31:17",
+      "updatedAt": "2025-12-05 19:31:17",
+      "lastSignedIn": "2025-12-05 19:31:17",
+      "stripeCustomerId": "NULL",
+      "phone": "NULL",
+      "repCode": "NULL",
+      "isActive": "1",
+      "teamLeadId": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\topenId\tname\temail\tloginMethod\trole\tcreatedAt\tupdatedAt\tlastSignedIn\tstripeCustomerId\tphone\trepCode\tisActive\tteamLeadId\n1\t6LwwxHSVbVMsfvKtzuxCAi\tNextdoor Exteriors\tnextdoorextsolutions@gmail.com\tgoogle\towner\t2025-12-05 19:31:17\t2025-12-05 19:31:17\t2025-12-05 19:31:17\tNULL\tNULL\tNULL\t1\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 55
+}

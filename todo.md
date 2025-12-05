@@ -101,3 +101,11 @@
 - [x] Team Lead: view assigned jobs + team members' jobs
 - [x] Admin: view/edit all, no delete
 - [x] Owner: full access including delete and history view
+
+## Team Management Updates
+- [x] Remove role hierarchy & permissions display from Team page
+- [x] Change "Invite Member" to "Create Account" button
+- [x] Add account creation form (name, email, role, team lead assignment)
+- [x] Add backend endpoint for owner to create team member accounts
+- [x] Show credentials after account creation for owner to share
+- [x] Clean up database - removed test admin accounts

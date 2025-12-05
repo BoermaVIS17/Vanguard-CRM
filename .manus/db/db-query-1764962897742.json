@@ -1,0 +1,124 @@
+{
+  "query": "SELECT id, name, email, role FROM users ORDER BY role, id;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3LkhXw7W2NLietY.root --database a7GnrUTuzTDTFdbLnSt79K --execute SELECT id, name, email, role FROM users ORDER BY role, id;",
+  "rows": [
+    {
+      "id": "240023",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "240024",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "240025",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "240026",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "240027",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "240028",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "240029",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "240030",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "240031",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "240032",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "240033",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "240034",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "240035",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "240036",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "240037",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "240038",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "240039",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "240040",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "1",
+      "name": "Nextdoor Exteriors",
+      "email": "nextdoorextsolutions@gmail.com",
+      "role": "owner"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\temail\trole\n240023\tNULL\tNULL\tadmin\n240024\tNULL\tNULL\tadmin\n240025\tNULL\tNULL\tadmin\n240026\tNULL\tNULL\tadmin\n240027\tNULL\tNULL\tadmin\n240028\tNULL\tNULL\tadmin\n240029\tNULL\tNULL\tadmin\n240030\tNULL\tNULL\tadmin\n240031\tNULL\tNULL\tadmin\n240032\tNULL\tNULL\tadmin\n240033\tNULL\tNULL\tadmin\n240034\tNULL\tNULL\tadmin\n240035\tNULL\tNULL\tadmin\n240036\tNULL\tNULL\tadmin\n240037\tNULL\tNULL\tadmin\n240038\tNULL\tNULL\tadmin\n240039\tNULL\tNULL\tadmin\n240040\tNULL\tNULL\tadmin\n1\tNextdoor Exteriors\tnextdoorextsolutions@gmail.com\towner\n",
+  "stderr": "",
+  "execution_time_ms": 58
+}

@@ -10,7 +10,7 @@ import { notifyOwner } from "./_core/notification";
 import { sendSMSNotification } from "./sms";
 import Stripe from "stripe";
 import { ENV } from "./_core/env";
-import { eq, desc, and, or, like, sql, gte, lte, inArray } from "drizzle-orm";
+import { eq, desc, and, or, like, sql, gte, lte, inArray, isNotNull } from "drizzle-orm";
 import { storagePut, storageGet } from "./storage";
 import { 
   normalizeRole, 
@@ -626,7 +626,10 @@ export const appRouter = router({
       const db = await getDb();
       if (!db) throw new Error("Database not available");
 
-      const team = await db.select().from(users).orderBy(users.name);
+      // Filter out users without name or email (incomplete profiles)
+      const team = await db.select().from(users)
+        .where(and(isNotNull(users.name), isNotNull(users.email)))
+        .orderBy(users.name);
       
       // Add role display names and team lead info
       const teamWithRoles = await Promise.all(team.map(async (member) => {
@@ -681,6 +684,48 @@ export const appRouter = router({
 
         await db.update(users).set(updateData).where(eq(users.id, input.userId));
         return { success: true };
+      }),
+
+    // Create team account (Owner only)
+    createTeamAccount: protectedProcedure
+      .input(z.object({
+        name: z.string().min(1),
+        email: z.string().email(),
+        role: z.enum(["admin", "owner", "office", "sales_rep", "team_lead"]),
+        teamLeadId: z.number().optional(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const db = await getDb();
+        if (!db) throw new Error("Database not available");
+
+        // Only owners can create accounts
+        if (!isOwner(ctx.user)) {
+          throw new Error("Only owners can create team accounts");
+        }
+
+        // Check if email already exists
+        const existing = await db.select().from(users).where(eq(users.email, input.email));
+        if (existing.length > 0) {
+          throw new Error("An account with this email already exists");
+        }
+
+        // Create the user account with a placeholder openId (will be updated on first login)
+        const placeholderOpenId = `pending_${Date.now()}_${Math.random().toString(36).substring(7)}`;
+        const [newUser] = await db.insert(users).values({
+          openId: placeholderOpenId,
+          name: input.name,
+          email: input.email,
+          role: input.role,
+          teamLeadId: input.teamLeadId || null,
+          isActive: true,
+        }).$returningId();
+
+        return {
+          id: newUser.id,
+          name: input.name,
+          email: input.email,
+          role: input.role,
+        };
       }),
 
     // Get team leads for assignment dropdown

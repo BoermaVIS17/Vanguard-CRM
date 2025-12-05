@@ -1,0 +1,748 @@
+{
+  "query": "SELECT id, name, email, role FROM users;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3LkhXw7W2NLietY.root --database a7GnrUTuzTDTFdbLnSt79K --execute SELECT id, name, email, role FROM users;",
+  "rows": [
+    {
+      "id": "1",
+      "name": "Nextdoor Exteriors",
+      "email": "nextdoorextsolutions@gmail.com",
+      "role": "owner"
+    },
+    {
+      "id": "2",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "3",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "30001",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "30002",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "30003",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "30004",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "30005",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "30006",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "30007",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "60001",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "60002",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "60003",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "60004",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "60005",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "60006",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "60007",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "60008",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "60009",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "60010",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "60011",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "60012",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "60013",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "60014",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "60015",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "60016",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "60017",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "60018",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "60019",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "60020",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "60021",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "60022",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "60023",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "60024",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "60025",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "60026",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "60027",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "60028",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "60029",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "60030",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "60031",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "60032",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "60033",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "60034",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "60035",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "90001",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "90002",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "120001",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "120002",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "120003",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "120004",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "120005",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "120006",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "120007",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "120008",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "120009",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "120010",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "120011",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "120012",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "120013",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "120014",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "120015",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "120016",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "120017",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "120018",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "120019",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "120020",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "120021",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "120022",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "120023",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "120024",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "120025",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "120026",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "120027",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "120028",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "120029",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "120030",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "120031",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "120032",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "120033",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "120034",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "120035",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "120036",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "120037",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "120038",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "120039",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "120040",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "120041",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "120042",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "120043",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "120044",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "120045",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "120046",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "150001",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "180001",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "180002",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "180003",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "210001",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "210002",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "210003",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "210004",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "240001",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "240002",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "240003",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "240004",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "240005",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "240006",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "240007",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "240008",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "240009",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "240010",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "240011",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "240012",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "240013",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "240014",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "240015",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "240016",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "240017",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "240018",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "240019",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "240020",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "240021",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "240022",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\temail\trole\n1\tNextdoor Exteriors\tnextdoorextsolutions@gmail.com\towner\n2\tNULL\tNULL\tadmin\n3\tNULL\tNULL\tadmin\n30001\tNULL\tNULL\tadmin\n30002\tNULL\tNULL\tadmin\n30003\tNULL\tNULL\tadmin\n30004\tNULL\tNULL\tadmin\n30005\tNULL\tNULL\tadmin\n30006\tNULL\tNULL\tadmin\n30007\tNULL\tNULL\tadmin\n60001\tNULL\tNULL\tadmin\n60002\tNULL\tNULL\tadmin\n60003\tNULL\tNULL\tadmin\n60004\tNULL\tNULL\tadmin\n60005\tNULL\tNULL\tadmin\n60006\tNULL\tNULL\tadmin\n60007\tNULL\tNULL\tadmin\n60008\tNULL\tNULL\tadmin\n60009\tNULL\tNULL\tadmin\n60010\tNULL\tNULL\tadmin\n60011\tNULL\tNULL\tadmin\n60012\tNULL\tNULL\tadmin\n60013\tNULL\tNULL\tadmin\n60014\tNULL\tNULL\tadmin\n60015\tNULL\tNULL\tadmin\n60016\tNULL\tNULL\tadmin\n60017\tNULL\tNULL\tadmin\n60018\tNULL\tNULL\tadmin\n60019\tNULL\tNULL\tadmin\n60020\tNULL\tNULL\tadmin\n60021\tNULL\tNULL\tadmin\n60022\tNULL\tNULL\tadmin\n60023\tNULL\tNULL\tadmin\n60024\tNULL\tNULL\tadmin\n60025\tNULL\tNULL\tadmin\n60026\tNULL\tNULL\tadmin\n60027\tNULL\tNULL\tadmin\n60028\tNULL\tNULL\tadmin\n60029\tNULL\tNULL\tadmin\n60030\tNULL\tNULL\tadmin\n60031\tNULL\tNULL\tadmin\n60032\tNULL\tNULL\tadmin\n60033\tNULL\tNULL\tadmin\n60034\tNULL\tNULL\tadmin\n60035\tNULL\tNULL\tadmin\n90001\tNULL\tNULL\tadmin\n90002\tNULL\tNULL\tadmin\n120001\tNULL\tNULL\tadmin\n120002\tNULL\tNULL\tadmin\n120003\tNULL\tNULL\tadmin\n120004\tNULL\tNULL\tadmin\n120005\tNULL\tNULL\tadmin\n120006\tNULL\tNULL\tadmin\n120007\tNULL\tNULL\tadmin\n120008\tNULL\tNULL\tadmin\n120009\tNULL\tNULL\tadmin\n120010\tNULL\tNULL\tadmin\n120011\tNULL\tNULL\tadmin\n120012\tNULL\tNULL\tadmin\n120013\tNULL\tNULL\tadmin\n120014\tNULL\tNULL\tadmin\n120015\tNULL\tNULL\tadmin\n120016\tNULL\tNULL\tadmin\n120017\tNULL\tNULL\tadmin\n120018\tNULL\tNULL\tadmin\n120019\tNULL\tNULL\tadmin\n120020\tNULL\tNULL\tadmin\n120021\tNULL\tNULL\tadmin\n120022\tNULL\tNULL\tadmin\n120023\tNULL\tNULL\tadmin\n120024\tNULL\tNULL\tadmin\n120025\tNULL\tNULL\tadmin\n120026\tNULL\tNULL\tadmin\n120027\tNULL\tNULL\tadmin\n120028\tNULL\tNULL\tadmin\n120029\tNULL\tNULL\tadmin\n120030\tNULL\tNULL\tadmin\n120031\tNULL\tNULL\tadmin\n120032\tNULL\tNULL\tadmin\n120033\tNULL\tNULL\tadmin\n120034\tNULL\tNULL\tadmin\n120035\tNULL\tNULL\tadmin\n120036\tNULL\tNULL\tadmin\n120037\tNULL\tNULL\tadmin\n120038\tNULL\tNULL\tadmin\n120039\tNULL\tNULL\tadmin\n120040\tNULL\tNULL\tadmin\n120041\tNULL\tNULL\tadmin\n120042\tNULL\tNULL\tadmin\n120043\tNULL\tNULL\tadmin\n120044\tNULL\tNULL\tadmin\n120045\tNULL\tNULL\tadmin\n120046\tNULL\tNULL\tadmin\n150001\tNULL\tNULL\tadmin\n180001\tNULL\tNULL\tadmin\n180002\tNULL\tNULL\tadmin\n180003\tNULL\tNULL\tadmin\n210001\tNULL\tNULL\tadmin\n210002\tNULL\tNULL\tadmin\n210003\tNULL\tNULL\tadmin\n210004\tNULL\tNULL\tadmin\n240001\tNULL\tNULL\tadmin\n240002\tNULL\tNULL\tadmin\n240003\tNULL\tNULL\tadmin\n240004\tNULL\tNULL\tadmin\n240005\tNULL\tNULL\tadmin\n240006\tNULL\tNULL\tadmin\n240007\tNULL\tNULL\tadmin\n240008\tNULL\tNULL\tadmin\n240009\tNULL\tNULL\tadmin\n240010\tNULL\tNULL\tadmin\n240011\tNULL\tNULL\tadmin\n240012\tNULL\tNULL\tadmin\n240013\tNULL\tNULL\tadmin\n240014\tNULL\tNULL\tadmin\n240015\tNULL\tNULL\tadmin\n240016\tNULL\tNULL\tadmin\n240017\tNULL\tNULL\tadmin\n240018\tNULL\tNULL\tadmin\n240019\tNULL\tNULL\tadmin\n240020\tNULL\tNULL\tadmin\n240021\tNULL\tNULL\tadmin\n240022\tNULL\tNULL\tadmin\n",
+  "stderr": "",
+  "execution_time_ms": 54
+}

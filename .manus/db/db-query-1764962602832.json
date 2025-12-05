@@ -1,0 +1,310 @@
+{
+  "query": "SELECT id, name, email, role FROM users ORDER BY role, id LIMIT 50;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3LkhXw7W2NLietY.root --database a7GnrUTuzTDTFdbLnSt79K --execute SELECT id, name, email, role FROM users ORDER BY role, id LIMIT 50;",
+  "rows": [
+    {
+      "id": "1",
+      "name": "Nextdoor Exteriors",
+      "email": "nextdoorextsolutions@gmail.com",
+      "role": "admin"
+    },
+    {
+      "id": "2",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "3",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "30001",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "30002",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "30003",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "30004",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "30005",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "30006",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "30007",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "60001",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "60002",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "60003",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "60004",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "60005",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "60006",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "60007",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "60008",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "60009",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "60010",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "60011",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "60012",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "60013",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "60014",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "60015",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "60016",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "60017",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "60018",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "60019",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "60020",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "60021",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "60022",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "60023",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "60024",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "60025",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "60026",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "60027",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "60028",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "60029",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "60030",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "60031",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "60032",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "60033",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "60034",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "60035",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "90001",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "90002",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "120001",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "120002",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    },
+    {
+      "id": "120003",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\temail\trole\n1\tNextdoor Exteriors\tnextdoorextsolutions@gmail.com\tadmin\n2\tNULL\tNULL\tadmin\n3\tNULL\tNULL\tadmin\n30001\tNULL\tNULL\tadmin\n30002\tNULL\tNULL\tadmin\n30003\tNULL\tNULL\tadmin\n30004\tNULL\tNULL\tadmin\n30005\tNULL\tNULL\tadmin\n30006\tNULL\tNULL\tadmin\n30007\tNULL\tNULL\tadmin\n60001\tNULL\tNULL\tadmin\n60002\tNULL\tNULL\tadmin\n60003\tNULL\tNULL\tadmin\n60004\tNULL\tNULL\tadmin\n60005\tNULL\tNULL\tadmin\n60006\tNULL\tNULL\tadmin\n60007\tNULL\tNULL\tadmin\n60008\tNULL\tNULL\tadmin\n60009\tNULL\tNULL\tadmin\n60010\tNULL\tNULL\tadmin\n60011\tNULL\tNULL\tadmin\n60012\tNULL\tNULL\tadmin\n60013\tNULL\tNULL\tadmin\n60014\tNULL\tNULL\tadmin\n60015\tNULL\tNULL\tadmin\n60016\tNULL\tNULL\tadmin\n60017\tNULL\tNULL\tadmin\n60018\tNULL\tNULL\tadmin\n60019\tNULL\tNULL\tadmin\n60020\tNULL\tNULL\tadmin\n60021\tNULL\tNULL\tadmin\n60022\tNULL\tNULL\tadmin\n60023\tNULL\tNULL\tadmin\n60024\tNULL\tNULL\tadmin\n60025\tNULL\tNULL\tadmin\n60026\tNULL\tNULL\tadmin\n60027\tNULL\tNULL\tadmin\n60028\tNULL\tNULL\tadmin\n60029\tNULL\tNULL\tadmin\n60030\tNULL\tNULL\tadmin\n60031\tNULL\tNULL\tadmin\n60032\tNULL\tNULL\tadmin\n60033\tNULL\tNULL\tadmin\n60034\tNULL\tNULL\tadmin\n60035\tNULL\tNULL\tadmin\n90001\tNULL\tNULL\tadmin\n90002\tNULL\tNULL\tadmin\n120001\tNULL\tNULL\tadmin\n120002\tNULL\tNULL\tadmin\n120003\tNULL\tNULL\tadmin\n",
+  "stderr": "",
+  "execution_time_ms": 55
+}

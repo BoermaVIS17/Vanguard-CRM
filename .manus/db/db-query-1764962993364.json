@@ -1,0 +1,66 @@
+{
+  "query": "SELECT id, name, email, role, openId FROM users;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3LkhXw7W2NLietY.root --database a7GnrUTuzTDTFdbLnSt79K --execute SELECT id, name, email, role, openId FROM users;",
+  "rows": [
+    {
+      "id": "1",
+      "name": "Nextdoor Exteriors",
+      "email": "nextdoorextsolutions@gmail.com",
+      "role": "owner",
+      "openId": "6LwwxHSVbVMsfvKtzuxCAi"
+    },
+    {
+      "id": "240045",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin",
+      "openId": "6LwwxHSVbVMsfvKtzuxCAi"
+    },
+    {
+      "id": "240046",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin",
+      "openId": "6LwwxHSVbVMsfvKtzuxCAi"
+    },
+    {
+      "id": "240047",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin",
+      "openId": "6LwwxHSVbVMsfvKtzuxCAi"
+    },
+    {
+      "id": "240048",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin",
+      "openId": "6LwwxHSVbVMsfvKtzuxCAi"
+    },
+    {
+      "id": "240049",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin",
+      "openId": "6LwwxHSVbVMsfvKtzuxCAi"
+    },
+    {
+      "id": "240050",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin",
+      "openId": "6LwwxHSVbVMsfvKtzuxCAi"
+    },
+    {
+      "id": "240051",
+      "name": "NULL",
+      "email": "NULL",
+      "role": "admin",
+      "openId": "6LwwxHSVbVMsfvKtzuxCAi"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\temail\trole\topenId\n1\tNextdoor Exteriors\tnextdoorextsolutions@gmail.com\towner\t6LwwxHSVbVMsfvKtzuxCAi\n240045\tNULL\tNULL\tadmin\t6LwwxHSVbVMsfvKtzuxCAi\n240046\tNULL\tNULL\tadmin\t6LwwxHSVbVMsfvKtzuxCAi\n240047\tNULL\tNULL\tadmin\t6LwwxHSVbVMsfvKtzuxCAi\n240048\tNULL\tNULL\tadmin\t6LwwxHSVbVMsfvKtzuxCAi\n240049\tNULL\tNULL\tadmin\t6LwwxHSVbVMsfvKtzuxCAi\n240050\tNULL\tNULL\tadmin\t6LwwxHSVbVMsfvKtzuxCAi\n240051\tNULL\tNULL\tadmin\t6LwwxHSVbVMsfvKtzuxCAi\n",
+  "stderr": "",
+  "execution_time_ms": 60
+}

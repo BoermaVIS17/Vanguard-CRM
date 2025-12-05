@@ -1,0 +1,14 @@
+{
+  "query": "SELECT email, COUNT(*) as count FROM users GROUP BY email;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3LkhXw7W2NLietY.root --database a7GnrUTuzTDTFdbLnSt79K --execute SELECT email, COUNT(*) as count FROM users GROUP BY email;",
+  "rows": [
+    {
+      "email": "nextdoorextsolutions@gmail.com",
+      "count": "1"
+    }
+  ],
+  "messages": [],
+  "stdout": "email\tcount\nnextdoorextsolutions@gmail.com\t1\n",
+  "stderr": "",
+  "execution_time_ms": 52
+}
