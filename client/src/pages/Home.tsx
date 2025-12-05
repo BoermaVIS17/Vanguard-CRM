@@ -906,9 +906,9 @@ export default function Home() {
             <div>
               <h4 className="font-heading font-bold text-white mb-4">About Us</h4>
               <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><a href="https://nextdoorextroofing.com/about" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">Our Story</a></li>
-                <li><a href="https://nextdoorextroofing.com/services" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">Full Services</a></li>
-                <li><a href="https://nextdoorextroofing.com/contact" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">Contact Us</a></li>
+                <li><button onClick={() => toast.info("Visit nextdoorextroofing.com for our full story")} className="hover:text-primary transition-colors text-left">Our Story</button></li>
+                <li><button onClick={() => toast.info("Visit nextdoorextroofing.com for our full services")} className="hover:text-primary transition-colors text-left">Full Services</button></li>
+                <li><button onClick={() => scrollToSection("request-form")} className="hover:text-primary transition-colors text-left">Contact Us</button></li>
               </ul>
             </div>
           </div>

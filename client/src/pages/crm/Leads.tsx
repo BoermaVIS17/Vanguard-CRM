@@ -28,6 +28,17 @@ const STATUS_OPTIONS = [
 export default function CRMLeads() {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [showNewJobDialog, setShowNewJobDialog] = useState(false);
+  const [newJobForm, setNewJobForm] = useState({
+    fullName: "",
+    email: "",
+    phone: "",
+    address: "",
+    cityStateZip: "",
+    roofAge: "",
+    roofConcerns: "",
+    dealType: "cash" as "insurance" | "cash" | "financed",
+  });
   const [selectedLead, setSelectedLead] = useState<number | null>(null);
   const [uploading, setUploading] = useState(false);
   const [noteText, setNoteText] = useState("");
@@ -70,6 +81,34 @@ export default function CRMLeads() {
       refetchLead();
     },
   });
+  const createJob = trpc.crm.createJob.useMutation({
+    onSuccess: () => {
+      toast.success("Job created successfully");
+      setShowNewJobDialog(false);
+      setNewJobForm({
+        fullName: "",
+        email: "",
+        phone: "",
+        address: "",
+        cityStateZip: "",
+        roofAge: "",
+        roofConcerns: "",
+        dealType: "cash",
+      });
+      refetch();
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+  });
+
+  const handleCreateJob = () => {
+    if (!newJobForm.fullName || !newJobForm.email || !newJobForm.phone || !newJobForm.address || !newJobForm.cityStateZip) {
+      toast.error("Please fill in all required fields");
+      return;
+    }
+    createJob.mutate(newJobForm);
+  };
 
   const filteredLeads = leads?.filter((lead) => {
     const matchesSearch = search === "" || 
@@ -166,7 +205,10 @@ export default function CRMLeads() {
                 ))}
               </SelectContent>
             </Select>
-            <Button className="bg-[#00d4aa] hover:bg-[#00b894] text-black font-semibold">
+            <Button 
+              className="bg-[#00d4aa] hover:bg-[#00b894] text-black font-semibold"
+              onClick={() => setShowNewJobDialog(true)}
+            >
               <Plus className="w-4 h-4 mr-2" />
               New Job
             </Button>
@@ -441,6 +483,106 @@ export default function CRMLeads() {
             </div>
           </CardContent>
         </Card>
+
+        {/* New Job Dialog */}
+        <Dialog open={showNewJobDialog} onOpenChange={setShowNewJobDialog}>
+          <DialogContent className="bg-slate-800 border-slate-700 text-white max-w-2xl">
+            <DialogHeader>
+              <DialogTitle className="text-xl font-bold text-white">Create New Job</DialogTitle>
+            </DialogHeader>
+            <div className="grid grid-cols-2 gap-4 py-4">
+              <div className="space-y-2">
+                <label className="text-sm text-slate-300">Full Name *</label>
+                <Input
+                  value={newJobForm.fullName}
+                  onChange={(e) => setNewJobForm({ ...newJobForm, fullName: e.target.value })}
+                  placeholder="Customer name"
+                  className="bg-slate-700 border-slate-600 text-white"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm text-slate-300">Email *</label>
+                <Input
+                  type="email"
+                  value={newJobForm.email}
+                  onChange={(e) => setNewJobForm({ ...newJobForm, email: e.target.value })}
+                  placeholder="customer@email.com"
+                  className="bg-slate-700 border-slate-600 text-white"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm text-slate-300">Phone *</label>
+                <Input
+                  value={newJobForm.phone}
+                  onChange={(e) => setNewJobForm({ ...newJobForm, phone: e.target.value })}
+                  placeholder="(555) 123-4567"
+                  className="bg-slate-700 border-slate-600 text-white"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm text-slate-300">Deal Type</label>
+                <Select value={newJobForm.dealType} onValueChange={(v: "insurance" | "cash" | "financed") => setNewJobForm({ ...newJobForm, dealType: v })}>
+                  <SelectTrigger className="bg-slate-700 border-slate-600 text-white">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="bg-slate-800 border-slate-600">
+                    <SelectItem value="cash" className="text-white">Cash</SelectItem>
+                    <SelectItem value="insurance" className="text-white">Insurance</SelectItem>
+                    <SelectItem value="financed" className="text-white">Financed</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="col-span-2 space-y-2">
+                <label className="text-sm text-slate-300">Address *</label>
+                <Input
+                  value={newJobForm.address}
+                  onChange={(e) => setNewJobForm({ ...newJobForm, address: e.target.value })}
+                  placeholder="123 Main Street"
+                  className="bg-slate-700 border-slate-600 text-white"
+                />
+              </div>
+              <div className="col-span-2 space-y-2">
+                <label className="text-sm text-slate-300">City, State, ZIP *</label>
+                <Input
+                  value={newJobForm.cityStateZip}
+                  onChange={(e) => setNewJobForm({ ...newJobForm, cityStateZip: e.target.value })}
+                  placeholder="Houston, TX 77001"
+                  className="bg-slate-700 border-slate-600 text-white"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm text-slate-300">Roof Age</label>
+                <Input
+                  value={newJobForm.roofAge}
+                  onChange={(e) => setNewJobForm({ ...newJobForm, roofAge: e.target.value })}
+                  placeholder="e.g., 15 years"
+                  className="bg-slate-700 border-slate-600 text-white"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm text-slate-300">Roof Concerns</label>
+                <Input
+                  value={newJobForm.roofConcerns}
+                  onChange={(e) => setNewJobForm({ ...newJobForm, roofConcerns: e.target.value })}
+                  placeholder="e.g., Leaking, storm damage"
+                  className="bg-slate-700 border-slate-600 text-white"
+                />
+              </div>
+            </div>
+            <div className="flex justify-end gap-3 pt-4 border-t border-slate-700">
+              <Button variant="outline" onClick={() => setShowNewJobDialog(false)} className="border-slate-600 text-slate-300 hover:bg-slate-700">
+                Cancel
+              </Button>
+              <Button 
+                onClick={handleCreateJob}
+                disabled={createJob.isPending}
+                className="bg-[#00d4aa] hover:bg-[#00b894] text-black font-semibold"
+              >
+                {createJob.isPending ? "Creating..." : "Create Job"}
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
     </CRMLayout>
   );

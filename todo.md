@@ -140,3 +140,17 @@
 - [x] Add manual "Send Lien Rights Alert" button to Dashboard
 - [ ] Set up scheduled task for weekly lien rights checks (requires external scheduler)
 - [x] Test notification delivery
+
+## Website Dead-End Review
+- [x] Review landing page navigation and links
+- [x] Review CRM Dashboard navigation and buttons
+- [x] Review Leads page functionality
+- [x] Review Pipeline page functionality
+- [x] Review Calendar page functionality
+- [x] Review Reports page functionality
+- [x] Review Team page functionality
+- [x] Review Job Detail page and all tabs
+- [x] Fix footer links (Our Story, Full Services → toast, Contact Us → scroll to form)
+- [x] Fix Reports page NaN% conversion rate issue
+- [x] Add New Job creation form with dialog to Leads page
+- [x] Add createJob backend endpoint for owners/admins

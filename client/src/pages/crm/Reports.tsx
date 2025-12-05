@@ -120,7 +120,7 @@ export default function Reports() {
         <div class="summary">
           <div class="stat"><strong>Total Leads:</strong> ${stats?.totalLeads || 0}</div>
           <div class="stat"><strong>Revenue:</strong> $${Number(stats?.totalRevenue || 0).toFixed(2)}</div>
-          <div class="stat"><strong>Conversion Rate:</strong> ${Number(stats?.conversionRate || 0).toFixed(1)}%</div>
+          <div class="stat"><strong>Conversion Rate:</strong> ${isNaN(Number(stats?.conversionRate)) ? '0.0' : Number(stats?.conversionRate || 0).toFixed(1)}%</div>
         </div>
 
         <table>
@@ -221,7 +221,7 @@ export default function Reports() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-slate-400">Conversion Rate</p>
-                  <p className="text-3xl font-bold text-white">{Number(stats?.conversionRate || 0).toFixed(1)}%</p>
+                  <p className="text-3xl font-bold text-white">{isNaN(Number(stats?.conversionRate)) ? '0.0' : Number(stats?.conversionRate || 0).toFixed(1)}%</p>
                 </div>
                 <div className="w-12 h-12 rounded-full bg-purple-500/20 flex items-center justify-center">
                   <TrendingUp className="w-6 h-6 text-purple-400" />

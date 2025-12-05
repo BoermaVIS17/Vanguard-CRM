@@ -422,6 +422,62 @@ export const appRouter = router({
         return { ...lead, activities: leadActivities, documents: leadDocuments };
       }),
 
+    // Create a new job/lead from CRM
+    createJob: protectedProcedure
+      .input(z.object({
+        fullName: z.string().min(2),
+        email: z.string().email(),
+        phone: z.string().min(10),
+        address: z.string().min(5),
+        cityStateZip: z.string().min(5),
+        roofAge: z.string().optional(),
+        roofConcerns: z.string().optional(),
+        dealType: z.enum(["insurance", "cash", "financed"]).optional(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const db = await getDb();
+        if (!db) throw new Error("Database not available");
+
+        // Only owners and admins can create jobs
+        if (!isOwner(ctx.user) && !isAdmin(ctx.user)) {
+          throw new Error("Only owners and admins can create new jobs");
+        }
+
+        const result = await db.insert(reportRequests).values({
+          fullName: input.fullName,
+          email: input.email,
+          phone: input.phone,
+          address: input.address,
+          cityStateZip: input.cityStateZip,
+          roofAge: input.roofAge || null,
+          roofConcerns: input.roofConcerns || null,
+          dealType: input.dealType || "cash",
+          status: "lead",
+          priority: "medium" as const,
+          handsOnInspection: false,
+          amountPaid: 0,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        }).$returningId();
+
+        const newJobId = result[0].id;
+        const [newJob] = await db.select().from(reportRequests).where(eq(reportRequests.id, newJobId));
+
+        // Log the creation in edit history
+        await logEditHistory(
+          db,
+          newJob.id,
+          ctx.user.id,
+          "Job Created",
+          null,
+          `Created by ${ctx.user.name || ctx.user.email}`,
+          "create",
+          ctx
+        );
+
+        return newJob;
+      }),
+
     // Update lead (with permission check and edit history)
     updateLead: protectedProcedure
       .input(z.object({
@@ -1118,7 +1174,7 @@ export const appRouter = router({
         // Calculate stats from filtered leads
         const total = leads.length;
         const closedWon = leads.filter(l => l.status === "closed_won").length;
-        const conversionRate = total > 0 ? ((closedWon / total) * 100).toFixed(1) : "0";
+        const conversionRate = total > 0 ? Number(((closedWon / total) * 100).toFixed(1)) : 0;
         const totalRevenue = leads.reduce((sum, l) => sum + (l.amountPaid || 0), 0) / 100;
 
         // Group by status
