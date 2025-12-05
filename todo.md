@@ -40,3 +40,14 @@
 - [x] Create customer profile pages (via lead detail modal)
 - [x] Add activity log functionality
 - [x] Build team/user management (Owner only)
+
+## CRM Development (Phase 2)
+- [x] Document upload functionality for leads (photos, PDFs, storm reports)
+- [x] File storage integration with S3
+- [x] Document viewer/preview in lead detail
+- [x] Scheduling calendar page with appointment management
+- [x] Appointment creation with rep assignment
+- [x] Calendar view (month view with day appointments)
+- [x] Reports export page with filters
+- [x] CSV export for lead lists
+- [x] PDF report generation

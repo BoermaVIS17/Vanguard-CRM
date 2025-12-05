@@ -11,6 +11,8 @@ import CRMLeads from "./pages/crm/Leads";
 import CRMPipeline from "./pages/crm/Pipeline";
 import CRMTeam from "./pages/crm/Team";
 import CRMLogin from "./pages/crm/Login";
+import CRMCalendar from "./pages/crm/Calendar";
+import CRMReports from "./pages/crm/Reports";
 import { trpc } from "./lib/trpc";
 
 // Protected route wrapper for CRM
@@ -51,6 +53,12 @@ function Router() {
       </Route>
       <Route path={"/crm/team"}>
         <ProtectedCRMRoute component={CRMTeam} />
+      </Route>
+      <Route path={"/crm/calendar"}>
+        <ProtectedCRMRoute component={CRMCalendar} />
+      </Route>
+      <Route path={"/crm/reports"}>
+        <ProtectedCRMRoute component={CRMReports} />
       </Route>
       <Route path={"/crm/login"} component={CRMLogin} />
       

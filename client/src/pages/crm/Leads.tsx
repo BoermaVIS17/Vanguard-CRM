@@ -1,12 +1,13 @@
-import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useState, useRef } from "react";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { trpc } from "@/lib/trpc";
-import { Search, Phone, Mail, MapPin, Clock, User, FileText, ChevronRight } from "lucide-react";
+import { Search, Phone, Mail, MapPin, Clock, FileText, ChevronRight, Upload, File, Image, Trash2, Download, Calendar, BarChart3 } from "lucide-react";
 import { Link } from "wouter";
 import { toast } from "sonner";
 
@@ -26,9 +27,11 @@ export default function CRMLeads() {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [selectedLead, setSelectedLead] = useState<number | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const { data: leads, isLoading, refetch } = trpc.crm.getLeads.useQuery({});
-  const { data: leadDetail } = trpc.crm.getLead.useQuery(
+  const { data: leadDetail, refetch: refetchLead } = trpc.crm.getLead.useQuery(
     { id: selectedLead! },
     { enabled: !!selectedLead }
   );
@@ -41,7 +44,24 @@ export default function CRMLeads() {
   const addNote = trpc.crm.addNote.useMutation({
     onSuccess: () => {
       toast.success("Note added");
-      refetch();
+      refetchLead();
+    },
+  });
+  const uploadDocument = trpc.crm.uploadDocument.useMutation({
+    onSuccess: () => {
+      toast.success("Document uploaded successfully");
+      refetchLead();
+      setUploading(false);
+    },
+    onError: (error) => {
+      toast.error(error.message);
+      setUploading(false);
+    },
+  });
+  const deleteDocument = trpc.crm.deleteDocument.useMutation({
+    onSuccess: () => {
+      toast.success("Document deleted");
+      refetchLead();
     },
   });
 
@@ -56,6 +76,32 @@ export default function CRMLeads() {
 
   const getStatusColor = (status: string) => {
     return STATUS_OPTIONS.find(s => s.value === status)?.color || "bg-gray-500/20 text-gray-400";
+  };
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !selectedLead) return;
+
+    setUploading(true);
+    
+    // Convert file to base64
+    const reader = new FileReader();
+    reader.onload = () => {
+      const base64 = (reader.result as string).split(",")[1];
+      uploadDocument.mutate({
+        leadId: selectedLead,
+        fileName: file.name,
+        fileType: file.type,
+        fileData: base64,
+        category: "other",
+      });
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const getFileIcon = (fileType: string) => {
+    if (fileType.startsWith("image/")) return <Image className="w-4 h-4" />;
+    return <File className="w-4 h-4" />;
   };
 
   return (
@@ -74,6 +120,12 @@ export default function CRMLeads() {
             <Link href="/crm" className="text-gray-400 hover:text-white transition">Dashboard</Link>
             <Link href="/crm/leads" className="text-primary font-medium">Leads</Link>
             <Link href="/crm/pipeline" className="text-gray-400 hover:text-white transition">Pipeline</Link>
+            <Link href="/crm/calendar" className="text-gray-400 hover:text-white transition flex items-center gap-1">
+              <Calendar className="w-4 h-4" /> Calendar
+            </Link>
+            <Link href="/crm/reports" className="text-gray-400 hover:text-white transition flex items-center gap-1">
+              <BarChart3 className="w-4 h-4" /> Reports
+            </Link>
             <Link href="/crm/team" className="text-gray-400 hover:text-white transition">Team</Link>
           </nav>
         </div>
@@ -177,96 +229,176 @@ export default function CRMLeads() {
                               View <ChevronRight className="w-4 h-4 ml-1" />
                             </Button>
                           </DialogTrigger>
-                          <DialogContent className="bg-[#111] border-white/10 text-white max-w-2xl">
+                          <DialogContent className="bg-[#111] border-white/10 text-white max-w-3xl max-h-[90vh] overflow-y-auto">
                             <DialogHeader>
                               <DialogTitle className="text-xl">{leadDetail?.fullName || lead.fullName}</DialogTitle>
                             </DialogHeader>
                             {leadDetail && (
-                              <div className="space-y-6">
-                                {/* Contact Info */}
-                                <div className="grid grid-cols-2 gap-4">
+                              <Tabs defaultValue="details" className="w-full">
+                                <TabsList className="bg-black/40 border-white/10">
+                                  <TabsTrigger value="details">Details</TabsTrigger>
+                                  <TabsTrigger value="documents">Documents ({leadDetail.documents?.length || 0})</TabsTrigger>
+                                  <TabsTrigger value="activity">Activity</TabsTrigger>
+                                </TabsList>
+
+                                <TabsContent value="details" className="space-y-6 mt-4">
+                                  {/* Contact Info */}
+                                  <div className="grid grid-cols-2 gap-4">
+                                    <div>
+                                      <p className="text-sm text-gray-400 mb-1">Email</p>
+                                      <p className="text-white">{leadDetail.email}</p>
+                                    </div>
+                                    <div>
+                                      <p className="text-sm text-gray-400 mb-1">Phone</p>
+                                      <a href={`tel:${leadDetail.phone}`} className="text-primary hover:underline">{leadDetail.phone}</a>
+                                    </div>
+                                    <div className="col-span-2">
+                                      <p className="text-sm text-gray-400 mb-1">Address</p>
+                                      <p className="text-white">{leadDetail.address}, {leadDetail.cityStateZip}</p>
+                                    </div>
+                                    <div>
+                                      <p className="text-sm text-gray-400 mb-1">Roof Age</p>
+                                      <p className="text-white">{leadDetail.roofAge || "Not specified"}</p>
+                                    </div>
+                                    <div>
+                                      <p className="text-sm text-gray-400 mb-1">Payment</p>
+                                      <p className="text-white">${(leadDetail.amountPaid / 100).toFixed(2)}</p>
+                                    </div>
+                                  </div>
+
+                                  {/* Status Update */}
                                   <div>
-                                    <p className="text-sm text-gray-400 mb-1">Email</p>
-                                    <p className="text-white">{leadDetail.email}</p>
+                                    <p className="text-sm text-gray-400 mb-2">Update Status</p>
+                                    <Select 
+                                      value={leadDetail.status} 
+                                      onValueChange={(value) => updateLead.mutate({ id: leadDetail.id, status: value })}
+                                    >
+                                      <SelectTrigger className="bg-black/40 border-white/10">
+                                        <SelectValue />
+                                      </SelectTrigger>
+                                      <SelectContent>
+                                        {STATUS_OPTIONS.map((status) => (
+                                          <SelectItem key={status.value} value={status.value}>{status.label}</SelectItem>
+                                        ))}
+                                      </SelectContent>
+                                    </Select>
                                   </div>
-                                  <div>
-                                    <p className="text-sm text-gray-400 mb-1">Phone</p>
-                                    <p className="text-white">{leadDetail.phone}</p>
+
+                                  {/* Roof Concerns */}
+                                  {leadDetail.roofConcerns && (
+                                    <div>
+                                      <p className="text-sm text-gray-400 mb-1">Roof Concerns</p>
+                                      <p className="text-white bg-white/5 p-3 rounded">{leadDetail.roofConcerns}</p>
+                                    </div>
+                                  )}
+
+                                  {/* Hands-on Inspection */}
+                                  <div className="flex items-center gap-2">
+                                    <span className={`px-2 py-1 rounded text-xs font-medium ${
+                                      leadDetail.handsOnInspection ? "bg-primary/20 text-primary" : "bg-gray-500/20 text-gray-400"
+                                    }`}>
+                                      {leadDetail.handsOnInspection ? "✓ Hands-On Inspection Requested" : "Drone Only"}
+                                    </span>
                                   </div>
-                                  <div className="col-span-2">
-                                    <p className="text-sm text-gray-400 mb-1">Address</p>
-                                    <p className="text-white">{leadDetail.address}, {leadDetail.cityStateZip}</p>
+                                </TabsContent>
+
+                                <TabsContent value="documents" className="mt-4">
+                                  {/* Upload Button */}
+                                  <div className="mb-4">
+                                    <input
+                                      type="file"
+                                      ref={fileInputRef}
+                                      onChange={handleFileUpload}
+                                      className="hidden"
+                                      accept="image/*,.pdf,.doc,.docx"
+                                    />
+                                    <Button 
+                                      onClick={() => fileInputRef.current?.click()}
+                                      disabled={uploading}
+                                      className="bg-primary hover:bg-primary/90"
+                                    >
+                                      <Upload className="w-4 h-4 mr-2" />
+                                      {uploading ? "Uploading..." : "Upload Document"}
+                                    </Button>
+                                    <p className="text-xs text-gray-500 mt-2">
+                                      Supported: Images, PDFs, Word documents
+                                    </p>
                                   </div>
-                                </div>
 
-                                {/* Status Update */}
-                                <div>
-                                  <p className="text-sm text-gray-400 mb-2">Update Status</p>
-                                  <Select 
-                                    value={leadDetail.status} 
-                                    onValueChange={(value) => updateLead.mutate({ id: leadDetail.id, status: value })}
-                                  >
-                                    <SelectTrigger className="bg-black/40 border-white/10">
-                                      <SelectValue />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                      {STATUS_OPTIONS.map((status) => (
-                                        <SelectItem key={status.value} value={status.value}>{status.label}</SelectItem>
-                                      ))}
-                                    </SelectContent>
-                                  </Select>
-                                </div>
-
-                                {/* Roof Concerns */}
-                                {leadDetail.roofConcerns && (
-                                  <div>
-                                    <p className="text-sm text-gray-400 mb-1">Roof Concerns</p>
-                                    <p className="text-white bg-white/5 p-3 rounded">{leadDetail.roofConcerns}</p>
+                                  {/* Documents List */}
+                                  <div className="space-y-2">
+                                    {leadDetail.documents?.map((doc: any) => (
+                                      <div key={doc.id} className="flex items-center justify-between bg-white/5 p-3 rounded">
+                                        <div className="flex items-center gap-3">
+                                          {getFileIcon(doc.fileType)}
+                                          <div>
+                                            <p className="text-sm text-white">{doc.fileName}</p>
+                                            <p className="text-xs text-gray-500">
+                                              {new Date(doc.createdAt).toLocaleDateString()} • {doc.uploadedBy?.name || "System"}
+                                            </p>
+                                          </div>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                          <a href={doc.fileUrl} target="_blank" rel="noopener noreferrer">
+                                            <Button variant="ghost" size="sm">
+                                              <Download className="w-4 h-4" />
+                                            </Button>
+                                          </a>
+                                          <Button 
+                                            variant="ghost" 
+                                            size="sm" 
+                                            className="text-red-400 hover:text-red-300"
+                                            onClick={() => deleteDocument.mutate({ documentId: doc.id })}
+                                          >
+                                            <Trash2 className="w-4 h-4" />
+                                          </Button>
+                                        </div>
+                                      </div>
+                                    ))}
+                                    {(!leadDetail.documents || leadDetail.documents.length === 0) && (
+                                      <div className="text-center py-8 text-gray-500">
+                                        <FileText className="w-12 h-12 mx-auto mb-2 opacity-50" />
+                                        <p>No documents uploaded yet</p>
+                                      </div>
+                                    )}
                                   </div>
-                                )}
+                                </TabsContent>
 
-                                {/* Hands-on Inspection */}
-                                <div className="flex items-center gap-2">
-                                  <span className={`px-2 py-1 rounded text-xs font-medium ${
-                                    leadDetail.handsOnInspection ? "bg-primary/20 text-primary" : "bg-gray-500/20 text-gray-400"
-                                  }`}>
-                                    {leadDetail.handsOnInspection ? "✓ Hands-On Inspection Requested" : "Drone Only"}
-                                  </span>
-                                </div>
-
-                                {/* Activity Log */}
-                                <div>
-                                  <p className="text-sm text-gray-400 mb-2">Activity Log</p>
-                                  <div className="space-y-2 max-h-40 overflow-y-auto">
+                                <TabsContent value="activity" className="mt-4">
+                                  {/* Activity Log */}
+                                  <div className="space-y-2 max-h-60 overflow-y-auto mb-4">
                                     {leadDetail.activities?.map((activity: any) => (
-                                      <div key={activity.id} className="text-sm bg-white/5 p-2 rounded">
+                                      <div key={activity.id} className="text-sm bg-white/5 p-3 rounded">
                                         <p className="text-gray-300">{activity.description}</p>
-                                        <p className="text-xs text-gray-500">{new Date(activity.createdAt).toLocaleString()}</p>
+                                        <p className="text-xs text-gray-500 mt-1">
+                                          {new Date(activity.createdAt).toLocaleString()}
+                                          {activity.user && ` • ${activity.user.name || activity.user.email}`}
+                                        </p>
                                       </div>
                                     ))}
                                     {(!leadDetail.activities || leadDetail.activities.length === 0) && (
-                                      <p className="text-gray-500 text-sm">No activity yet</p>
+                                      <p className="text-gray-500 text-sm text-center py-4">No activity yet</p>
                                     )}
                                   </div>
-                                </div>
 
-                                {/* Add Note */}
-                                <div>
-                                  <p className="text-sm text-gray-400 mb-2">Add Note</p>
-                                  <form onSubmit={(e) => {
-                                    e.preventDefault();
-                                    const form = e.target as HTMLFormElement;
-                                    const note = (form.elements.namedItem("note") as HTMLTextAreaElement).value;
-                                    if (note.trim()) {
-                                      addNote.mutate({ leadId: leadDetail.id, note });
-                                      form.reset();
-                                    }
-                                  }}>
-                                    <Textarea name="note" placeholder="Add a note..." className="bg-black/40 border-white/10 mb-2" />
-                                    <Button type="submit" size="sm">Add Note</Button>
-                                  </form>
-                                </div>
-                              </div>
+                                  {/* Add Note */}
+                                  <div>
+                                    <p className="text-sm text-gray-400 mb-2">Add Note</p>
+                                    <form onSubmit={(e) => {
+                                      e.preventDefault();
+                                      const form = e.target as HTMLFormElement;
+                                      const note = (form.elements.namedItem("note") as HTMLTextAreaElement).value;
+                                      if (note.trim()) {
+                                        addNote.mutate({ leadId: leadDetail.id, note });
+                                        form.reset();
+                                      }
+                                    }}>
+                                      <Textarea name="note" placeholder="Add a note..." className="bg-black/40 border-white/10 mb-2" />
+                                      <Button type="submit" size="sm" className="bg-primary">Add Note</Button>
+                                    </form>
+                                  </div>
+                                </TabsContent>
+                              </Tabs>
                             )}
                           </DialogContent>
                         </Dialog>

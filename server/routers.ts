@@ -10,7 +10,8 @@ import { notifyOwner } from "./_core/notification";
 import { sendSMSNotification } from "./sms";
 import Stripe from "stripe";
 import { ENV } from "./_core/env";
-import { eq, desc, and, or, like, sql } from "drizzle-orm";
+import { eq, desc, and, or, like, sql, gte, lte, between } from "drizzle-orm";
+import { storagePut, storageGet } from "./storage";
 
 // Initialize Stripe
 const stripe = new Stripe(ENV.stripeSecretKey || "", {
@@ -211,7 +212,11 @@ export const appRouter = router({
           .where(eq(activities.reportRequestId, input.id))
           .orderBy(desc(activities.createdAt));
 
-        return { ...lead, activities: leadActivities };
+        const leadDocuments = await db.select().from(documents)
+          .where(eq(documents.reportRequestId, input.id))
+          .orderBy(desc(documents.createdAt));
+
+        return { ...lead, activities: leadActivities, documents: leadDocuments };
       }),
 
     // Update lead
@@ -324,6 +329,270 @@ export const appRouter = router({
 
         await db.update(users).set(updateData).where(eq(users.id, input.userId));
         return { success: true };
+      }),
+
+    // ============ DOCUMENT UPLOAD ============
+    
+    // Upload document to a lead
+    uploadDocument: protectedProcedure
+      .input(z.object({
+        leadId: z.number(),
+        fileName: z.string(),
+        fileData: z.string(), // Base64 encoded file data
+        fileType: z.string(),
+        category: z.enum(["drone_photo", "inspection_photo", "report", "contract", "invoice", "other"]),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const db = await getDb();
+        if (!db) throw new Error("Database not available");
+
+        // Decode base64 file data
+        const buffer = Buffer.from(input.fileData, "base64");
+        const fileSize = buffer.length;
+
+        // Generate unique file path
+        const timestamp = Date.now();
+        const safeName = input.fileName.replace(/[^a-zA-Z0-9.-]/g, "_");
+        const filePath = `leads/${input.leadId}/${timestamp}_${safeName}`;
+
+        // Upload to S3
+        const { url } = await storagePut(filePath, buffer, input.fileType);
+
+        // Save document record
+        const [result] = await db.insert(documents).values({
+          reportRequestId: input.leadId,
+          uploadedBy: ctx.user?.id,
+          fileName: input.fileName,
+          fileUrl: url,
+          fileType: input.fileType,
+          fileSize: fileSize,
+          category: input.category,
+        });
+
+        // Log activity
+        await db.insert(activities).values({
+          reportRequestId: input.leadId,
+          userId: ctx.user?.id,
+          activityType: "document_uploaded",
+          description: `Uploaded ${input.category.replace("_", " ")}: ${input.fileName}`,
+        });
+
+        return { success: true, documentId: result.insertId, url };
+      }),
+
+    // Get documents for a lead
+    getDocuments: protectedProcedure
+      .input(z.object({ leadId: z.number() }))
+      .query(async ({ input }) => {
+        const db = await getDb();
+        if (!db) throw new Error("Database not available");
+
+        const docs = await db.select().from(documents)
+          .where(eq(documents.reportRequestId, input.leadId))
+          .orderBy(desc(documents.createdAt));
+
+        return docs;
+      }),
+
+    // Delete document
+    deleteDocument: protectedProcedure
+      .input(z.object({ documentId: z.number() }))
+      .mutation(async ({ input, ctx }) => {
+        const db = await getDb();
+        if (!db) throw new Error("Database not available");
+
+        // Only owners/admins can delete
+        if (ctx.user?.role !== "owner" && ctx.user?.role !== "admin") {
+          throw new Error("Unauthorized");
+        }
+
+        await db.delete(documents).where(eq(documents.id, input.documentId));
+        return { success: true };
+      }),
+
+    // ============ SCHEDULING / CALENDAR ============
+
+    // Get appointments for calendar view
+    getAppointments: protectedProcedure
+      .input(z.object({
+        startDate: z.string(),
+        endDate: z.string(),
+        assignedTo: z.number().optional(),
+      }))
+      .query(async ({ input }) => {
+        const db = await getDb();
+        if (!db) throw new Error("Database not available");
+
+        const start = new Date(input.startDate);
+        const end = new Date(input.endDate);
+
+        let query = db.select({
+          id: reportRequests.id,
+          fullName: reportRequests.fullName,
+          phone: reportRequests.phone,
+          address: reportRequests.address,
+          cityStateZip: reportRequests.cityStateZip,
+          scheduledDate: reportRequests.scheduledDate,
+          status: reportRequests.status,
+          priority: reportRequests.priority,
+          assignedTo: reportRequests.assignedTo,
+          handsOnInspection: reportRequests.handsOnInspection,
+        })
+        .from(reportRequests)
+        .where(
+          and(
+            sql`${reportRequests.scheduledDate} IS NOT NULL`,
+            gte(reportRequests.scheduledDate, start),
+            lte(reportRequests.scheduledDate, end)
+          )
+        );
+
+        const appointments = await query;
+        return appointments;
+      }),
+
+    // Schedule appointment
+    scheduleAppointment: protectedProcedure
+      .input(z.object({
+        leadId: z.number(),
+        scheduledDate: z.string(),
+        assignedTo: z.number().optional(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const db = await getDb();
+        if (!db) throw new Error("Database not available");
+
+        const updateData: Record<string, unknown> = {
+          scheduledDate: new Date(input.scheduledDate),
+          status: "inspection_scheduled",
+        };
+        if (input.assignedTo !== undefined) {
+          updateData.assignedTo = input.assignedTo;
+        }
+
+        await db.update(reportRequests).set(updateData).where(eq(reportRequests.id, input.leadId));
+
+        // Log activity
+        await db.insert(activities).values({
+          reportRequestId: input.leadId,
+          userId: ctx.user?.id,
+          activityType: "appointment_scheduled",
+          description: `Inspection scheduled for ${new Date(input.scheduledDate).toLocaleString()}`,
+        });
+
+        return { success: true };
+      }),
+
+    // ============ REPORTS / EXPORT ============
+
+    // Get leads for export with filters
+    getLeadsForExport: protectedProcedure
+      .input(z.object({
+        startDate: z.string().optional(),
+        endDate: z.string().optional(),
+        status: z.string().optional(),
+        salesRep: z.string().optional(),
+        assignedTo: z.number().optional(),
+      }))
+      .query(async ({ input }) => {
+        const db = await getDb();
+        if (!db) throw new Error("Database not available");
+
+        let conditions = [];
+        
+        if (input.startDate) {
+          conditions.push(gte(reportRequests.createdAt, new Date(input.startDate)));
+        }
+        if (input.endDate) {
+          conditions.push(lte(reportRequests.createdAt, new Date(input.endDate)));
+        }
+        if (input.status && input.status !== "all") {
+          conditions.push(eq(reportRequests.status, input.status as any));
+        }
+        if (input.salesRep) {
+          conditions.push(eq(reportRequests.salesRepCode, input.salesRep));
+        }
+        if (input.assignedTo) {
+          conditions.push(eq(reportRequests.assignedTo, input.assignedTo));
+        }
+
+        const query = conditions.length > 0
+          ? db.select().from(reportRequests).where(and(...conditions)).orderBy(desc(reportRequests.createdAt))
+          : db.select().from(reportRequests).orderBy(desc(reportRequests.createdAt));
+
+        const leads = await query;
+        return leads;
+      }),
+
+    // Get report summary stats
+    getReportStats: protectedProcedure
+      .input(z.object({
+        startDate: z.string().optional(),
+        endDate: z.string().optional(),
+      }))
+      .query(async ({ input }) => {
+        const db = await getDb();
+        if (!db) throw new Error("Database not available");
+
+        let conditions = [];
+        if (input.startDate) {
+          conditions.push(gte(reportRequests.createdAt, new Date(input.startDate)));
+        }
+        if (input.endDate) {
+          conditions.push(lte(reportRequests.createdAt, new Date(input.endDate)));
+        }
+
+        const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
+
+        // Total leads
+        const [totalResult] = await db.select({ count: sql<number>`COUNT(*)` })
+          .from(reportRequests)
+          .where(whereClause);
+
+        // By status
+        const statusCounts = await db.select({
+          status: reportRequests.status,
+          count: sql<number>`COUNT(*)`,
+        })
+        .from(reportRequests)
+        .where(whereClause)
+        .groupBy(reportRequests.status);
+
+        // By sales rep
+        const repCounts = await db.select({
+          salesRepCode: reportRequests.salesRepCode,
+          count: sql<number>`COUNT(*)`,
+        })
+        .from(reportRequests)
+        .where(whereClause)
+        .groupBy(reportRequests.salesRepCode);
+
+        // Revenue
+        const [revenueResult] = await db.select({
+          total: sql<number>`COALESCE(SUM(amountPaid), 0)`,
+        })
+        .from(reportRequests)
+        .where(whereClause);
+
+        // Conversion rate (closed_won / total)
+        const [closedWonResult] = await db.select({ count: sql<number>`COUNT(*)` })
+          .from(reportRequests)
+          .where(conditions.length > 0 
+            ? and(...conditions, eq(reportRequests.status, "closed_won"))
+            : eq(reportRequests.status, "closed_won")
+          );
+
+        const total = totalResult?.count || 0;
+        const closedWon = closedWonResult?.count || 0;
+        const conversionRate = total > 0 ? ((closedWon / total) * 100).toFixed(1) : "0";
+
+        return {
+          totalLeads: total,
+          byStatus: statusCounts,
+          byRep: repCounts,
+          totalRevenue: (revenueResult?.total || 0) / 100,
+          conversionRate: `${conversionRate}%`,
+        };
       }),
   }),
 });
