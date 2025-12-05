@@ -176,3 +176,6 @@
 ## Job Detail Enhancements
 - [x] Add Team Lead assignment section (Owners can also be team leads)
 - [x] Make job details section editable (status, deal type, priority, scheduled date, etc.)
+
+## Edit History Management
+- [x] Allow owners to delete edit history entries

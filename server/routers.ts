@@ -729,6 +729,30 @@ export const appRouter = router({
         }));
       }),
 
+    // Delete edit history entry (Owner only)
+    deleteEditHistory: protectedProcedure
+      .input(z.object({ 
+        id: z.number(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const db = await getDb();
+        if (!db) throw new Error("Database not available");
+
+        // Only owners can delete edit history
+        if (!isOwner(ctx.user)) {
+          throw new Error("Only owners can delete edit history entries");
+        }
+
+        // Verify the entry exists
+        const [entry] = await db.select().from(editHistory).where(eq(editHistory.id, input.id));
+        if (!entry) throw new Error("Edit history entry not found");
+
+        // Delete the entry
+        await db.delete(editHistory).where(eq(editHistory.id, input.id));
+
+        return { success: true };
+      }),
+
     // Add note to lead
     addNote: protectedProcedure
       .input(z.object({

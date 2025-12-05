@@ -287,6 +287,14 @@ export default function JobDetail() {
     onError: (error) => toast.error(error.message),
   });
 
+  const deleteEditHistory = trpc.crm.deleteEditHistory.useMutation({
+    onSuccess: () => {
+      toast.success("History entry deleted");
+      refetch();
+    },
+    onError: (error) => toast.error(error.message),
+  });
+
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, type: "document" | "photo") => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -1250,11 +1258,27 @@ export default function JobDetail() {
                         <div className="flex items-start gap-4">
                           <div className={`w-2 h-2 rounded-full mt-2 ${EDIT_TYPE_COLORS[edit.editType] || "bg-gray-500"}`} />
                           <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-2">
-                              <span className="font-medium text-white capitalize">{edit.fieldName.replace(/([A-Z])/g, ' $1').trim()}</span>
-                              <span className={`px-2 py-0.5 rounded text-xs text-white ${EDIT_TYPE_COLORS[edit.editType] || "bg-gray-500"}`}>
-                                {edit.editType.replace("_", " ")}
-                              </span>
+                            <div className="flex items-center justify-between mb-2">
+                              <div className="flex items-center gap-2">
+                                <span className="font-medium text-white capitalize">{edit.fieldName.replace(/([A-Z])/g, ' $1').trim()}</span>
+                                <span className={`px-2 py-0.5 rounded text-xs text-white ${EDIT_TYPE_COLORS[edit.editType] || "bg-gray-500"}`}>
+                                  {edit.editType.replace("_", " ")}
+                                </span>
+                              </div>
+                              {canDelete && (
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => {
+                                    if (confirm("Are you sure you want to delete this history entry? This cannot be undone.")) {
+                                      deleteEditHistory.mutate({ id: edit.id });
+                                    }
+                                  }}
+                                  className="text-red-400 hover:text-red-300 hover:bg-red-500/10 h-7 w-7 p-0"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </Button>
+                              )}
                             </div>
                             <div className="grid grid-cols-2 gap-4 text-sm">
                               <div>
