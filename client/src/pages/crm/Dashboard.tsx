@@ -19,7 +19,10 @@ import {
   Banknote,
   CreditCard,
   Gavel,
+  Bell,
+  Loader2,
 } from "lucide-react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { trpc } from "@/lib/trpc";
@@ -170,6 +173,42 @@ function ConversionFunnel({ stats }: { stats: any }) {
         </div>
       ))}
     </div>
+  );
+}
+
+// Send Lien Rights Alert Button Component
+function SendLienRightsAlertButton() {
+  const sendAlert = trpc.crm.sendLienRightsAlert.useMutation({
+    onSuccess: (result) => {
+      if (result.success) {
+        if (result.warningCount === 0 && result.criticalCount === 0) {
+          toast.info("No jobs requiring lien rights alerts at this time.");
+        } else {
+          toast.success(`Lien rights alert sent for ${result.criticalCount} critical and ${result.warningCount} warning jobs.`);
+        }
+      } else {
+        toast.error(result.error || "Failed to send lien rights alert.");
+      }
+    },
+    onError: (error) => {
+      toast.error(error.message || "Failed to send alert.");
+    },
+  });
+
+  return (
+    <Button
+      variant="outline"
+      className="border-red-400 text-red-400 hover:bg-red-400/10 bg-transparent"
+      onClick={() => sendAlert.mutate({})}
+      disabled={sendAlert.isPending}
+    >
+      {sendAlert.isPending ? (
+        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+      ) : (
+        <Bell className="w-4 h-4 mr-2" />
+      )}
+      Send Lien Rights Alert
+    </Button>
   );
 }
 
@@ -482,6 +521,7 @@ export default function CRMDashboard() {
                       Schedule Inspection
                     </Button>
                   </Link>
+                  <SendLienRightsAlertButton />
                 </div>
               </CardContent>
             </Card>

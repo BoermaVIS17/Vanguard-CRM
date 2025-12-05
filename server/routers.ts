@@ -9,6 +9,7 @@ import { PRODUCTS, validatePromoCode } from "./products";
 import { notifyOwner } from "./_core/notification";
 import { sendSMSNotification } from "./sms";
 import { sendWelcomeEmail } from "./email";
+import { sendLienRightsAlertNotification, getLienRightsAlertJobs } from "./lienRightsNotification";
 import Stripe from "stripe";
 import { ENV } from "./_core/env";
 import { eq, desc, and, or, like, sql, gte, lte, inArray, isNotNull } from "drizzle-orm";
@@ -1558,6 +1559,37 @@ export const appRouter = router({
         }
 
         return results;
+      }),
+
+    // ============ LIEN RIGHTS ALERTS ============
+
+    // Get lien rights alert summary (for dashboard widget)
+    getLienRightsAlertSummary: protectedProcedure.query(async () => {
+      const { warningJobs, criticalJobs } = await getLienRightsAlertJobs();
+      
+      return {
+        warningCount: warningJobs.length,
+        criticalCount: criticalJobs.length,
+        warningJobs: warningJobs.slice(0, 5), // Top 5 most urgent
+        criticalJobs: criticalJobs.slice(0, 5),
+      };
+    }),
+
+    // Send lien rights alert notification (Owner/Admin only)
+    sendLienRightsAlert: protectedProcedure
+      .input(z.object({
+        crmUrl: z.string().optional(),
+      }).optional())
+      .mutation(async ({ input, ctx }) => {
+        // Only owners and admins can trigger alerts
+        if (!isOwner(ctx.user) && !isAdmin(ctx.user)) {
+          throw new Error("Only owners and admins can send lien rights alerts");
+        }
+
+        const crmUrl = input?.crmUrl || "https://nextdoor-landing.manus.space";
+        const result = await sendLienRightsAlertNotification(crmUrl);
+        
+        return result;
       }),
   }),
 });

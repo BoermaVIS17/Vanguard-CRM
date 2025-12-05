@@ -130,3 +130,13 @@
 - [x] Add weekly urgency updates for lien rights
 - [x] Update Dashboard with new pipeline stages
 - [x] Update Leads page with new status options
+
+## Lien Rights Email Notifications
+- [x] Create lien rights notification service
+- [x] Build email templates for warning (30 days) and critical (14 days) alerts
+- [x] Add backend endpoint to check lien rights status and send alerts
+- [x] Include job details, days remaining, and action links in emails
+- [x] Send notifications to all admin and owner users
+- [x] Add manual "Send Lien Rights Alert" button to Dashboard
+- [ ] Set up scheduled task for weekly lien rights checks (requires external scheduler)
+- [x] Test notification delivery
