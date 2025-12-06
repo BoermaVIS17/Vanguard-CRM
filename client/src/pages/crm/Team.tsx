@@ -144,14 +144,13 @@ export default function CRMTeam() {
               <Users className="w-4 h-4" />
               {team?.length || 0} team members
             </span>
-            {canEditRoles && (
-              <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
-                <DialogTrigger asChild>
-                  <Button className="bg-[#00d4aa] hover:bg-[#00b894] text-black font-semibold">
-                    <Plus className="w-4 h-4 mr-2" />
-                    Create Account
-                  </Button>
-                </DialogTrigger>
+            <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
+              <DialogTrigger asChild>
+                <Button className="bg-[#00d4aa] hover:bg-[#00b894] text-black font-semibold">
+                  <Plus className="w-4 h-4 mr-2" />
+                  Add Team Member
+                </Button>
+              </DialogTrigger>
                 <DialogContent className="bg-slate-800 border-slate-700">
                   <DialogHeader>
                     <DialogTitle className="text-white">
@@ -291,8 +290,7 @@ export default function CRMTeam() {
                     </div>
                   )}
                 </DialogContent>
-              </Dialog>
-            )}
+            </Dialog>
           </div>
         </div>
 
@@ -417,15 +415,13 @@ export default function CRMTeam() {
                 <Users className="w-12 h-12 mx-auto mb-3 opacity-50" />
                 <p>No team members yet</p>
                 <p className="text-sm mt-1 mb-4">Add your first team member to get started</p>
-                {canEditRoles && (
-                  <Button 
-                    onClick={() => setShowCreateDialog(true)}
-                    className="bg-[#00d4aa] hover:bg-[#00b894] text-black font-semibold"
-                  >
-                    <Plus className="w-4 h-4 mr-2" />
-                    Add Team Member
-                  </Button>
-                )}
+                <Button 
+                  onClick={() => setShowCreateDialog(true)}
+                  className="bg-[#00d4aa] hover:bg-[#00b894] text-black font-semibold"
+                >
+                  <Plus className="w-4 h-4 mr-2" />
+                  Add Team Member
+                </Button>
               </CardContent>
             </Card>
           )}
