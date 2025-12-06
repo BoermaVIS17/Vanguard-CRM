@@ -1,6 +1,7 @@
 // @ts-nocheck
 import "dotenv/config";
 import express from "express";
+import cors from "cors";
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import { registerOAuthRoutes } from "./oauth";
 import { appRouter } from "../routers";
@@ -76,6 +77,35 @@ try {
 // Create Express App
 // ============================================
 const app = express();
+
+// ============================================
+// CORS Configuration
+// ============================================
+const allowedOrigins = [
+  "https://ndespanels.com",
+  "https://www.ndespanels.com",
+  "http://localhost:3000",
+  "http://localhost:5173",
+];
+
+app.use(cors({
+  origin: (origin, callback) => {
+    // Allow requests with no origin (mobile apps, curl, etc.)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      console.warn(`[CORS] Blocked request from origin: ${origin}`);
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
+}));
+
+console.log("[Server] CORS configured for:", allowedOrigins);
 
 // ============================================
 // DEBUG: Request Logging Middleware (FIRST)
