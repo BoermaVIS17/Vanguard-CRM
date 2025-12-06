@@ -26,6 +26,8 @@ import {
   ExternalLink,
   Shield,
   Eye,
+  Copy,
+  Link2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -1208,25 +1210,42 @@ export default function JobDetail() {
             <div>
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-lg font-semibold text-white">Photos ({filteredPhotos.length})</h2>
-                {canEdit && (
-                  <div>
-                    <input
-                      type="file"
-                      ref={photoInputRef}
-                      onChange={(e) => handleFileUpload(e, "photo")}
-                      className="hidden"
-                      accept="image/*"
-                    />
-                    <Button 
-                      onClick={() => photoInputRef.current?.click()}
-                      disabled={isUploading}
-                      className="bg-[#00d4aa] hover:bg-[#00b894] text-black"
+                <div className="flex items-center gap-2">
+                  {/* Copy Field Upload Link - for owners to share with crew */}
+                  {permissions?.role === "owner" && (
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        const uploadUrl = `${window.location.origin}/upload?id=${jobId}`;
+                        navigator.clipboard.writeText(uploadUrl);
+                        toast.success("Upload link copied! Share with your field crew.");
+                      }}
+                      className="border-slate-600 text-slate-300 hover:bg-slate-700 hover:text-white"
                     >
-                      <Upload className="w-4 h-4 mr-2" />
-                      {isUploading ? "Uploading..." : "Upload Photo"}
+                      <Link2 className="w-4 h-4 mr-2" />
+                      Copy Upload Link
                     </Button>
-                  </div>
-                )}
+                  )}
+                  {canEdit && (
+                    <div>
+                      <input
+                        type="file"
+                        ref={photoInputRef}
+                        onChange={(e) => handleFileUpload(e, "photo")}
+                        className="hidden"
+                        accept="image/*"
+                      />
+                      <Button 
+                        onClick={() => photoInputRef.current?.click()}
+                        disabled={isUploading}
+                        className="bg-[#00d4aa] hover:bg-[#00b894] text-black"
+                      >
+                        <Upload className="w-4 h-4 mr-2" />
+                        {isUploading ? "Uploading..." : "Upload Photo"}
+                      </Button>
+                    </div>
+                  )}
+                </div>
               </div>
               
               {filteredPhotos.length > 0 ? (
