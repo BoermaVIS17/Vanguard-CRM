@@ -1,4 +1,4 @@
-import { User, ReportRequest } from "../../drizzle/schema";
+import { User, ReportRequest } from "../../_drizzle/schema";
 
 /**
  * Role hierarchy and permissions for NextDoor CRM

@@ -8,7 +8,7 @@ import { createContext } from "./context";
 import Stripe from "stripe";
 import { ENV } from "./env";
 import { getDb } from "../db";
-import { reportRequests } from "../../drizzle/schema";
+import { reportRequests } from "../../_drizzle/schema";
 import { eq } from "drizzle-orm";
 import { notifyOwner } from "./notification";
 import { sendSMSNotification } from "../sms";
