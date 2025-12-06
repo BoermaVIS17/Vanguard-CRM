@@ -252,3 +252,12 @@
 - [x] Fix Supabase availability check showing false errors
 - [x] Show specific error messages (no account, wrong password)
 - [x] Verify forgot password resets Supabase user password (uses Supabase auth.resetPasswordForEmail)
+
+## First User Owner Logic
+- [ ] Make first user to log in automatically become owner
+- [ ] Subsequent users get sales_rep role by default
+
+## Performance Optimizations
+- [x] Add database indexes for email, openId, status, assignedTo fields (SQL file created)
+- [x] Optimize React Query caching (staleTime, gcTime, retry settings)
+- [x] Update dashboard to load data in parallel with stable date references

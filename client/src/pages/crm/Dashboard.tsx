@@ -215,14 +215,31 @@ function SendLienRightsAlertButton() {
 export default function CRMDashboard() {
   const [activeTab, setActiveTab] = useState("all");
   
-  const { data: stats, isLoading: statsLoading } = trpc.crm.getStats.useQuery();
+  // Stabilize date reference to prevent infinite re-renders
+  const [todayDate] = useState(() => new Date().toISOString().split("T")[0]);
+  
+  // All queries run in parallel automatically with React Query
+  // Using stable references and optimized staleTime from QueryClient defaults
+  const { data: stats, isLoading: statsLoading } = trpc.crm.getStats.useQuery(
+    undefined,
+    { staleTime: 30 * 1000 } // Stats refresh every 30 seconds
+  );
   const { data: appointments } = trpc.crm.getAppointments.useQuery({
-    startDate: new Date().toISOString().split("T")[0],
-    endDate: new Date().toISOString().split("T")[0],
+    startDate: todayDate,
+    endDate: todayDate,
   });
-  const { data: monthlyTrends } = trpc.crm.getMonthlyTrends.useQuery({ months: 6 });
-  const { data: categoryCounts } = trpc.crm.getCategoryCounts.useQuery();
-  const { data: lienRightsJobs } = trpc.crm.getLienRightsJobs.useQuery();
+  const { data: monthlyTrends } = trpc.crm.getMonthlyTrends.useQuery(
+    { months: 6 },
+    { staleTime: 5 * 60 * 1000 } // Trends can be stale for 5 minutes
+  );
+  const { data: categoryCounts } = trpc.crm.getCategoryCounts.useQuery(
+    undefined,
+    { staleTime: 60 * 1000 } // Category counts refresh every minute
+  );
+  const { data: lienRightsJobs } = trpc.crm.getLienRightsJobs.useQuery(
+    undefined,
+    { staleTime: 2 * 60 * 1000 } // Lien rights data can be stale for 2 minutes
+  );
   const { data: categoryLeads } = trpc.crm.getLeadsByCategory.useQuery(
     { category: activeTab as any },
     { enabled: activeTab !== "all" }
