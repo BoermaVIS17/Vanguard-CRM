@@ -261,3 +261,8 @@
 - [x] Add database indexes for email, openId, status, assignedTo fields (SQL file created)
 - [x] Optimize React Query caching (staleTime, gcTime, retry settings)
 - [x] Update dashboard to load data in parallel with stable date references
+
+## Database Schema Fix
+- [x] Refactor drizzle/schema.ts from MySQL to PostgreSQL (Supabase)
+- [x] Update db.ts to use PostgreSQL driver
+- [x] Generate CREATE TABLE SQL for all tables

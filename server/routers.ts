@@ -163,9 +163,9 @@ export const appRouter = router({
           role: isFirstUser ? 'owner' : 'user',
           isActive: true,
           lastSignedIn: new Date(),
-        });
+        }).returning({ id: users.id });
         
-        const newUserId = result.insertId;
+        const newUserId = result.id;
         
         // Set session cookie
         const { sdk } = await import("./_core/sdk");
@@ -291,7 +291,7 @@ export const appRouter = router({
             status: "new_lead",
             salesRepCode: promoResult.salesRep || null,
             leadSource: "website",
-          });
+          }).returning({ id: reportRequests.id });
 
           await notifyOwner({
             title: input.handsOnInspection 
@@ -309,7 +309,7 @@ export const appRouter = router({
             salesRep: salesRepAttribution,
           });
 
-          return { success: true, requiresPayment: false, requestId: result.insertId };
+          return { success: true, requiresPayment: false, requestId: result.id };
         } else {
           const origin = ctx.req.headers.origin || "http://localhost:3000";
           
@@ -327,9 +327,9 @@ export const appRouter = router({
             amountPaid: 0,
             status: "new_lead",
             leadSource: "website",
-          });
+          }).returning({ id: reportRequests.id });
 
-          const requestId = result.insertId;
+          const requestId = result.id;
 
           const session = await stripe.checkout.sessions.create({
             payment_method_types: ["card"],
@@ -581,7 +581,7 @@ export const appRouter = router({
           throw new Error("Only owners and admins can create new jobs");
         }
 
-        const result = await db.insert(reportRequests).values({
+        const [result] = await db.insert(reportRequests).values({
           fullName: input.fullName,
           email: input.email,
           phone: input.phone,
@@ -596,9 +596,9 @@ export const appRouter = router({
           amountPaid: 0,
           createdAt: new Date(),
           updatedAt: new Date(),
-        }).$returningId();
+        }).returning({ id: reportRequests.id });
 
-        const newJobId = result[0].id;
+        const newJobId = result.id;
         const [newJob] = await db.select().from(reportRequests).where(eq(reportRequests.id, newJobId));
 
         // Create dedicated folder in Supabase Storage for this job
@@ -1058,7 +1058,7 @@ export const appRouter = router({
           role: input.role,
           teamLeadId: input.teamLeadId || null,
           isActive: true,
-        }).$returningId();
+        }).returning({ id: users.id });
 
         // Send welcome email notification to owner with login details to share
         const loginUrl = process.env.NODE_ENV === 'production' 
@@ -1156,7 +1156,7 @@ export const appRouter = router({
           fileType: input.fileType,
           fileSize: fileSize,
           category: input.category,
-        });
+        }).returning({ id: documents.id });
 
         // Log activity
         await db.insert(activities).values({
@@ -1166,7 +1166,7 @@ export const appRouter = router({
           description: `Uploaded ${input.category.replace("_", " ")}: ${input.fileName}`,
         });
 
-        return { success: true, documentId: result.insertId, url };
+        return { success: true, documentId: result.id, url };
       }),
 
     // Get documents for a lead
@@ -1761,7 +1761,7 @@ export const appRouter = router({
           latitude: exifData.latitude,
           longitude: exifData.longitude,
           cameraModel: exifData.cameraModel,
-        });
+        }).returning({ id: documents.id });
 
         await db.insert(activities).values({
           reportRequestId: input.jobId,
@@ -1770,7 +1770,7 @@ export const appRouter = router({
           description: `Uploaded photo: ${input.fileName}`,
         });
 
-        return { success: true, documentId: result.insertId, url };
+        return { success: true, documentId: result.id, url };
       }),
 
     // ============ FIELD UPLOAD (PUBLIC) ============
@@ -1835,7 +1835,7 @@ export const appRouter = router({
           latitude: exifData.latitude,
           longitude: exifData.longitude,
           cameraModel: exifData.cameraModel,
-        });
+        }).returning({ id: documents.id });
 
         // Log activity
         await db.insert(activities).values({
@@ -1845,7 +1845,7 @@ export const appRouter = router({
           description: `Field upload: ${input.fileName}`,
         });
 
-        return { success: true, documentId: result.insertId, url };
+        return { success: true, documentId: result.id, url };
       }),
 
     // Search within job (documents, notes, messages)
