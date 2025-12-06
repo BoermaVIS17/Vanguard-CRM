@@ -274,3 +274,6 @@
 ## Dashboard Header Fixes
 - [x] Fix sign out: await supabase.auth.signOut(), clear React Query cache, force redirect
 - [x] Fix name display: query users table by open_id, show name/role, fallback to email
+
+## Database Connection Fix
+- [x] Fix database query errors - added retry logic and better connection pooling (dev server uses TiDB/MySQL, production uses Supabase/PostgreSQL)
