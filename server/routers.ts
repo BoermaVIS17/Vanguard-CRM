@@ -288,7 +288,7 @@ export const appRouter = router({
             promoCode: input.promoCode?.toUpperCase() || null,
             promoApplied: true,
             amountPaid: 0,
-            status: "new_lead",
+            status: "lead",
             salesRepCode: promoResult.salesRep || null,
             leadSource: "website",
           }).returning({ id: reportRequests.id });
@@ -325,7 +325,7 @@ export const appRouter = router({
             promoCode: input.promoCode?.toUpperCase() || null,
             promoApplied: false,
             amountPaid: 0,
-            status: "new_lead",
+            status: "lead",
             leadSource: "website",
           }).returning({ id: reportRequests.id });
 
@@ -947,14 +947,15 @@ export const appRouter = router({
       leads = await filterLeadsByRole(db, ctx.user, leads);
 
       const pipeline = {
-        new_lead: leads.filter(l => l.status === "new_lead"),
-        contacted: leads.filter(l => l.status === "contacted"),
+        lead: leads.filter(l => l.status === "lead"),
         appointment_set: leads.filter(l => l.status === "appointment_set"),
-        inspection_scheduled: leads.filter(l => l.status === "inspection_scheduled"),
-        inspection_complete: leads.filter(l => l.status === "inspection_complete"),
-        report_sent: leads.filter(l => l.status === "report_sent"),
-        follow_up: leads.filter(l => l.status === "follow_up"),
-        closed_won: leads.filter(l => l.status === "closed_won"),
+        prospect: leads.filter(l => l.status === "prospect"),
+        approved: leads.filter(l => l.status === "approved"),
+        project_scheduled: leads.filter(l => l.status === "project_scheduled"),
+        completed: leads.filter(l => l.status === "completed"),
+        invoiced: leads.filter(l => l.status === "invoiced"),
+        lien_legal: leads.filter(l => l.status === "lien_legal"),
+        closed_deal: leads.filter(l => l.status === "closed_deal"),
         closed_lost: leads.filter(l => l.status === "closed_lost"),
       };
 
@@ -1431,7 +1432,7 @@ export const appRouter = router({
             monthlyData[monthKey] = { leads: 0, closed: 0, revenue: 0 };
           }
           monthlyData[monthKey].leads++;
-          if (lead.status === "closed_won") {
+          if (lead.status === "closed_deal") {
             monthlyData[monthKey].closed++;
             monthlyData[monthKey].revenue += (lead.amountPaid || 0) / 100;
           }
