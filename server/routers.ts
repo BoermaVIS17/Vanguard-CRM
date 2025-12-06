@@ -955,16 +955,22 @@ export const appRouter = router({
       const db = await getDb();
       if (!db) throw new Error("Database not available");
 
-      const teamLeads = await db.select({
+      const teamLeads = await db.selectDistinct({
         id: users.id,
         name: users.name,
         email: users.email,
         role: users.role,
       })
       .from(users)
-      .where(or(eq(users.role, "team_lead"), eq(users.role, "owner")));
+      .where(or(eq(users.role, "team_lead"), eq(users.role, "owner")))
+      .orderBy(users.role, users.name);
 
-      return teamLeads;
+      // Filter to ensure unique users (in case of any duplicates)
+      const uniqueLeads = teamLeads.filter((lead, index, self) => 
+        index === self.findIndex(l => l.id === lead.id)
+      );
+
+      return uniqueLeads;
     }),
 
     // ============ DOCUMENT UPLOAD ============

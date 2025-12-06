@@ -199,3 +199,9 @@
 - [x] Add in-browser preview for images and documents (PDF, video, audio, text files)
 - [x] Create job detail modal/drawer for clicking jobs in the list view
 - [x] Auto-create dedicated Supabase folder for each new job created (jobs/{id}/documents, jobs/{id}/photos)
+
+## UI Fixes
+- [x] Fix Team Lead dropdown showing duplicate owner entries
+- [x] Change job row click to navigate directly to job page (remove modal)
+- [x] Ensure all clickable job boxes link to their respective job pages
+- [x] Make lead source, roof age, roof concerns, and hands-on inspection editable by admin/owners

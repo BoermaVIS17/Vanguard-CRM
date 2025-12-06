@@ -122,17 +122,16 @@ export default function CRMPipeline() {
 
   // Render a job card
   const renderJobCard = (lead: any, stageKey: string) => (
-    <Card
-      key={lead.id}
-      draggable
-      onDragStart={(e) => handleDragStart(e, lead.id)}
-      className="p-3 bg-slate-700 cursor-grab active:cursor-grabbing hover:bg-slate-600 transition-colors border border-slate-600"
-    >
-      <div className="flex items-start gap-2">
-        <GripVertical className="w-4 h-4 text-slate-500 mt-1 flex-shrink-0" />
-        <div className="flex-1 min-w-0">
-          <Link href={`/crm/job/${lead.id}`}>
-            <div className="flex items-center gap-2 mb-1 hover:opacity-80">
+    <Link href={`/crm/job/${lead.id}`} key={lead.id}>
+      <div
+        draggable
+        onDragStart={(e) => handleDragStart(e, lead.id)}
+        className="p-3 bg-slate-700 cursor-pointer hover:bg-slate-600 transition-colors border border-slate-600"
+      >
+        <div className="flex items-start gap-2">
+          <GripVertical className="w-4 h-4 text-slate-500 mt-1 flex-shrink-0 cursor-grab" />
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 mb-1">
               <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#00d4aa] to-[#00b894] flex items-center justify-center flex-shrink-0">
                 <span className="text-black font-semibold text-xs">
                   {lead.fullName?.charAt(0) || "?"}
@@ -140,7 +139,6 @@ export default function CRMPipeline() {
               </div>
               <p className="font-medium text-white truncate">{lead.fullName}</p>
             </div>
-          </Link>
           
           <div className="space-y-1 text-xs text-slate-400">
             <div className="flex items-center gap-1">
@@ -183,7 +181,8 @@ export default function CRMPipeline() {
           {(stageKey === "completed" || stageKey === "invoiced") && getLienRightsIndicator(lead)}
         </div>
       </div>
-    </Card>
+    </div>
+    </Link>
   );
 
   return (

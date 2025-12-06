@@ -799,6 +799,36 @@ export default function JobDetail() {
                           </SelectContent>
                         </Select>
                       </div>
+                      <div>
+                        <label className="text-sm text-slate-400">Roof Age</label>
+                        <Input
+                          value={customerForm.roofAge}
+                          onChange={(e) => setCustomerForm({ ...customerForm, roofAge: e.target.value })}
+                          placeholder="e.g., 15 years"
+                          className="bg-slate-700 border-slate-600 text-white mt-1"
+                        />
+                      </div>
+                      <div className="col-span-2">
+                        <label className="text-sm text-slate-400">Roof Concerns</label>
+                        <Textarea
+                          value={customerForm.roofConcerns}
+                          onChange={(e) => setCustomerForm({ ...customerForm, roofConcerns: e.target.value })}
+                          placeholder="Describe any roof concerns..."
+                          className="bg-slate-700 border-slate-600 text-white mt-1"
+                          rows={3}
+                        />
+                      </div>
+                      <div className="col-span-2">
+                        <label className="flex items-center gap-2 text-sm text-slate-400 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={customerForm.handsOnInspection}
+                            onChange={(e) => setCustomerForm({ ...customerForm, handsOnInspection: e.target.checked })}
+                            className="rounded border-slate-600 bg-slate-700 text-[#00d4aa] focus:ring-[#00d4aa]"
+                          />
+                          Hands-On Inspection Requested
+                        </label>
+                      </div>
                     </div>
                   ) : (
                     <>
