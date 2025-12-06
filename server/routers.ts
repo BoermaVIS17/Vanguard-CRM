@@ -276,14 +276,13 @@ export const appRouter = router({
 
         
 
-          await sendSMSNotification({
-            customerName: input.fullName,
-            customerPhone: input.phone,
-            address: `${input.address}, ${input.cityStateZip}`,
-            isPaid: false,
-            promoCode: input.promoCode?.toUpperCase(),
-            salesRep: salesRepAttribution,
-          });
+         // Landing page/inspection submissions disabled - client portal only  
+        throw new Error("Storm report submissions are not available. Please contact us directly.");
+      }),
+  }),
+
+  // CRM procedures (protected - requires login)
+  crm: router({
 
       
           
