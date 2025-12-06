@@ -11,8 +11,8 @@ import { notifyOwner } from "./_core/notification";
 import { sendSMSNotification } from "./sms";
 import { sendWelcomeEmail } from "./email";
 import { sendLienRightsAlertNotification, getLienRightsAlertJobs } from "./lienRightsNotification";
-import Stripe from "stripe";
-import { ENV } from "./_core/env";
+
+
 import { eq, desc, and, or, like, sql, gte, lte, inArray, isNotNull } from "drizzle-orm";
 import { storagePut, storageGet, STORAGE_BUCKET } from "./storage";
 import { supabaseAdmin } from "./lib/supabase";
@@ -31,10 +31,8 @@ import {
   getRoleDisplayName
 } from "./lib/rbac";
 
-// Initialize Stripe
-const stripe = new Stripe(ENV.stripeSecretKey || "", {
-  apiVersion: "2025-11-17.clover",
-});
+
+
 
 // CRM Role check helper
 const CRM_ROLES = ["owner", "admin", "office", "sales_rep", "project_manager", "team_lead"];
@@ -276,30 +274,7 @@ export const appRouter = router({
         const handsOnText = input.handsOnInspection ? "✅ YES - Requested" : "No";
         const concernsText = input.roofConcerns?.trim() || "None specified";
 
-        if (isFree) {
-          const [result] = await db.insert(reportRequests).values({
-            fullName: input.fullName,
-            email: input.email,
-            phone: input.phone,
-            address: input.address,
-            cityStateZip: input.cityStateZip,
-            roofAge: input.roofAge || null,
-            roofConcerns: input.roofConcerns || null,
-            handsOnInspection: input.handsOnInspection || false,
-            promoCode: input.promoCode?.toUpperCase() || null,
-            promoApplied: true,
-            amountPaid: 0,
-            status: "lead",
-            salesRepCode: promoResult.salesRep || null,
-            leadSource: "website",
-          }).returning({ id: reportRequests.id });
-
-          await notifyOwner({
-            title: input.handsOnInspection 
-              ? "🏠🔧 New Storm Report Request (FREE + HANDS-ON)" 
-              : "🏠 New Storm Report Request (FREE - Promo Code)",
-            content: `**New Report Request Received**\n\n**Customer Details:**\n- Name: ${input.fullName}\n- Email: ${input.email}\n- Phone: ${input.phone}\n\n**Property:**\n- Address: ${input.address}\n- City/State/ZIP: ${input.cityStateZip}\n- Roof Age: ${input.roofAge || "Not specified"}\n\n**Roof Concerns:**\n${concernsText}\n\n**Hands-On Inspection:** ${handsOnText}\n\n**Payment:**\n- Promo Code: ${input.promoCode?.toUpperCase()}\n- Amount: $0.00 (Fee Waived)\n\n**📋 Sales Rep Attribution:** ${salesRepAttribution}\n\n**Status:** Pending Scheduling`.trim(),
-          });
+        
 
           await sendSMSNotification({
             customerName: input.fullName,
@@ -310,65 +285,14 @@ export const appRouter = router({
             salesRep: salesRepAttribution,
           });
 
-          return { success: true, requiresPayment: false, requestId: result.id };
-        } else {
-          const origin = ctx.req.headers.origin || "http://localhost:3000";
+      
           
-          const [result] = await db.insert(reportRequests).values({
-            fullName: input.fullName,
-            email: input.email,
-            phone: input.phone,
-            address: input.address,
-            cityStateZip: input.cityStateZip,
-            roofAge: input.roofAge || null,
-            roofConcerns: input.roofConcerns || null,
-            handsOnInspection: input.handsOnInspection || false,
-            promoCode: input.promoCode?.toUpperCase() || null,
-            promoApplied: false,
-            amountPaid: 0,
-            status: "lead",
-            leadSource: "website",
-          }).returning({ id: reportRequests.id });
+       
 
-          const requestId = result.id;
+ 
 
-          const session = await stripe.checkout.sessions.create({
-            payment_method_types: ["card"],
-            line_items: [{
-              price_data: {
-                currency: PRODUCTS.STORM_REPORT.currency,
-                product_data: {
-                  name: PRODUCTS.STORM_REPORT.name,
-                  description: PRODUCTS.STORM_REPORT.description,
-                },
-                unit_amount: PRODUCTS.STORM_REPORT.priceInCents,
-              },
-              quantity: 1,
-            }],
-            mode: "payment",
-            success_url: `${origin}/thank-you?success=true&request_id=${requestId}`,
-            cancel_url: `${origin}/?cancelled=true`,
-            customer_email: input.email,
-            client_reference_id: requestId.toString(),
-            metadata: {
-              request_id: requestId.toString(),
-              customer_name: input.fullName,
-              customer_email: input.email,
-              customer_phone: input.phone,
-              address: input.address,
-              city_state_zip: input.cityStateZip,
-              hands_on_inspection: input.handsOnInspection ? "yes" : "no",
-            },
-          });
-
-          await db.update(reportRequests)
-            .set({ stripeCheckoutSessionId: session.id })
-            .where(eq(reportRequests.id, requestId));
-
-          return { success: true, requiresPayment: true, checkoutUrl: session.url, requestId };
-        }
-      }),
-  }),
+          
+         
 
   // CRM procedures (protected - requires login)
   crm: router({
