@@ -75,7 +75,7 @@ export default function CRMLayout({ children }: CRMLayoutProps) {
 
   const handleLogout = async () => {
     await logoutMutation.mutateAsync();
-    window.location.href = "/crm/login";
+    window.location.href = "/login";
   };
 
   const isActive = (href: string) => {

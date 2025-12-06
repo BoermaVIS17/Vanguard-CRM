@@ -83,15 +83,21 @@ export async function upsertUser(user: InsertUser): Promise<void> {
 }
 
 export async function getUserByOpenId(openId: string) {
+  console.log("[Database] Looking up user by openId:", openId);
   const db = await getDb();
   if (!db) {
     console.warn("[Database] Cannot get user: database not available");
     return undefined;
   }
 
-  const result = await db.select().from(users).where(eq(users.openId, openId)).limit(1);
-
-  return result.length > 0 ? result[0] : undefined;
+  try {
+    const result = await db.select().from(users).where(eq(users.openId, openId)).limit(1);
+    console.log("[Database] User lookup result:", result.length > 0 ? { id: result[0].id, name: result[0].name, role: result[0].role } : "not found");
+    return result.length > 0 ? result[0] : undefined;
+  } catch (error) {
+    console.error("[Database] Error looking up user:", error);
+    return undefined;
+  }
 }
 
 // TODO: add feature queries here as your schema grows.

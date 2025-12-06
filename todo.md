@@ -266,3 +266,6 @@
 - [x] Refactor drizzle/schema.ts from MySQL to PostgreSQL (Supabase)
 - [x] Update db.ts to use PostgreSQL driver
 - [x] Generate CREATE TABLE SQL for all tables
+
+## Bug Fixes
+- [x] Fix sign out button not working (redirect to /login instead of /crm/login)
