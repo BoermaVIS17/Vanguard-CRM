@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
 import {
   LayoutDashboard,
@@ -27,9 +27,16 @@ import {
 import { Input } from "@/components/ui/input";
 import { trpc } from "@/lib/trpc";
 import { supabase } from "@/lib/supabase";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface CRMLayoutProps {
   children: React.ReactNode;
+}
+
+interface UserProfile {
+  name: string | null;
+  email: string | null;
+  role: string | null;
 }
 
 const navItems = [
@@ -71,21 +78,70 @@ export default function CRMLayout({ children }: CRMLayoutProps) {
   const [location] = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const { data: user } = trpc.auth.me.useQuery();
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  const queryClient = useQueryClient();
   const logoutMutation = trpc.auth.logout.useMutation();
+
+  // Fetch user profile from Supabase users table
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      if (!supabase) return;
+      
+      try {
+        // Get current Supabase session
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session?.user?.id) return;
+
+        // Query the users table by open_id (which matches Supabase user.id)
+        const { data, error } = await supabase
+          .from('users')
+          .select('name, email, role')
+          .eq('open_id', session.user.id)
+          .single();
+
+        if (error) {
+          console.error('Error fetching user profile:', error);
+          // Fallback to session email
+          setUserProfile({
+            name: null,
+            email: session.user.email || null,
+            role: null
+          });
+          return;
+        }
+
+        setUserProfile(data);
+      } catch (error) {
+        console.error('Error in fetchUserProfile:', error);
+      }
+    };
+
+    fetchUserProfile();
+  }, []);
 
   const handleLogout = async () => {
     try {
-      // Sign out from Supabase
+      // 1. Sign out from Supabase first
       if (supabase) {
         await supabase.auth.signOut();
       }
-      // Clear server session cookie
-      await logoutMutation.mutateAsync();
+      
+      // 2. Clear server session cookie
+      try {
+        await logoutMutation.mutateAsync();
+      } catch (e) {
+        // Ignore server errors, we're logging out anyway
+        console.log('Server logout:', e);
+      }
+      
+      // 3. Clear React Query cache
+      queryClient.clear();
+      
     } catch (error) {
       console.error('Logout error:', error);
     }
-    // Always redirect to login
+    
+    // 4. Force redirect to login (always execute this)
     window.location.href = "/login";
   };
 
@@ -93,6 +149,11 @@ export default function CRMLayout({ children }: CRMLayoutProps) {
     if (href === "/crm") return location === "/crm";
     return location.startsWith(href);
   };
+
+  // Display name: prefer name, fallback to email
+  const displayName = userProfile?.name || userProfile?.email || "User";
+  const displayInitial = displayName.charAt(0).toUpperCase();
+  const displayRole = userProfile?.role ? userProfile.role.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase()) : null;
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -184,17 +245,20 @@ export default function CRMLayout({ children }: CRMLayoutProps) {
                 >
                   <div className="w-8 h-8 rounded-full bg-[#00d4aa] flex items-center justify-center">
                     <span className="text-black font-semibold text-sm">
-                      {user?.name?.charAt(0) || "U"}
+                      {displayInitial}
                     </span>
                   </div>
-                  <span className="hidden sm:block">{user?.name || "User"}</span>
+                  <span className="hidden sm:block">{displayName}</span>
                   <ChevronDown className="w-3 h-3" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
                 <div className="px-3 py-2 border-b">
-                  <p className="font-medium">{user?.name}</p>
-                  <p className="text-sm text-muted-foreground">{user?.email}</p>
+                  <p className="font-medium">{displayName}</p>
+                  {displayRole && (
+                    <p className="text-xs text-[#00d4aa] font-medium">{displayRole}</p>
+                  )}
+                  <p className="text-sm text-muted-foreground">{userProfile?.email}</p>
                 </div>
                 <DropdownMenuItem asChild>
                   <Link href="/crm/team" className="cursor-pointer">

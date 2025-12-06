@@ -270,3 +270,7 @@
 ## Bug Fixes
 - [x] Fix sign out button not working (redirect to /login instead of /crm/login)
 - [x] Fix sign out button - added Supabase signOut and error handling
+
+## Dashboard Header Fixes
+- [x] Fix sign out: await supabase.auth.signOut(), clear React Query cache, force redirect
+- [x] Fix name display: query users table by open_id, show name/role, fallback to email
