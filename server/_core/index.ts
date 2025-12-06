@@ -1,5 +1,6 @@
 import "dotenv/config";
-import express, { Request, Response, Express, NextFunction } from "express";
+import express from "express";
+import type { Request, Response, Express, NextFunction } from "express";
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import { registerOAuthRoutes } from "./oauth";
 import { appRouter } from "../routers";
