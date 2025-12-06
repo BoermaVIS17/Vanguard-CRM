@@ -1,5 +1,5 @@
 import "dotenv/config";
-import express, { Request, Response, Express } from "express";
+import express, { Request, Response, Express, NextFunction } from "express";
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import { registerOAuthRoutes } from "./oauth";
 import { appRouter } from "../routers";
@@ -77,9 +77,31 @@ try {
 const app: Express = express();
 
 // ============================================
+// DEBUG: Request Logging Middleware (FIRST)
+// ============================================
+app.use((req: Request, _res: Response, next: NextFunction) => {
+  console.log('[DEBUG] === Incoming Request ===');
+  console.log('[DEBUG] Method:', req.method);
+  console.log('[DEBUG] Original URL:', req.originalUrl);
+  console.log('[DEBUG] Path:', req.path);
+  console.log('[DEBUG] Base URL:', req.baseUrl);
+  console.log('[DEBUG] URL:', req.url);
+  console.log('[DEBUG] Headers:', JSON.stringify({
+    host: req.headers.host,
+    'x-forwarded-proto': req.headers['x-forwarded-proto'],
+    'x-vercel-id': req.headers['x-vercel-id'],
+    'content-type': req.headers['content-type'],
+  }, null, 2));
+  console.log('[DEBUG] === End Request Info ===');
+  next();
+});
+
+// ============================================
 // Stripe Webhook Route (MUST be before express.json())
 // ============================================
 app.post("/api/stripe/webhook", express.raw({ type: "application/json" }), async (req: Request, res: Response) => {
+  console.log("[Webhook] Route hit: /api/stripe/webhook");
+  
   if (!stripe) {
     console.error("[Webhook] Stripe not initialized");
     return res.status(500).json({ error: "Stripe not configured" });
@@ -207,6 +229,7 @@ app.use(express.urlencoded({ limit: "1mb", extended: true }));
 // Health Check Endpoint
 // ============================================
 app.get("/api/health", (_req: Request, res: Response) => {
+  console.log("[Health] Route hit: /api/health");
   res.json({
     status: "ok",
     timestamp: new Date().toISOString(),
@@ -241,11 +264,40 @@ app.use(
 );
 
 // ============================================
-// Error Handler
+// Log Registered Routes
 // ============================================
-app.use((err: any, _req: Request, res: Response, _next: any) => {
-  console.error("[Server] Unhandled error:", err);
-  res.status(500).json({ error: "Internal server error" });
+console.log('[STARTUP] Registered Express routes:');
+if (app._router && app._router.stack) {
+  app._router.stack.forEach((middleware: any) => {
+    if (middleware.route) {
+      console.log('[STARTUP] Route:', Object.keys(middleware.route.methods).join(',').toUpperCase(), middleware.route.path);
+    } else if (middleware.name === 'router') {
+      console.log('[STARTUP] Router middleware at:', middleware.regexp);
+    }
+  });
+}
+
+// ============================================
+// 404 Handler (MUST be after all routes)
+// ============================================
+app.use((req: Request, res: Response) => {
+  console.log('[404] No route matched for:', req.method, req.path);
+  console.log('[404] Original URL:', req.originalUrl);
+  res.status(404).json({ 
+    error: 'Route not found',
+    path: req.path,
+    originalUrl: req.originalUrl,
+    method: req.method 
+  });
+});
+
+// ============================================
+// Error Handler (MUST be last)
+// ============================================
+app.use((err: any, req: Request, res: Response, _next: NextFunction) => {
+  console.error('[ERROR] Unhandled error:', err);
+  console.error('[ERROR] Request was:', req.method, req.path);
+  res.status(500).json({ error: 'Internal server error', message: err.message });
 });
 
 // ============================================
