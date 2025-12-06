@@ -39,7 +39,13 @@ export const supabase: SupabaseClient | null = hasValidCredentials
   : null;
 
 // Check if Supabase is available
-export const isSupabaseAvailable = (): boolean => supabase !== null;
+export const isSupabaseAvailable = (): boolean => {
+  const available = supabase !== null;
+  if (!available) {
+    console.warn("[Supabase] Client not available. URL:", supabaseUrl ? "present" : "missing", "Key:", supabaseAnonKey ? "present" : "missing");
+  }
+  return available;
+};
 
 // Real-time subscription types
 export type RealtimeEvent = "INSERT" | "UPDATE" | "DELETE" | "*";

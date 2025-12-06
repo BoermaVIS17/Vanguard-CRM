@@ -1,0 +1,24 @@
+{
+  "query": "SELECT id, name, email, role, openId FROM users WHERE email LIKE '%nextdoor%' OR email LIKE '%contact%';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3LkhXw7W2NLietY.root --database a7GnrUTuzTDTFdbLnSt79K --execute SELECT id, name, email, role, openId FROM users WHERE email LIKE '%nextdoor%' OR email LIKE '%contact%';",
+  "rows": [
+    {
+      "id": "1",
+      "name": "Nextdoor Exteriors",
+      "email": "nextdoorextsolutions@gmail.com",
+      "role": "owner",
+      "openId": "6LwwxHSVbVMsfvKtzuxCAi"
+    },
+    {
+      "id": "690002",
+      "name": "contact",
+      "email": "contact@nextdoorext.com",
+      "role": "owner",
+      "openId": "ee079795-1d0a-4f8f-8404-48b0cbb0d2a6"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\temail\trole\topenId\n1\tNextdoor Exteriors\tnextdoorextsolutions@gmail.com\towner\t6LwwxHSVbVMsfvKtzuxCAi\n690002\tcontact\tcontact@nextdoorext.com\towner\tee079795-1d0a-4f8f-8404-48b0cbb0d2a6\n",
+  "stderr": "",
+  "execution_time_ms": 63
+}

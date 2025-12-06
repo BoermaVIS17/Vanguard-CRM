@@ -241,3 +241,14 @@
 - [x] Remove landing page, make CRM the main application
 - [x] Write tests for authentication functionality (106 tests passing)
 - [x] Push changes to GitHub main branch
+
+## Supabase Auth User Sync Fix
+- [ ] Sync Supabase Auth users to CRM users table on login
+- [ ] Auto-create CRM user record when Supabase user logs in
+- [ ] Assign owner role to first user or specified email
+- [ ] Show Create Account button for owners on Team page
+
+## Login Error Improvements
+- [x] Fix Supabase availability check showing false errors
+- [x] Show specific error messages (no account, wrong password)
+- [x] Verify forgot password resets Supabase user password (uses Supabase auth.resetPasswordForEmail)

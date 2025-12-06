@@ -106,6 +106,89 @@ export const appRouter = router({
       ctx.res.clearCookie(COOKIE_NAME, { ...cookieOptions, maxAge: -1 });
       return { success: true } as const;
     }),
+    // Sync Supabase Auth user to CRM users table
+    syncSupabaseUser: publicProcedure
+      .input(z.object({
+        supabaseUserId: z.string(),
+        email: z.string().email(),
+        name: z.string().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const db = await getDb();
+        if (!db) throw new Error("Database not available");
+        
+        // Check if user already exists by email
+        const [existingUser] = await db.select()
+          .from(users)
+          .where(eq(users.email, input.email))
+          .limit(1);
+        
+        if (existingUser) {
+          // Update existing user with Supabase ID if not set
+          if (!existingUser.openId || existingUser.openId !== input.supabaseUserId) {
+            await db.update(users)
+              .set({ 
+                openId: input.supabaseUserId,
+                lastSignedIn: new Date()
+              })
+              .where(eq(users.id, existingUser.id));
+          }
+          
+          // Set session cookie
+          const { sdk } = await import("./_core/sdk");
+          const ONE_YEAR_MS = 365 * 24 * 60 * 60 * 1000;
+          const sessionToken = await sdk.createSessionToken(input.supabaseUserId, {
+            name: existingUser.name || input.name || "",
+            expiresInMs: ONE_YEAR_MS,
+          });
+          const cookieOptions = getSessionCookieOptions(ctx.req);
+          ctx.res.cookie(COOKIE_NAME, sessionToken, { ...cookieOptions, maxAge: ONE_YEAR_MS });
+          
+          return { 
+            success: true, 
+            user: { id: existingUser.id, name: existingUser.name, role: existingUser.role, email: existingUser.email },
+            isNewUser: false
+          };
+        }
+        
+        // Check if this is the first user (make them owner)
+        const [userCount] = await db.select({ count: sql<number>`COUNT(*)` }).from(users);
+        const isFirstUser = !userCount || userCount.count === 0;
+        
+        // Create new user
+        const [result] = await db.insert(users).values({
+          openId: input.supabaseUserId,
+          email: input.email,
+          name: input.name || input.email.split('@')[0],
+          role: isFirstUser ? 'owner' : 'user',
+          isActive: true,
+          lastSignedIn: new Date(),
+        });
+        
+        const newUserId = result.insertId;
+        
+        // Set session cookie
+        const { sdk } = await import("./_core/sdk");
+        const ONE_YEAR_MS = 365 * 24 * 60 * 60 * 1000;
+        const sessionToken = await sdk.createSessionToken(input.supabaseUserId, {
+          name: input.name || input.email.split('@')[0],
+          expiresInMs: ONE_YEAR_MS,
+        });
+        const cookieOptions = getSessionCookieOptions(ctx.req);
+        ctx.res.cookie(COOKIE_NAME, sessionToken, { ...cookieOptions, maxAge: ONE_YEAR_MS });
+        
+        return { 
+          success: true, 
+          user: { 
+            id: Number(newUserId), 
+            name: input.name || input.email.split('@')[0], 
+            role: isFirstUser ? 'owner' : 'user',
+            email: input.email
+          },
+          isNewUser: true,
+          isOwner: isFirstUser
+        };
+      }),
     loginWithPassword: publicProcedure
       .input(z.object({
         email: z.string().email(),

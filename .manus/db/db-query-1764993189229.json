@@ -1,0 +1,17 @@
+{
+  "query": "SELECT id, name, email, role, openId FROM users WHERE email = 'contact@nextdoorext.com';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3LkhXw7W2NLietY.root --database a7GnrUTuzTDTFdbLnSt79K --execute SELECT id, name, email, role, openId FROM users WHERE email = 'contact@nextdoorext.com';",
+  "rows": [
+    {
+      "id": "690002",
+      "name": "contact",
+      "email": "contact@nextdoorext.com",
+      "role": "owner",
+      "openId": "ee079795-1d0a-4f8f-8404-48b0cbb0d2a6"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\temail\trole\topenId\n690002\tcontact\tcontact@nextdoorext.com\towner\tee079795-1d0a-4f8f-8404-48b0cbb0d2a6\n",
+  "stderr": "",
+  "execution_time_ms": 55
+}
