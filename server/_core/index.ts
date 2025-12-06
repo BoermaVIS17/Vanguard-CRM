@@ -61,13 +61,14 @@ if (missingRequired.length > 0) {
 // ============================================
 let stripe: Stripe | null = null;
 try {
-  if (ENV.stripeSecretKey) {
+  // Check for non-empty string, not just truthy
+  if (ENV.stripeSecretKey && ENV.stripeSecretKey.length > 0) {
     stripe = new Stripe(ENV.stripeSecretKey, {
       apiVersion: "2025-11-17.clover",
     });
     console.log("[Server] Stripe initialized successfully");
   } else {
-    console.warn("[Server] Stripe not initialized - missing STRIPE_SECRET_KEY");
+    console.warn("[Server] Stripe not initialized - STRIPE_SECRET_KEY not configured (optional)");
   }
 } catch (err) {
   console.error("[Server] Failed to initialize Stripe:", err);
