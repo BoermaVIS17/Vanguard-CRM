@@ -1,12 +1,9 @@
 import "dotenv/config";
 import express from "express";
-import { createServer } from "http";
-import net from "net";
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import { registerOAuthRoutes } from "./oauth";
 import { appRouter } from "../routers";
 import { createContext } from "./context";
-import { serveStatic, setupVite } from "./vite";
 import Stripe from "stripe";
 import { ENV } from "./env";
 import { getDb } from "../db";
@@ -19,7 +16,6 @@ const stripe = new Stripe(ENV.stripeSecretKey || "", {
   apiVersion: "2025-11-17.clover",
 });
 
-// Create Express app
 const app = express();
 
 // Stripe webhook route - MUST be before express.json() middleware
@@ -31,11 +27,9 @@ app.post("/api/stripe/webhook", express.raw({ type: "application/json" }), async
     event = stripe.webhooks.constructEvent(req.body, sig, ENV.stripeWebhookSecret);
   } catch (err: any) {
     console.error("[Webhook] Signature verification failed:", err.message);
-    // Security fix: Return generic error message to prevent information disclosure
     return res.status(400).send("Webhook signature verification failed");
   }
 
-  // Handle test events
   if (event.id.startsWith("evt_test_")) {
     console.log("[Webhook] Test event detected, returning verification response");
     return res.json({ verified: true });
@@ -43,7 +37,6 @@ app.post("/api/stripe/webhook", express.raw({ type: "application/json" }), async
 
   console.log("[Webhook] Received event:", event.type);
 
-  // Handle the event
   switch (event.type) {
     case "checkout.session.completed": {
       const session = event.data.object as Stripe.Checkout.Session;
@@ -53,7 +46,6 @@ app.post("/api/stripe/webhook", express.raw({ type: "application/json" }), async
         try {
           const db = await getDb();
           if (db) {
-            // Update the report request status
             await db.update(reportRequests)
               .set({
                 paymentStatus: "paid",
@@ -62,11 +54,9 @@ app.post("/api/stripe/webhook", express.raw({ type: "application/json" }), async
               })
               .where(eq(reportRequests.id, parseInt(requestId)));
 
-            // Get the request details for notification
             const [request] = await db.select().from(reportRequests).where(eq(reportRequests.id, parseInt(requestId)));
             
             if (request) {
-              // Send email notification to owner
               try {
                 await notifyOwner({
                   title: "💰 New PAID Storm Report Request",
@@ -94,7 +84,6 @@ app.post("/api/stripe/webhook", express.raw({ type: "application/json" }), async
                 console.error("[Webhook] Failed to send owner notification:", notifyError);
               }
 
-              // Send SMS notification to owner
               try {
                 await sendSMSNotification({
                   customerName: request.fullName,
@@ -109,9 +98,7 @@ app.post("/api/stripe/webhook", express.raw({ type: "application/json" }), async
             }
           }
         } catch (dbError) {
-          // Stability fix: Catch database errors to prevent crash loops
           console.error("[Webhook] Database operation failed:", dbError);
-          // Don't throw - we still want to acknowledge the webhook
         }
       }
       break;
@@ -123,11 +110,11 @@ app.post("/api/stripe/webhook", express.raw({ type: "application/json" }), async
   res.json({ received: true });
 });
 
-// Configure body parser with safe size limits
+// Body parsers
 app.use(express.json({ limit: "1mb" }));
 app.use(express.urlencoded({ limit: "1mb", extended: true }));
 
-// OAuth callback under /api/oauth/callback
+// OAuth routes
 registerOAuthRoutes(app);
 
 // tRPC API
@@ -139,48 +126,21 @@ app.use(
   })
 );
 
-// Export the Express app for Vercel serverless
+// IMPORTANT: Export for Vercel
 export default app;
 
-// Helper functions for development server
-const isPortAvailable = (port: number): Promise<boolean> => {
-  return new Promise(resolve => {
-    const server = net.createServer();
-    server.listen(port, () => {
-      server.close(() => resolve(true));
-    });
-    server.on("error", () => resolve(false));
-  });
-};
-
-const findAvailablePort = async (startPort: number = 3000): Promise<number> => {
-  for (let port = startPort; port < startPort + 20; port++) {
-    if (await isPortAvailable(port)) {
-      return port;
-    }
-  }
-  throw new Error(`No available port found starting from ${startPort}`);
-};
-
-const startServer = async () => {
-  const server = createServer(app);
-  
-  // development mode uses Vite
-  await setupVite(app, server);
-
-  const preferredPort = parseInt(process.env.PORT || "3000");
-  const port = await findAvailablePort(preferredPort);
-
-  if (port !== preferredPort) {
-    console.log(`Port ${preferredPort} is busy, using port ${port} instead`);
-  }
-
-  server.listen(port, () => {
-    console.log(`Server running on http://localhost:${port}/`);
-  });
-};
-
-// Only start the server in development mode (not on Vercel)
+// Only start server in development
 if (process.env.NODE_ENV === "development") {
-  startServer().catch(console.error);
+  (async () => {
+    const { createServer } = await import("http");
+    const { setupVite } = await import("./vite");
+    
+    const server = createServer(app);
+    await setupVite(app, server);
+    
+    const port = parseInt(process.env.PORT || "3000");
+    server.listen(port, () => {
+      console.log(`Dev server running on http://localhost:${port}/`);
+    });
+  })();
 }
