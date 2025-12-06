@@ -277,3 +277,8 @@
 
 ## Database Connection Fix
 - [x] Fix database query errors - added retry logic and better connection pooling (dev server uses TiDB/MySQL, production uses Supabase/PostgreSQL)
+
+## Critical UI Bug Fixes
+- [x] Fix Sign Out 404 - redirect to / instead of /login
+- [x] Add Team Member button to TeamManagement page (empty state)
+- [x] Create dialog/modal for adding new team members by email and role (already existed)

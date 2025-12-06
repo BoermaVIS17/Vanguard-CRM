@@ -141,8 +141,8 @@ export default function CRMLayout({ children }: CRMLayoutProps) {
       console.error('Logout error:', error);
     }
     
-    // 4. Force redirect to login (always execute this)
-    window.location.href = "/login";
+    // 4. Force redirect to root (which contains login form)
+    window.location.href = "/";
   };
 
   const isActive = (href: string) => {

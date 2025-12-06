@@ -416,7 +416,16 @@ export default function CRMTeam() {
               <CardContent className="py-12 text-center text-slate-400">
                 <Users className="w-12 h-12 mx-auto mb-3 opacity-50" />
                 <p>No team members yet</p>
-                <p className="text-sm mt-1">Click "Create Account" to add your first team member</p>
+                <p className="text-sm mt-1 mb-4">Add your first team member to get started</p>
+                {canEditRoles && (
+                  <Button 
+                    onClick={() => setShowCreateDialog(true)}
+                    className="bg-[#00d4aa] hover:bg-[#00b894] text-black font-semibold"
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    Add Team Member
+                  </Button>
+                )}
               </CardContent>
             </Card>
           )}
