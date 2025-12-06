@@ -8,7 +8,7 @@ import { createContext } from "./context";
 import Stripe from "stripe";
 import { ENV } from "./env";
 import { getDb } from "../db";
-import { reportRequests } from "../../_drizzle/schema";
+import { reportRequests } from "../../drizzle/schema";
 import { eq } from "drizzle-orm";
 import { notifyOwner } from "./notification";
 import { sendSMSNotification } from "../sms";
@@ -302,14 +302,17 @@ app.use((err: any, req: any, res: any, _next: any) => {
 });
 
 // ============================================
-// Export for Vercel Serverless
+// Export for module imports
 // ============================================
 export default app;
 
 // ============================================
-// Development Server (only runs locally)
+// Server Startup
 // ============================================
+const port = parseInt(process.env.PORT || "3000");
+
 if (process.env.NODE_ENV === "development") {
+  // Development mode with Vite HMR
   (async () => {
     try {
       const { createServer } = await import("http");
@@ -318,7 +321,6 @@ if (process.env.NODE_ENV === "development") {
       const server = createServer(app);
       await setupVite(app, server);
       
-      const port = parseInt(process.env.PORT || "3000");
       server.listen(port, () => {
         console.log(`[Server] Dev server running on http://localhost:${port}/`);
       });
@@ -326,4 +328,9 @@ if (process.env.NODE_ENV === "development") {
       console.error("[Server] Failed to start development server:", err);
     }
   })();
+} else {
+  // Production mode (Render)
+  app.listen(port, () => {
+    console.log(`[Server] Production server running on port ${port}`);
+  });
 }

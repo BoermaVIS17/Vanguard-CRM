@@ -1,6 +1,6 @@
 import { ENV } from "./_core/env";
 import { getDb } from "./db";
-import { reportRequests, users } from "../_drizzle/schema";
+import { reportRequests, users } from "../drizzle/schema";
 import { eq, and, isNotNull, lte, gte, inArray } from "drizzle-orm";
 
 interface LienRightsJob {

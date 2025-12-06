@@ -1,11 +1,11 @@
 // @ts-nocheck
-import { COOKIE_NAME } from "../_shared/const";
+import { COOKIE_NAME } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { z } from "zod";
 import { getDb } from "./db";
-import { reportRequests, users, activities, documents, editHistory } from "../_drizzle/schema";
+import { reportRequests, users, activities, documents, editHistory } from "../drizzle/schema";
 import { PRODUCTS, validatePromoCode } from "./products";
 import { notifyOwner } from "./_core/notification";
 import { sendSMSNotification } from "./sms";
