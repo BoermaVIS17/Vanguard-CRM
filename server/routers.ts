@@ -1031,7 +1031,7 @@ export const appRouter = router({
       .input(z.object({
         name: z.string().min(1),
         email: z.string().email(),
-        role: z.enum(["admin", "owner", "office", "sales_rep", "team_lead"]),
+        role: z.enum(["admin", "owner", "office", "sales_rep", "team_lead", "field_crew"]),
         teamLeadId: z.number().optional(),
       }))
       .mutation(async ({ input, ctx }) => {
