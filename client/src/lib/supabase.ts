@@ -1,12 +1,35 @@
 import { createClient, RealtimeChannel, SupabaseClient } from "@supabase/supabase-js";
 
 // Client-side Supabase client with anon key (limited access)
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || "";
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || "";
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-// Only create client if credentials are available
-export const supabase: SupabaseClient | null = supabaseUrl && supabaseAnonKey 
-  ? createClient(supabaseUrl, supabaseAnonKey, {
+// Validate URL format
+function isValidUrl(urlString: string | undefined): boolean {
+  if (!urlString) return false;
+  try {
+    new URL(urlString);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+// Check if credentials are valid
+const hasValidCredentials = isValidUrl(supabaseUrl) && !!supabaseAnonKey;
+
+// Log warnings in development if credentials are missing
+if (!hasValidCredentials) {
+  console.warn(
+    "[Supabase] Missing or invalid configuration. Real-time features will be disabled.",
+    "\n  VITE_SUPABASE_URL:", supabaseUrl ? (isValidUrl(supabaseUrl) ? "✓ Valid" : "✗ Invalid URL format") : "✗ Missing",
+    "\n  VITE_SUPABASE_ANON_KEY:", supabaseAnonKey ? "✓ Present" : "✗ Missing"
+  );
+}
+
+// Only create client if credentials are valid
+export const supabase: SupabaseClient | null = hasValidCredentials
+  ? createClient(supabaseUrl!, supabaseAnonKey!, {
       realtime: {
         params: {
           eventsPerSecond: 10,
