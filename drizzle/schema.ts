@@ -4,7 +4,6 @@ import { pgTable, serial, text, varchar, boolean, timestamp, integer, pgEnum } f
 export const roleEnum = pgEnum("role", ["user", "admin", "owner", "office", "sales_rep", "project_manager", "team_lead", "field_crew"]);
 
 export const statusEnum = pgEnum("status", [
-  // New pipeline stages
   "lead",
   "appointment_set",
   "prospect",
@@ -14,17 +13,7 @@ export const statusEnum = pgEnum("status", [
   "invoiced",
   "lien_legal",
   "closed_deal",
-  "closed_lost",
-  // Legacy values (for migration compatibility)
-  "pending",
-  "new_lead",
-  "contacted",
-  "inspection_scheduled",
-  "inspection_complete",
-  "report_sent",
-  "follow_up",
-  "closed_won",
-  "cancelled"
+  "closed_lost"
 ]);
 
 export const dealTypeEnum = pgEnum("deal_type", ["insurance", "cash", "financed"]);
