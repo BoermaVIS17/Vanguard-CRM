@@ -950,52 +950,98 @@ export const appRouter = router({
         password: z.string().min(6).optional(),
       }))
       .mutation(async ({ input, ctx }) => {
+        console.log('[CreateAccount] Starting account creation for:', input.email);
+        
+        // Step 1: Check database connection
         const db = await getDb();
-        if (!db) throw new Error("Database not available");
+        if (!db) {
+          console.error('[CreateAccount] STEP 1 FAILED: Database not available');
+          throw new Error("[DB_ERROR] Database connection failed");
+        }
+        console.log('[CreateAccount] Step 1 passed: Database connected');
 
-        // Only owners can create accounts
+        // Step 2: Check permissions
         if (!isOwner(ctx.user)) {
-          throw new Error("Only owners can create team accounts");
+          console.error('[CreateAccount] STEP 2 FAILED: User is not owner. User role:', ctx.user?.role);
+          throw new Error("[PERMISSION_ERROR] Only owners can create team accounts");
+        }
+        console.log('[CreateAccount] Step 2 passed: User is owner');
+
+        // Step 3: Check if email already exists
+        try {
+          const existing = await db.select().from(users).where(eq(users.email, input.email));
+          if (existing.length > 0) {
+            console.error('[CreateAccount] STEP 3 FAILED: Email already exists in users table');
+            throw new Error("[DUPLICATE_ERROR] An account with this email already exists in CRM");
+          }
+          console.log('[CreateAccount] Step 3 passed: Email is unique in CRM');
+        } catch (dbError: any) {
+          if (dbError.message.includes('[DUPLICATE_ERROR]')) throw dbError;
+          console.error('[CreateAccount] STEP 3 FAILED: Database query error:', dbError);
+          throw new Error(`[DB_QUERY_ERROR] Failed to check existing users: ${dbError.message}`);
         }
 
-        // Check if email already exists in our users table
-        const existing = await db.select().from(users).where(eq(users.email, input.email));
-        if (existing.length > 0) {
-          throw new Error("An account with this email already exists");
-        }
-
-        // Generate a temporary password if not provided
+        // Step 4: Generate temp password
         const tempPassword = input.password || `Temp${Math.random().toString(36).substring(2, 10)}!`;
+        console.log('[CreateAccount] Step 4 passed: Generated temp password');
 
-        // Create Supabase Auth user first
-        const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
-          email: input.email,
-          password: tempPassword,
-          email_confirm: true, // Auto-confirm the email
-          user_metadata: {
+        // Step 5: Create Supabase Auth user
+        console.log('[CreateAccount] Step 5: Creating Supabase Auth user...');
+        let authData;
+        try {
+          const result = await supabaseAdmin.auth.admin.createUser({
+            email: input.email,
+            password: tempPassword,
+            email_confirm: true,
+            user_metadata: {
+              name: input.name,
+              role: input.role,
+            },
+          });
+          
+          if (result.error) {
+            console.error('[CreateAccount] STEP 5 FAILED: Supabase Auth error:', JSON.stringify(result.error));
+            throw new Error(`[SUPABASE_AUTH_ERROR] ${result.error.message}`);
+          }
+          
+          if (!result.data.user) {
+            console.error('[CreateAccount] STEP 5 FAILED: No user returned from Supabase');
+            throw new Error("[SUPABASE_AUTH_ERROR] No user returned from Supabase Auth");
+          }
+          
+          authData = result.data;
+          console.log('[CreateAccount] Step 5 passed: Supabase Auth user created with ID:', authData.user.id);
+        } catch (supabaseError: any) {
+          if (supabaseError.message.includes('[SUPABASE_AUTH_ERROR]')) throw supabaseError;
+          console.error('[CreateAccount] STEP 5 FAILED: Supabase exception:', supabaseError);
+          throw new Error(`[SUPABASE_EXCEPTION] ${supabaseError.message}`);
+        }
+
+        // Step 6: Create user in CRM database
+        console.log('[CreateAccount] Step 6: Creating user in CRM database...');
+        let newUser;
+        try {
+          const [insertedUser] = await db.insert(users).values({
+            openId: authData.user.id,
             name: input.name,
+            email: input.email,
             role: input.role,
-          },
-        });
-
-        if (authError) {
-          console.error('[CreateAccount] Supabase Auth error:', authError);
-          throw new Error(`Failed to create auth account: ${authError.message}`);
+            teamLeadId: input.teamLeadId || null,
+            isActive: true,
+          }).returning({ id: users.id });
+          newUser = insertedUser;
+          console.log('[CreateAccount] Step 6 passed: CRM user created with ID:', newUser.id);
+        } catch (dbInsertError: any) {
+          console.error('[CreateAccount] STEP 6 FAILED: CRM database insert error:', dbInsertError);
+          // Try to clean up the Supabase Auth user since CRM insert failed
+          try {
+            await supabaseAdmin.auth.admin.deleteUser(authData.user.id);
+            console.log('[CreateAccount] Cleaned up orphaned Supabase Auth user');
+          } catch (cleanupError) {
+            console.error('[CreateAccount] Failed to cleanup Supabase Auth user:', cleanupError);
+          }
+          throw new Error(`[CRM_DB_ERROR] Failed to create CRM user: ${dbInsertError.message}`);
         }
-
-        if (!authData.user) {
-          throw new Error("Failed to create auth account - no user returned");
-        }
-
-        // Create the user in our users table with the Supabase Auth user ID
-        const [newUser] = await db.insert(users).values({
-          openId: authData.user.id,
-          name: input.name,
-          email: input.email,
-          role: input.role,
-          teamLeadId: input.teamLeadId || null,
-          isActive: true,
-        }).returning({ id: users.id });
 
         // Login URL
         const loginUrl = 'https://ndespanels.com/login';
