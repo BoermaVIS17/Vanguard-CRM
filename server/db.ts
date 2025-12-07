@@ -11,20 +11,24 @@ let _isInitialized = false;
 
 /**
  * Get or create database connection singleton
- * Uses SUPABASE_URL or DATABASE_URL (SUPABASE_URL takes priority for Supabase projects)
- * Connection pooling configured for Supabase Transaction Mode (port 6543)
+ * Uses DATABASE_URL (Transaction Pooler on port 6543)
+ * Connection pooling configured for Supabase Transaction Mode
  */
 export async function getDb() {
   if (_isInitialized && _db) {
     return _db;
   }
 
-  // Priority: SUPABASE_URL (recommended for Supabase) > DATABASE_URL
-  const connectionString = process.env.SUPABASE_URL || process.env.DATABASE_URL;
-  
+  // 1. Priority: DATABASE_URL (Explicit Postgres Connection)
+  let connectionString = process.env.DATABASE_URL;
+
+  // 2. Fallback: SUPABASE_URL (Only if it is a postgres string, NOT https)
+  if (!connectionString && process.env.SUPABASE_URL?.startsWith('postgres')) {
+    connectionString = process.env.SUPABASE_URL;
+  }
+
   if (!connectionString) {
-    console.error("❌ MISSING: SUPABASE_URL or DATABASE_URL environment variable");
-    console.error("Add SUPABASE_URL to Render Environment tab");
+    console.error("❌ MISSING: DATABASE_URL (or valid postgres SUPABASE_URL)");
     return null;
   }
 
