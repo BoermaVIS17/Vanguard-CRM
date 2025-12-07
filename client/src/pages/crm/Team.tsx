@@ -34,6 +34,19 @@ export default function CRMTeam() {
     },
   });
 
+  const createAccount = trpc.crm.createTeamAccount.useMutation({
+    onSuccess: (data) => {
+      toast.success("Account created successfully");
+      setCreatedAccount(data);
+      refetch();
+      setIsCreating(false);
+    },
+    onError: (error) => {
+      toast.error(error.message || 'Failed to create account');
+      setIsCreating(false);
+    },
+  });
+
   const [isCreating, setIsCreating] = useState(false);
 
   const [editingMember, setEditingMember] = useState<any>(null);
@@ -80,43 +93,13 @@ export default function CRMTeam() {
     
     setIsCreating(true);
     
-    try {
-      // Get the current session token
-      const { data: { session } } = await supabase!.auth.getSession();
-      if (!session?.access_token) {
-        toast.error("Not authenticated");
-        setIsCreating(false);
-        return;
-      }
-
-      const response = await fetch('/api/team/create', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session.access_token}`,
-        },
-        body: JSON.stringify({
-          name: newAccountName,
-          email: newAccountEmail,
-          role: newAccountRole,
-          teamLeadId: newAccountTeamLead === "none" ? undefined : parseInt(newAccountTeamLead),
-        }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to create account');
-      }
-
-      toast.success("Account created successfully");
-      setCreatedAccount(data);
-      refetch();
-    } catch (error: any) {
-      toast.error(error.message || 'Failed to create account');
-    } finally {
-      setIsCreating(false);
-    }
+    // Use tRPC mutation instead of fetch
+    createAccount.mutate({
+      name: newAccountName,
+      email: newAccountEmail,
+      role: newAccountRole as "admin" | "owner" | "office" | "sales_rep" | "team_lead" | "field_crew",
+      teamLeadId: newAccountTeamLead === "none" ? undefined : parseInt(newAccountTeamLead),
+    });
   };
 
   const resetCreateForm = () => {
