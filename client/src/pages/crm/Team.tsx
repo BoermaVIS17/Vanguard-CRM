@@ -34,6 +34,18 @@ export default function CRMTeam() {
     },
   });
 
+  // Owner-only user update mutation with audit trail
+  const updateUser = trpc.crm.updateUser.useMutation({
+    onSuccess: (data) => {
+      toast.success(data.message);
+      refetch();
+      setEditingMember(null);
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+  });
+
   const createAccount = trpc.crm.createTeamAccount.useMutation({
     onSuccess: (data) => {
       toast.success("Account created successfully");
@@ -52,6 +64,13 @@ export default function CRMTeam() {
   const [editingMember, setEditingMember] = useState<any>(null);
   const [selectedRole, setSelectedRole] = useState<string>("");
   const [selectedTeamLead, setSelectedTeamLead] = useState<string>("");
+  
+  // Editable fields for owner-only editing
+  const [editName, setEditName] = useState<string>("");
+  const [editEmail, setEditEmail] = useState<string>("");
+  const [editPhone, setEditPhone] = useState<string>("");
+  const [editRepCode, setEditRepCode] = useState<string>("");
+  const [editIsActive, setEditIsActive] = useState<boolean>(true);
   
   // Create account form state
   const [showCreateDialog, setShowCreateDialog] = useState(false);
@@ -83,6 +102,35 @@ export default function CRMTeam() {
     setEditingMember(member);
     setSelectedRole(member.role);
     setSelectedTeamLead(member.teamLeadId?.toString() || "none");
+    // Set editable fields
+    setEditName(member.name || "");
+    setEditEmail(member.email || "");
+    setEditPhone(member.phone || "");
+    setEditRepCode(member.repCode || "");
+    setEditIsActive(member.isActive !== false);
+  };
+
+  // Check if current user is an owner
+  const isOwnerUser = currentUser?.role === "owner";
+
+  // Handle save with owner-level editing
+  const handleOwnerSave = () => {
+    if (!editingMember) return;
+    
+    updateUser.mutate({
+      targetUserId: editingMember.id,
+      data: {
+        name: editName !== editingMember.name ? editName : undefined,
+        email: editEmail !== editingMember.email ? editEmail : undefined,
+        phone: editPhone !== editingMember.phone ? editPhone : undefined,
+        role: selectedRole !== editingMember.role ? selectedRole as any : undefined,
+        repCode: editRepCode !== editingMember.repCode ? editRepCode : undefined,
+        teamLeadId: selectedTeamLead === "none" 
+          ? (editingMember.teamLeadId ? null : undefined) 
+          : (parseInt(selectedTeamLead) !== editingMember.teamLeadId ? parseInt(selectedTeamLead) : undefined),
+        isActive: editIsActive !== editingMember.isActive ? editIsActive : undefined,
+      },
+    });
   };
 
   const handleCreateAccount = async () => {
@@ -443,18 +491,72 @@ export default function CRMTeam() {
           )}
         </div>
 
-        {/* Edit Member Dialog */}
+        {/* Edit Member Dialog - Enhanced for Owners */}
         <Dialog open={!!editingMember} onOpenChange={(open) => !open && setEditingMember(null)}>
-          <DialogContent className="bg-slate-800 border-slate-700">
+          <DialogContent className="bg-slate-800 border-slate-700 max-w-md">
             <DialogHeader>
               <DialogTitle className="text-white">Edit Team Member</DialogTitle>
             </DialogHeader>
             {editingMember && (
-              <div className="space-y-4 pt-4">
+              <div className="space-y-4 pt-4 max-h-[70vh] overflow-y-auto">
+                {/* Name - Editable for Owners */}
                 <div>
-                  <p className="text-sm text-slate-400 mb-1">Name</p>
-                  <p className="font-medium text-white">{editingMember.name || editingMember.email}</p>
+                  <p className="text-sm text-slate-400 mb-2">Name</p>
+                  {isOwnerUser ? (
+                    <Input
+                      value={editName}
+                      onChange={(e) => setEditName(e.target.value)}
+                      className="bg-slate-700 border-slate-600 text-white"
+                      placeholder="Full name"
+                    />
+                  ) : (
+                    <p className="font-medium text-white">{editingMember.name || editingMember.email}</p>
+                  )}
                 </div>
+
+                {/* Email - Editable for Owners */}
+                {isOwnerUser && (
+                  <div>
+                    <p className="text-sm text-slate-400 mb-2">Email</p>
+                    <Input
+                      type="email"
+                      value={editEmail}
+                      onChange={(e) => setEditEmail(e.target.value)}
+                      className="bg-slate-700 border-slate-600 text-white"
+                      placeholder="email@example.com"
+                    />
+                  </div>
+                )}
+
+                {/* Phone - Editable for Owners */}
+                {isOwnerUser && (
+                  <div>
+                    <p className="text-sm text-slate-400 mb-2">Phone</p>
+                    <Input
+                      type="tel"
+                      value={editPhone}
+                      onChange={(e) => setEditPhone(e.target.value)}
+                      className="bg-slate-700 border-slate-600 text-white"
+                      placeholder="(555) 123-4567"
+                    />
+                  </div>
+                )}
+
+                {/* Rep Code - Editable for Owners */}
+                {isOwnerUser && (
+                  <div>
+                    <p className="text-sm text-slate-400 mb-2">Rep Code</p>
+                    <Input
+                      value={editRepCode}
+                      onChange={(e) => setEditRepCode(e.target.value.toUpperCase())}
+                      className="bg-slate-700 border-slate-600 text-white font-mono"
+                      placeholder="e.g., DYS26"
+                    />
+                    <p className="text-xs text-slate-500 mt-1">Used for tracking sales attribution</p>
+                  </div>
+                )}
+
+                {/* Role */}
                 <div>
                   <p className="text-sm text-slate-400 mb-2">Role</p>
                   <Select 
@@ -505,7 +607,30 @@ export default function CRMTeam() {
                   </div>
                 )}
 
-                <div className="flex justify-end gap-2 pt-4">
+                {/* Active Status - Editable for Owners */}
+                {isOwnerUser && (
+                  <div className="flex items-center justify-between p-3 bg-slate-700/50 rounded-lg">
+                    <div>
+                      <p className="text-sm text-white font-medium">Account Active</p>
+                      <p className="text-xs text-slate-400">Inactive users cannot log in</p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setEditIsActive(!editIsActive)}
+                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                        editIsActive ? 'bg-[#00d4aa]' : 'bg-slate-600'
+                      }`}
+                    >
+                      <span
+                        className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                          editIsActive ? 'translate-x-6' : 'translate-x-1'
+                        }`}
+                      />
+                    </button>
+                  </div>
+                )}
+
+                <div className="flex justify-end gap-2 pt-4 border-t border-slate-700">
                   <Button 
                     variant="ghost" 
                     onClick={() => setEditingMember(null)}
@@ -514,11 +639,11 @@ export default function CRMTeam() {
                     Cancel
                   </Button>
                   <Button 
-                    onClick={handleSaveChanges}
-                    disabled={updateMember.isPending}
+                    onClick={isOwnerUser ? handleOwnerSave : handleSaveChanges}
+                    disabled={isOwnerUser ? updateUser.isPending : updateMember.isPending}
                     className="bg-[#00d4aa] hover:bg-[#00b894] text-black"
                   >
-                    Save Changes
+                    {(isOwnerUser ? updateUser.isPending : updateMember.isPending) ? "Saving..." : "Save Changes"}
                   </Button>
                 </div>
               </div>

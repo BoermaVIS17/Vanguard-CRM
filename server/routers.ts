@@ -1067,6 +1067,106 @@ export const appRouter = router({
         };
       }),
 
+    // Update user (Owner only) - with audit trail
+    updateUser: protectedProcedure
+      .input(z.object({
+        targetUserId: z.number(),
+        data: z.object({
+          name: z.string().min(1).optional(),
+          email: z.string().email().optional(),
+          phone: z.string().optional(),
+          role: z.enum(["user", "admin", "owner", "office", "sales_rep", "project_manager", "team_lead", "field_crew"]).optional(),
+          repCode: z.string().optional(),
+          teamLeadId: z.number().nullable().optional(),
+          isActive: z.boolean().optional(),
+        }),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const db = await getDb();
+        if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database not available" });
+
+        // Only owners can edit users
+        if (!isOwner(ctx.user)) {
+          throw new TRPCError({ code: "FORBIDDEN", message: "Only owners can edit user details" });
+        }
+
+        const { targetUserId, data } = input;
+
+        // Fetch original user data for audit log
+        const [oldUser] = await db.select().from(users).where(eq(users.id, targetUserId));
+        if (!oldUser) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "User not found" });
+        }
+
+        // Build update object with only provided fields
+        const updateData: Record<string, any> = {};
+        const changes: Array<{ field: string; oldValue: string | null; newValue: string | null }> = [];
+
+        if (data.name !== undefined && data.name !== oldUser.name) {
+          updateData.name = data.name;
+          changes.push({ field: "name", oldValue: oldUser.name || null, newValue: data.name });
+        }
+        if (data.email !== undefined && data.email !== oldUser.email) {
+          updateData.email = data.email;
+          changes.push({ field: "email", oldValue: oldUser.email || null, newValue: data.email });
+        }
+        if (data.phone !== undefined && data.phone !== oldUser.phone) {
+          updateData.phone = data.phone;
+          changes.push({ field: "phone", oldValue: oldUser.phone || null, newValue: data.phone });
+        }
+        if (data.role !== undefined && data.role !== oldUser.role) {
+          updateData.role = data.role;
+          changes.push({ field: "role", oldValue: oldUser.role || null, newValue: data.role });
+        }
+        if (data.repCode !== undefined && data.repCode !== oldUser.repCode) {
+          updateData.repCode = data.repCode;
+          changes.push({ field: "rep_code", oldValue: oldUser.repCode || null, newValue: data.repCode });
+        }
+        if (data.teamLeadId !== undefined && data.teamLeadId !== oldUser.teamLeadId) {
+          updateData.teamLeadId = data.teamLeadId;
+          changes.push({ field: "team_lead_id", oldValue: oldUser.teamLeadId?.toString() || null, newValue: data.teamLeadId?.toString() || null });
+        }
+        if (data.isActive !== undefined && data.isActive !== oldUser.isActive) {
+          updateData.isActive = data.isActive;
+          changes.push({ field: "is_active", oldValue: String(oldUser.isActive), newValue: String(data.isActive) });
+        }
+
+        // If no changes, return early
+        if (Object.keys(updateData).length === 0) {
+          return { success: true, message: "No changes to save" };
+        }
+
+        // Add updatedAt timestamp
+        updateData.updatedAt = new Date();
+
+        // Update user
+        await db.update(users)
+          .set(updateData)
+          .where(eq(users.id, targetUserId));
+
+        // Log each change to edit history (using reportRequestId = 0 for user edits)
+        for (const change of changes) {
+          await db.insert(editHistory).values({
+            reportRequestId: 0, // 0 indicates this is a user edit, not a job edit
+            userId: ctx.user!.id,
+            fieldName: `user.${change.field}`,
+            oldValue: change.oldValue,
+            newValue: change.newValue,
+            editType: "update",
+            ipAddress: ctx.req?.headers?.get?.("x-forwarded-for") || null,
+            userAgent: ctx.req?.headers?.get?.("user-agent")?.substring(0, 500) || null,
+          });
+        }
+
+        console.log(`[UpdateUser] Owner ${ctx.user?.name} updated user ${targetUserId}:`, changes);
+
+        return { 
+          success: true, 
+          message: `User updated successfully. ${changes.length} field(s) changed.`,
+          changes: changes.map(c => c.field),
+        };
+      }),
+
     // Get team leads for assignment dropdown (includes owners)
     getTeamLeads: protectedProcedure.query(async () => {
       const db = await getDb();
