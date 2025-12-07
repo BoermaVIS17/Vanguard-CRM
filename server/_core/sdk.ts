@@ -258,13 +258,27 @@ class SDKServer {
   }
 
   async authenticateRequest(req: Request): Promise<User> {
-    // Regular authentication flow
-    const cookies = this.parseCookies(req.headers.cookie);
-    const sessionCookie = cookies.get(COOKIE_NAME);
-    const session = await this.verifySession(sessionCookie);
+    // Try Authorization header first (for cross-origin requests)
+    let sessionToken: string | undefined;
+    const authHeader = req.headers.authorization;
+    
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      sessionToken = authHeader.substring(7);
+      console.log('[Auth] Using Authorization header token');
+    } else {
+      // Fall back to cookie
+      const cookies = this.parseCookies(req.headers.cookie);
+      sessionToken = cookies.get(COOKIE_NAME);
+      if (sessionToken) {
+        console.log('[Auth] Using cookie token');
+      }
+    }
+    
+    const session = await this.verifySession(sessionToken);
 
     if (!session) {
-      throw ForbiddenError("Invalid session cookie");
+      console.warn('[Auth] No valid session found in header or cookie');
+      throw ForbiddenError("Invalid session");
     }
 
     const sessionUserId = session.openId;

@@ -8,6 +8,24 @@ import App from "./App";
 import { getLoginUrl } from "./const";
 import "./index.css";
 
+// Session token storage key
+const SESSION_TOKEN_KEY = "manus-session-token";
+
+// Helper to get session token from localStorage
+export function getSessionToken(): string | null {
+  return localStorage.getItem(SESSION_TOKEN_KEY);
+}
+
+// Helper to set session token in localStorage
+export function setSessionToken(token: string): void {
+  localStorage.setItem(SESSION_TOKEN_KEY, token);
+}
+
+// Helper to clear session token from localStorage
+export function clearSessionToken(): void {
+  localStorage.removeItem(SESSION_TOKEN_KEY);
+}
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -61,6 +79,16 @@ const trpcClient = trpc.createClient({
     httpBatchLink({
       url: import.meta.env.VITE_API_URL || "/api/trpc",
       transformer: superjson,
+      headers() {
+        // Send session token as Authorization header for cross-origin requests
+        const token = getSessionToken();
+        if (token) {
+          return {
+            Authorization: `Bearer ${token}`,
+          };
+        }
+        return {};
+      },
       fetch(input, init) {
         return globalThis.fetch(input, {
           ...(init ?? {}),

@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { supabase, isSupabaseAvailable } from "@/lib/supabase";
 import { User, Session, AuthError } from "@supabase/supabase-js";
 import { trpc } from "@/lib/trpc";
+import { setSessionToken, clearSessionToken } from "@/main";
 
 export interface AuthState {
   user: User | null;
@@ -68,7 +69,7 @@ export function useSupabaseAuth(): UseSupabaseAuthReturn {
 
   const syncUserMutation = trpc.auth.syncSupabaseUser.useMutation();
 
-  // Function to sync Supabase user to CRM
+  // Function to sync Supabase user to CRM and store session token
   const syncToCRM = useCallback(async (supabaseUser: User) => {
     try {
       const result = await syncUserMutation.mutateAsync({
@@ -78,6 +79,12 @@ export function useSupabaseAuth(): UseSupabaseAuthReturn {
       });
       
       if (result.success && result.user) {
+        // Store the session token returned from the backend
+        if ((result as any).sessionToken) {
+          setSessionToken((result as any).sessionToken);
+          console.log("[Auth] Session token stored in localStorage");
+        }
+        
         setState(prev => ({
           ...prev,
           crmUser: result.user,
@@ -121,6 +128,12 @@ export function useSupabaseAuth(): UseSupabaseAuthReturn {
         if (session?.user && _event === "SIGNED_IN") {
           // Sync to CRM when user signs in
           await syncToCRM(session.user);
+        }
+        
+        if (_event === "SIGNED_OUT") {
+          // Clear session token on sign out
+          clearSessionToken();
+          console.log("[Auth] Session token cleared from localStorage");
         }
         
         setState(prev => ({
@@ -211,6 +224,10 @@ export function useSupabaseAuth(): UseSupabaseAuthReturn {
     if (!isSupabaseAvailable() || !supabase) return;
 
     setState(prev => ({ ...prev, loading: true }));
+    
+    // Clear session token from localStorage
+    clearSessionToken();
+    
     await supabase.auth.signOut();
     setState({
       user: null,

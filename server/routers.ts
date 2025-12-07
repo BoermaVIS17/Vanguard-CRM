@@ -170,7 +170,8 @@ export const appRouter = router({
             success: true, 
             user: { id: result.id, name: result.name, role: result.role, email: result.email },
             isNewUser: isFirstUser,
-            isOwner: result.role === 'owner'
+            isOwner: result.role === 'owner',
+            sessionToken, // Return token for cross-origin auth via Authorization header
           };
         } catch (error: any) {
           console.error('❌ CRITICAL ERROR in syncSupabaseUser:');
