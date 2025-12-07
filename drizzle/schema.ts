@@ -1,9 +1,12 @@
-import { pgTable, serial, text, varchar, boolean, timestamp, integer, pgEnum } from "drizzle-orm/pg-core";
+import { pgTable, serial, text, varchar, boolean, timestamp, integer, pgEnum, pgSchema } from "drizzle-orm/pg-core";
 
-// PostgreSQL enums
-export const roleEnum = pgEnum("role", ["user", "admin", "owner", "office", "sales_rep", "project_manager", "team_lead", "field_crew"]);
+// Define the public schema explicitly
+const publicSchema = pgSchema("public");
 
-export const statusEnum = pgEnum("status", [
+// PostgreSQL enums in public schema
+export const roleEnum = publicSchema.enum("role", ["user", "admin", "owner", "office", "sales_rep", "project_manager", "team_lead", "field_crew"]);
+
+export const statusEnum = publicSchema.enum("status", [
   "lead",
   "appointment_set",
   "prospect",
@@ -16,9 +19,9 @@ export const statusEnum = pgEnum("status", [
   "closed_lost"
 ]);
 
-export const dealTypeEnum = pgEnum("deal_type", ["insurance", "cash", "financed"]);
+export const dealTypeEnum = publicSchema.enum("deal_type", ["insurance", "cash", "financed"]);
 
-export const lienRightsStatusEnum = pgEnum("lien_rights_status", [
+export const lienRightsStatusEnum = publicSchema.enum("lien_rights_status", [
   "not_applicable",
   "active",
   "warning",
@@ -27,11 +30,11 @@ export const lienRightsStatusEnum = pgEnum("lien_rights_status", [
   "legal"
 ]);
 
-export const paymentStatusEnum = pgEnum("payment_status", ["pending", "paid", "refunded"]);
+export const paymentStatusEnum = publicSchema.enum("payment_status", ["pending", "paid", "refunded"]);
 
-export const priorityEnum = pgEnum("priority", ["low", "medium", "high", "urgent"]);
+export const priorityEnum = publicSchema.enum("priority", ["low", "medium", "high", "urgent"]);
 
-export const activityTypeEnum = pgEnum("activity_type", [
+export const activityTypeEnum = publicSchema.enum("activity_type", [
   "status_change",
   "note_added",
   "call_logged",
@@ -49,7 +52,7 @@ export const activityTypeEnum = pgEnum("activity_type", [
   "inspection_complete"
 ]);
 
-export const documentCategoryEnum = pgEnum("document_category", [
+export const documentCategoryEnum = publicSchema.enum("document_category", [
   "drone_photo",
   "inspection_photo",
   "report",
@@ -58,7 +61,7 @@ export const documentCategoryEnum = pgEnum("document_category", [
   "other"
 ]);
 
-export const editTypeEnum = pgEnum("edit_type", [
+export const editTypeEnum = publicSchema.enum("edit_type", [
   "create",
   "update",
   "delete",
@@ -75,7 +78,7 @@ export const editTypeEnum = pgEnum("edit_type", [
  * - team_lead: View own jobs + jobs of team members assigned to them
  * - sales_rep: View and edit only their own assigned jobs, no delete
  */
-export const users = pgTable("users", {
+export const users = publicSchema.table("users", {
   id: serial("id").primaryKey(),
   openId: varchar("open_id", { length: 64 }).notNull().unique(),
   name: text("name"),
@@ -99,7 +102,7 @@ export type InsertUser = typeof users.$inferInsert;
 /**
  * Report requests / Leads table - incoming storm documentation requests
  */
-export const reportRequests = pgTable("report_requests", {
+export const reportRequests = publicSchema.table("report_requests", {
   id: serial("id").primaryKey(),
   
   // Customer info
@@ -164,7 +167,7 @@ export type InsertReportRequest = typeof reportRequests.$inferInsert;
 /**
  * Activity log - tracks all actions on leads/jobs
  */
-export const activities = pgTable("activities", {
+export const activities = publicSchema.table("activities", {
   id: serial("id").primaryKey(),
   reportRequestId: integer("report_request_id").notNull(),
   userId: integer("user_id"),
@@ -183,7 +186,7 @@ export type InsertActivity = typeof activities.$inferInsert;
 /**
  * Documents - files attached to leads/jobs
  */
-export const documents = pgTable("documents", {
+export const documents = publicSchema.table("documents", {
   id: serial("id").primaryKey(),
   reportRequestId: integer("report_request_id").notNull(),
   uploadedBy: integer("uploaded_by"),
@@ -210,7 +213,7 @@ export type InsertDocument = typeof documents.$inferInsert;
 /**
  * Edit History - tracks all edits made to leads/jobs for audit trail
  */
-export const editHistory = pgTable("edit_history", {
+export const editHistory = publicSchema.table("edit_history", {
   id: serial("id").primaryKey(),
   reportRequestId: integer("report_request_id").notNull(),
   userId: integer("user_id").notNull(),
