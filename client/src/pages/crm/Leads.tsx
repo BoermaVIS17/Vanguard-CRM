@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Link, useLocation } from "wouter";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -30,6 +30,15 @@ export default function CRMLeads() {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [showNewJobDialog, setShowNewJobDialog] = useState(false);
+
+  // Read status filter from URL params on mount
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const statusParam = params.get("status");
+    if (statusParam && STATUS_OPTIONS.some(opt => opt.value === statusParam)) {
+      setStatusFilter(statusParam);
+    }
+  }, []);
   const [newJobForm, setNewJobForm] = useState({
     fullName: "",
     email: "",

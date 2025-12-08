@@ -27,7 +27,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { trpc } from "@/lib/trpc";
 import CRMLayout from "@/components/crm/CRMLayout";
-import { JobPipelineTracker } from "@/components/JobPipelineTracker";
+import { PipelineOverview } from "@/components/PipelineOverview";
 
 // New pipeline stage configuration
 const pipelineStages = [
@@ -435,7 +435,7 @@ export default function CRMDashboard() {
                 </Button>
               </Link>
             </div>
-            <JobPipelineTracker currentStatus="Lead" />
+            <PipelineOverview stats={stats} />
           </CardContent>
         </Card>
 
