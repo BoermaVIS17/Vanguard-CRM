@@ -83,10 +83,18 @@ queryClient.getMutationCache().subscribe(event => {
 });
 
 // Log the API URL being used for debugging
-const apiUrl = import.meta.env.VITE_API_URL || "/api/trpc";
-console.log("[TRPC Client] API URL:", apiUrl);
+// Ensure the URL ends with /trpc (or /api/trpc for relative paths)
+let apiUrl = import.meta.env.VITE_API_URL || "/api/trpc";
+
+// If VITE_API_URL is set but doesn't end with /trpc, append it
+if (import.meta.env.VITE_API_URL && !apiUrl.endsWith("/trpc")) {
+  // Remove trailing slash if present, then add /api/trpc
+  apiUrl = apiUrl.replace(/\/$/, "") + "/api/trpc";
+}
+
+console.log("[TRPC Client] Raw VITE_API_URL:", import.meta.env.VITE_API_URL);
+console.log("[TRPC Client] Final API URL:", apiUrl);
 console.log("[TRPC Client] Environment:", {
-  VITE_API_URL: import.meta.env.VITE_API_URL,
   mode: import.meta.env.MODE,
   dev: import.meta.env.DEV,
 });
