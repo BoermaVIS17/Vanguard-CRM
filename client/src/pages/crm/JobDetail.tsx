@@ -43,6 +43,7 @@ import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 import CRMLayout from "@/components/crm/CRMLayout";
 import { useRealtimeJob } from "@/hooks/useRealtimeJob";
+import { JobPipelineTracker } from "@/components/JobPipelineTracker";
 
 // Status configuration - Updated for new pipeline
 const STATUS_CONFIG: Record<string, { label: string; color: string; icon: typeof CheckCircle }> = {
@@ -702,7 +703,18 @@ export default function JobDetail() {
         <div className="p-6">
           {/* Overview Tab */}
           {activeTab === "overview" && (
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="space-y-6">
+              {/* Animated Pipeline Tracker */}
+              <Card className="bg-slate-800 border-slate-700">
+                <CardHeader>
+                  <CardTitle className="text-white">Pipeline Status</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <JobPipelineTracker currentStatus={job.status} />
+                </CardContent>
+              </Card>
+
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               {/* Customer Info - Editable */}
               <Card className="bg-slate-800 border-slate-700">
                 <CardHeader>
@@ -1107,6 +1119,7 @@ export default function JobDetail() {
                   </div>
                 </CardContent>
               </Card>
+              </div>
             </div>
           )}
 
