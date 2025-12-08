@@ -27,6 +27,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { trpc } from "@/lib/trpc";
 import CRMLayout from "@/components/crm/CRMLayout";
+import { JobPipelineTracker } from "@/components/JobPipelineTracker";
 
 // New pipeline stage configuration
 const pipelineStages = [
@@ -423,30 +424,18 @@ export default function CRMDashboard() {
           </Card>
         </div>
 
-        {/* Pipeline Badges */}
+        {/* Pipeline Tracker */}
         <Card className="bg-slate-800 border-slate-700 mb-6">
           <CardContent className="pt-4">
-            <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center justify-between mb-4">
               <h3 className="text-sm font-semibold text-slate-300">Pipeline Overview</h3>
               <Link href="/crm/pipeline">
                 <Button variant="ghost" size="sm" className="text-[#00d4aa] hover:text-[#00b894]">
-                  View Pipeline <ChevronRight className="w-4 h-4 ml-1" />
+                  View Full Pipeline <ChevronRight className="w-4 h-4 ml-1" />
                 </Button>
               </Link>
             </div>
-            <div className="flex flex-wrap gap-2">
-              {pipelineStages.map((stage) => (
-                <Link key={stage.key} href={`/crm/pipeline?stage=${stage.key}`}>
-                  <div className={`flex items-center gap-2 px-3 py-2 rounded-lg ${stage.color} bg-opacity-20 hover:bg-opacity-30 cursor-pointer transition-colors`}>
-                    <span className={`w-6 h-6 rounded-full ${stage.color} flex items-center justify-center text-white text-xs font-bold`}>
-                      {stage.short}
-                    </span>
-                    <span className="text-white text-sm">{stage.label}</span>
-                    <span className="text-white font-bold">{getPipelineCount(stage.key)}</span>
-                  </div>
-                </Link>
-              ))}
-            </div>
+            <JobPipelineTracker currentStatus="Lead" />
           </CardContent>
         </Card>
 
