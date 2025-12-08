@@ -6,7 +6,7 @@ import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { getDb } from "./db";
-import { reportRequests, users, activities, documents, editHistory, activityAttachments, messageReads } from "../drizzle/schema";
+import { reportRequests, users, activities, documents, editHistory, jobAttachments } from "../drizzle/schema";
 import { PRODUCTS, validatePromoCode } from "./products";
 import { notifyOwner } from "./_core/notification";
 import { sendSMSNotification } from "./sms";
@@ -822,6 +822,11 @@ export const appRouter = router({
       .input(z.object({
         leadId: z.number(),
         note: z.string().min(1),
+        attachments: z.array(z.object({
+          fileName: z.string(),
+          fileData: z.string(), // base64
+          fileType: z.string(),
+        })).optional(),
       }))
       .mutation(async ({ input, ctx }) => {
         const db = await getDb();
@@ -837,28 +842,56 @@ export const appRouter = router({
           throw new Error("You don't have permission to add notes to this job");
         }
 
-        await db.insert(activities).values({
+        const [activity] = await db.insert(activities).values({
           reportRequestId: input.leadId,
           userId: ctx.user?.id,
           activityType: "note_added",
           description: input.note,
-        });
+        }).returning({ id: activities.id });
+
+        // Handle file attachments if provided
+        if (input.attachments && input.attachments.length > 0) {
+          for (const attachment of input.attachments) {
+            const buffer = Buffer.from(attachment.fileData, "base64");
+            const fileSize = buffer.length;
+            const timestamp = Date.now();
+            const safeName = attachment.fileName.replace(/[^a-zA-Z0-9.-]/g, "_");
+            const filePath = `jobs/${input.leadId}/attachments/${timestamp}_${safeName}`;
+
+            // Upload to Supabase Storage (job-attachments bucket)
+            const { url } = await storagePut(filePath, buffer, attachment.fileType, "job-attachments");
+
+            // Save attachment record
+            await db.insert(jobAttachments).values({
+              jobId: input.leadId,
+              activityId: activity.id,
+              fileName: attachment.fileName,
+              fileUrl: url,
+              fileType: attachment.fileType,
+              fileSize: fileSize,
+              uploadedBy: ctx.user?.id,
+            });
+          }
+        }
 
         // Log to edit history for audit trail
         if (ctx.user?.id) {
+          const attachmentInfo = input.attachments && input.attachments.length > 0 
+            ? ` (${input.attachments.length} file${input.attachments.length > 1 ? 's' : ''} attached)` 
+            : '';
           await logEditHistory(
             db,
             input.leadId,
             ctx.user.id,
             "note",
             null,
-            input.note.substring(0, 500), // Truncate long notes
+            input.note.substring(0, 500) + attachmentInfo,
             "create",
             ctx
           );
         }
 
-        return { success: true };
+        return { success: true, activityId: activity.id };
       }),
 
     // Get pipeline data (role-based filtering)
@@ -1741,9 +1774,30 @@ export const appRouter = router({
           : [];
         const userMap = activityUsers.reduce((acc, u) => { acc[u.id] = u; return acc; }, {} as Record<number, any>);
 
+        // Get attachments for all activities
+        const activityIds = jobActivities.map(a => a.id);
+        const allAttachments = activityIds.length > 0
+          ? await db.select().from(jobAttachments)
+              .where(and(
+                eq(jobAttachments.jobId, input.id),
+                isNotNull(jobAttachments.activityId)
+              ))
+              .orderBy(desc(jobAttachments.createdAt))
+          : [];
+        
+        // Group attachments by activity ID
+        const attachmentsByActivity = allAttachments.reduce((acc, att) => {
+          if (att.activityId) {
+            if (!acc[att.activityId]) acc[att.activityId] = [];
+            acc[att.activityId].push(att);
+          }
+          return acc;
+        }, {} as Record<number, typeof allAttachments>);
+
         const enrichedActivities = jobActivities.map(a => ({
           ...a,
           user: a.userId ? userMap[a.userId] : null,
+          attachments: attachmentsByActivity[a.id] || [],
         }));
 
         // Get all documents

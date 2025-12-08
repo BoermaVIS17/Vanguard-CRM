@@ -14,7 +14,8 @@ import {
 export async function storagePut(
   relKey: string,
   data: Buffer | Uint8Array | string,
-  contentType = "application/octet-stream"
+  contentType = "application/octet-stream",
+  bucket = STORAGE_BUCKET
 ): Promise<{ key: string; url: string }> {
   const key = relKey.replace(/^\/+/, ""); // Remove leading slashes
   
@@ -23,7 +24,7 @@ export async function storagePut(
     ? Buffer.from(data, 'base64')
     : data;
 
-  const result = await uploadToSupabase(key, buffer as Buffer, contentType);
+  const result = await uploadToSupabase(key, buffer as Buffer, contentType, bucket);
   
   if (!result) {
     throw new Error(`Storage upload failed for ${key}`);

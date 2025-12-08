@@ -33,6 +33,7 @@ import {
   ZoomIn,
   Grid3X3,
   Maximize2,
+  Paperclip,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -67,7 +68,7 @@ const STATUS_CONFIG: Record<string, { label: string; color: string; icon: typeof
   completed: { label: "Completed", color: "bg-green-400", icon: CheckCircle },
   invoiced: { label: "Invoiced", color: "bg-lime-500", icon: FileText },
   lien_legal: { label: "Lien Legal", color: "bg-red-600", icon: AlertCircle },
-  closed_deal: { label: "💰 Closed Deal 💰", color: "bg-gradient-to-r from-yellow-500 to-green-500", icon: CheckCircle },
+  closed_deal: { label: "Closed Deal", color: "bg-gradient-to-r from-yellow-500 to-green-500", icon: CheckCircle },
   closed_lost: { label: "Closed Lost", color: "bg-slate-600", icon: XCircle },
 };
 
@@ -231,6 +232,7 @@ function InternalNotesEditor({
 }) {
   const [notes, setNotes] = useState(initialNotes);
   const [hasChanges, setHasChanges] = useState(false);
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   
   const updateLead = trpc.crm.updateLead.useMutation({
     onSuccess: () => {
@@ -243,8 +245,42 @@ function InternalNotesEditor({
     },
   });
 
-  const handleSave = () => {
-    updateLead.mutate({ id: jobId, internalNotes: notes });
+  const handleSave = async () => {
+    if (!notes.trim() && selectedFiles.length === 0) return;
+    
+    // Convert files to base64
+    const attachments = await Promise.all(
+      selectedFiles.map(async (file) => {
+        const base64 = await new Promise<string>((resolve) => {
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            const result = reader.result as string;
+            resolve(result.split(',')[1]); // Remove data:image/png;base64, prefix
+          };
+          reader.readAsDataURL(file);
+        });
+        return {
+          fileName: file.name,
+          fileData: base64,
+          fileType: file.type,
+        };
+      })
+    );
+    
+    updateLead.mutate(
+      { 
+        id: jobId, 
+        internalNotes: notes || "(File attachment)",
+        attachments: attachments.length > 0 ? attachments : undefined,
+      },
+      {
+        onSuccess: () => {
+          setNotes("");
+          setSelectedFiles([]);
+          onUpdate();
+        },
+      }
+    );
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -252,6 +288,16 @@ function InternalNotesEditor({
       e.preventDefault();
       handleSave();
     }
+  };
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      setSelectedFiles(prev => [...prev, ...Array.from(e.target.files!)]);
+    }
+  };
+
+  const removeFile = (index: number) => {
+    setSelectedFiles(prev => prev.filter((_, i) => i !== index));
   };
 
   // Update local state when initialNotes changes
@@ -276,6 +322,30 @@ function InternalNotesEditor({
         onKeyDown={handleKeyDown}
         className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-400 min-h-[120px]"
       />
+      <div className="flex items-center gap-2">
+        <Paperclip className="w-4 h-4 text-slate-400" />
+        <input
+          type="file"
+          multiple
+          onChange={handleFileSelect}
+          className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-400"
+        />
+        {selectedFiles.length > 0 && (
+          <div className="flex items-center gap-2">
+            {selectedFiles.map((file, index) => (
+              <div key={index} className="flex items-center gap-2">
+                <p className="text-xs text-slate-400">{file.name}</p>
+                <button
+                  onClick={() => removeFile(index)}
+                  className="text-red-400 hover:text-red-300"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
       <div className="flex items-center justify-between">
         <p className="text-xs text-slate-500">
           Press <kbd className="px-1.5 py-0.5 bg-slate-600 rounded text-slate-300">Ctrl+Enter</kbd> to save
@@ -376,6 +446,8 @@ export default function JobDetail() {
   const [activeTab, setActiveTab] = useState("overview");
   const [searchQuery, setSearchQuery] = useState("");
   const [newMessage, setNewMessage] = useState("");
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [isEditingCustomer, setIsEditingCustomer] = useState(false);
   const [previewDocument, setPreviewDocument] = useState<{ url: string; name: string; type: string } | null>(null);
@@ -531,13 +603,52 @@ export default function JobDetail() {
     e.target.value = "";
   };
 
-  const handleSendMessage = () => {
-    if (!newMessage.trim()) return;
-    addMessage.mutate({
-      jobId,
-      message: newMessage,
-      isInternal: true,
-    });
+  const handleSendMessage = async () => {
+    if (!newMessage.trim() && selectedFiles.length === 0) return;
+    
+    // Convert files to base64
+    const attachments = await Promise.all(
+      selectedFiles.map(async (file) => {
+        const base64 = await new Promise<string>((resolve) => {
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            const result = reader.result as string;
+            resolve(result.split(',')[1]); // Remove data:image/png;base64, prefix
+          };
+          reader.readAsDataURL(file);
+        });
+        return {
+          fileName: file.name,
+          fileData: base64,
+          fileType: file.type,
+        };
+      })
+    );
+    
+    addMessage.mutate(
+      { 
+        leadId: jobId, 
+        note: newMessage || "(File attachment)",
+        attachments: attachments.length > 0 ? attachments : undefined,
+      },
+      {
+        onSuccess: () => {
+          setNewMessage("");
+          setSelectedFiles([]);
+          refetch();
+        },
+      }
+    );
+  };
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      setSelectedFiles(prev => [...prev, ...Array.from(e.target.files!)]);
+    }
+  };
+
+  const removeFile = (index: number) => {
+    setSelectedFiles(prev => prev.filter((_, i) => i !== index));
   };
 
   const startEditingCustomer = () => {

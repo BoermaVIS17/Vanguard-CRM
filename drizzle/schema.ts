@@ -231,35 +231,22 @@ export type EditHistory = typeof editHistory.$inferSelect;
 export type InsertEditHistory = typeof editHistory.$inferInsert;
 
 /**
- * Activity Attachments - files/images attached to notes and messages
+ * Job Attachments - files/images attached to notes and messages
  */
-export const activityAttachments = pgTable("activity_attachments", {
+export const jobAttachments = pgTable("job_attachments", {
   id: serial("id").primaryKey(),
-  activityId: integer("activity_id").notNull(),
+  jobId: integer("job_id").notNull(),
+  activityId: integer("activity_id"), // Optional link to specific note/message
   
   fileName: varchar("file_name", { length: 255 }).notNull(),
   fileUrl: varchar("file_url", { length: 1000 }).notNull(),
   fileType: varchar("file_type", { length: 100 }),
   fileSize: integer("file_size"),
   
-  // Thumbnail for images
-  thumbnailUrl: varchar("thumbnail_url", { length: 1000 }),
+  uploadedBy: integer("uploaded_by"),
   
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
-export type ActivityAttachment = typeof activityAttachments.$inferSelect;
-export type InsertActivityAttachment = typeof activityAttachments.$inferInsert;
-
-/**
- * Message Reads - tracks which messages users have seen
- */
-export const messageReads = pgTable("message_reads", {
-  id: serial("id").primaryKey(),
-  activityId: integer("activity_id").notNull(),
-  userId: integer("user_id").notNull(),
-  readAt: timestamp("read_at").defaultNow().notNull(),
-});
-
-export type MessageRead = typeof messageReads.$inferSelect;
-export type InsertMessageRead = typeof messageReads.$inferInsert;
+export type JobAttachment = typeof jobAttachments.$inferSelect;
+export type InsertJobAttachment = typeof jobAttachments.$inferInsert;

@@ -11,17 +11,19 @@ export const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey, {
   },
 });
 
-// Single storage bucket for all CRM files
+// Storage buckets
 export const STORAGE_BUCKET = "CRM files";
+export const JOB_ATTACHMENTS_BUCKET = "job-attachments";
 
 // Upload file to Supabase Storage
 export async function uploadToSupabase(
   path: string,
   file: Buffer | Uint8Array,
-  contentType: string
+  contentType: string,
+  bucket: string = STORAGE_BUCKET
 ): Promise<{ url: string; path: string } | null> {
   const { data, error } = await supabaseAdmin.storage
-    .from(STORAGE_BUCKET)
+    .from(bucket)
     .upload(path, file, {
       contentType,
       upsert: true,
@@ -34,7 +36,7 @@ export async function uploadToSupabase(
 
   // Get public URL since bucket has public access policy
   const { data: urlData } = supabaseAdmin.storage
-    .from(STORAGE_BUCKET)
+    .from(bucket)
     .getPublicUrl(data.path);
 
   return {
@@ -44,9 +46,9 @@ export async function uploadToSupabase(
 }
 
 // Get public URL for a file
-export function getPublicUrl(path: string): string {
+export function getPublicUrl(path: string, bucket: string = STORAGE_BUCKET): string {
   const { data } = supabaseAdmin.storage
-    .from(STORAGE_BUCKET)
+    .from(bucket)
     .getPublicUrl(path);
   return data.publicUrl;
 }
