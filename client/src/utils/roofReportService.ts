@@ -138,11 +138,52 @@ function calculateWasteFactorTable(baseAreaSqFt: number) {
 
 /**
  * Generate PDF report mimicking EagleView layout
+ * @param address - Full address string
+ * @param customerName - Customer name for the report
+ * @param storedLat - Optional pre-geocoded latitude (skips geocoding step)
+ * @param storedLng - Optional pre-geocoded longitude (skips geocoding step)
  */
-export async function generateRoofReportPDF(address: string, customerName: string): Promise<void> {
+export async function generateRoofReportPDF(
+  address: string, 
+  customerName: string,
+  storedLat?: number,
+  storedLng?: number
+): Promise<void> {
   try {
-    // Fetch roof data
-    const roofData = await getRoofData(address);
+    // Fetch roof data (use stored coordinates if available)
+    let roofData: RoofData;
+    
+    if (storedLat !== undefined && storedLng !== undefined) {
+      // Skip geocoding - use stored coordinates
+      console.log('[Roof Report] Using stored coordinates:', storedLat, storedLng);
+      const insights = await fetchBuildingInsights(storedLat, storedLng);
+      
+      const roofSegments = insights.solarPotential.roofSegmentStats || [];
+      let totalAreaMeters = 0;
+      let pitchSum = 0;
+      let segmentCount = 0;
+      
+      roofSegments.forEach(segment => {
+        totalAreaMeters += segment.stats.areaMeters2;
+        pitchSum += segment.pitchDegrees;
+        segmentCount++;
+      });
+      
+      const avgPitchDegrees = segmentCount > 0 ? pitchSum / segmentCount : 0;
+      const totalAreaSqFt = totalAreaMeters * 10.764;
+      
+      roofData = {
+        totalAreaSqFt: Math.round(totalAreaSqFt),
+        predominantPitch: degreesToPitch(avgPitchDegrees),
+        address,
+        latitude: storedLat,
+        longitude: storedLng,
+      };
+    } else {
+      // Geocode the address first
+      console.log('[Roof Report] Geocoding address:', address);
+      roofData = await getRoofData(address);
+    }
     
     // Create PDF
     const doc = new jsPDF();

@@ -796,7 +796,13 @@ export default function JobDetail() {
                       setIsGeneratingReport(true);
                       try {
                         const fullAddress = `${job.address}, ${job.cityStateZip}`;
-                        await generateRoofReportPDF(fullAddress, job.fullName);
+                        // Pass stored coordinates if available to skip geocoding
+                        await generateRoofReportPDF(
+                          fullAddress, 
+                          job.fullName,
+                          job.latitude || undefined,
+                          job.longitude || undefined
+                        );
                         toast.success("Roof report generated successfully!");
                       } catch (error) {
                         console.error("Error generating report:", error);

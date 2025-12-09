@@ -11,6 +11,7 @@ import { trpc } from "@/lib/trpc";
 import { Search, Phone, Mail, MapPin, Clock, FileText, ChevronRight, Upload, File, Image, Trash2, Download, Plus, Filter, Shield, Eye, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 import CRMLayout from "@/components/crm/CRMLayout";
+import Autocomplete from "react-google-autocomplete";
 
 const STATUS_OPTIONS = [
   { value: "lead", label: "Lead", color: "bg-slate-500/20 text-slate-300 border-slate-400/30" },
@@ -45,6 +46,8 @@ export default function CRMLeads() {
     phone: "",
     address: "",
     cityStateZip: "",
+    latitude: undefined as number | undefined,
+    longitude: undefined as number | undefined,
     roofAge: "",
     roofConcerns: "",
     dealType: "cash" as "insurance" | "cash" | "financed",
@@ -114,6 +117,8 @@ export default function CRMLeads() {
         phone: "",
         address: "",
         cityStateZip: "",
+        latitude: undefined,
+        longitude: undefined,
         roofAge: "",
         roofConcerns: "",
         dealType: "cash",
@@ -475,23 +480,88 @@ export default function CRMLeads() {
                 <h3 className="text-md font-semibold text-[#00d4aa] mb-3">Property Details</h3>
                 <div className="grid grid-cols-1 gap-4">
                   <div className="space-y-2">
-                    <label className="text-sm text-slate-300">Address *</label>
-                    <Input
-                      value={newJobForm.address}
-                      onChange={(e) => setNewJobForm({ ...newJobForm, address: e.target.value })}
-                      placeholder="123 Main Street"
-                      className="bg-slate-700 border-slate-600 text-white"
+                    <label className="text-sm text-slate-300">
+                      Property Address * 
+                      <span className="text-xs text-slate-500 ml-2">(Start typing to search)</span>
+                    </label>
+                    <Autocomplete
+                      apiKey={import.meta.env.VITE_GOOGLE_MAPS_KEY || "AIzaSyA7QSM-fqUn4grHM6OYddNgKzK7uMlBY1I"}
+                      onPlaceSelected={(place: any) => {
+                        if (!place.geometry) {
+                          toast.error("Please select a valid address from the dropdown");
+                          return;
+                        }
+
+                        // Extract address components
+                        const addressComponents = place.address_components || [];
+                        let streetNumber = "";
+                        let route = "";
+                        let city = "";
+                        let state = "";
+                        let zip = "";
+
+                        addressComponents.forEach((component: any) => {
+                          const types = component.types;
+                          if (types.includes("street_number")) {
+                            streetNumber = component.long_name;
+                          }
+                          if (types.includes("route")) {
+                            route = component.long_name;
+                          }
+                          if (types.includes("locality")) {
+                            city = component.long_name;
+                          }
+                          if (types.includes("administrative_area_level_1")) {
+                            state = component.short_name;
+                          }
+                          if (types.includes("postal_code")) {
+                            zip = component.long_name;
+                          }
+                        });
+
+                        const streetAddress = `${streetNumber} ${route}`.trim();
+                        const cityStateZip = `${city}, ${state} ${zip}`.trim();
+                        const lat = place.geometry.location.lat();
+                        const lng = place.geometry.location.lng();
+
+                        setNewJobForm({
+                          ...newJobForm,
+                          address: streetAddress,
+                          cityStateZip: cityStateZip,
+                          latitude: lat,
+                          longitude: lng,
+                        });
+
+                        toast.success("Address auto-filled with coordinates!");
+                      }}
+                      options={{
+                        types: ["address"],
+                        componentRestrictions: { country: "us" },
+                      }}
+                      defaultValue={newJobForm.address}
+                      className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-md text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#00d4aa] focus:border-transparent"
+                      placeholder="Start typing address..."
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-sm text-slate-300">City, State, ZIP *</label>
+                    <label className="text-sm text-slate-300">
+                      City, State, ZIP * 
+                      <span className="text-xs text-slate-500 ml-2">(Auto-filled)</span>
+                    </label>
                     <Input
                       value={newJobForm.cityStateZip}
                       onChange={(e) => setNewJobForm({ ...newJobForm, cityStateZip: e.target.value })}
                       placeholder="Houston, TX 77001"
                       className="bg-slate-700 border-slate-600 text-white"
+                      readOnly
                     />
                   </div>
+                  {newJobForm.latitude && newJobForm.longitude && (
+                    <div className="text-xs text-[#00d4aa] flex items-center gap-2">
+                      <MapPin className="w-3 h-3" />
+                      Coordinates: {newJobForm.latitude.toFixed(6)}, {newJobForm.longitude.toFixed(6)}
+                    </div>
+                  )}
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <label className="text-sm text-slate-300">Roof Age</label>

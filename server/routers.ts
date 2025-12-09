@@ -501,6 +501,8 @@ export const appRouter = router({
         phone: z.string().optional(), // Made optional
         address: z.string().min(5),
         cityStateZip: z.string().min(5),
+        latitude: z.number().optional(), // Geocoded latitude
+        longitude: z.number().optional(), // Geocoded longitude
         roofAge: z.string().optional(),
         roofConcerns: z.string().optional(),
         dealType: z.enum(["insurance", "cash", "financed"]).optional(),
@@ -532,6 +534,8 @@ export const appRouter = router({
           phone: input.phone || null,
           address: input.address,
           cityStateZip: input.cityStateZip,
+          latitude: input.latitude || null,
+          longitude: input.longitude || null,
           roofAge: input.roofAge || null,
           roofConcerns: input.roofConcerns || null,
           dealType: input.dealType || "cash",

@@ -1,4 +1,4 @@
-import { pgTable, serial, text, varchar, boolean, timestamp, integer, pgEnum } from "drizzle-orm/pg-core";
+import { pgTable, serial, text, varchar, boolean, timestamp, integer, pgEnum, doublePrecision } from "drizzle-orm/pg-core";
 
 // PostgreSQL enums
 export const roleEnum = pgEnum("role", ["user", "admin", "owner", "office", "sales_rep", "project_manager", "team_lead", "field_crew"]);
@@ -117,6 +117,8 @@ export const reportRequests = pgTable("report_requests", {
   // Property info
   address: varchar("address", { length: 500 }).notNull(),
   cityStateZip: varchar("city_state_zip", { length: 255 }).notNull(),
+  latitude: doublePrecision("latitude"), // Geocoded latitude for instant roof reports
+  longitude: doublePrecision("longitude"), // Geocoded longitude for instant roof reports
   roofAge: varchar("roof_age", { length: 50 }),
   roofConcerns: text("roof_concerns"),
   handsOnInspection: boolean("hands_on_inspection").default(false).notNull(),
