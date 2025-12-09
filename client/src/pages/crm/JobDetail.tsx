@@ -47,7 +47,6 @@ import CRMLayout from "@/components/crm/CRMLayout";
 import { useRealtimeJob } from "@/hooks/useRealtimeJob";
 import { JobPipelineTracker } from "@/components/JobPipelineTracker";
 import { MentionInput } from "@/components/MentionInput";
-import { generateRoofReportPDF } from "@/utils/roofReportService";
 import { RoofingReportView } from "@/components/RoofingReportView";
 
 // Helper function to format mentions in messages
@@ -486,7 +485,6 @@ export default function JobDetail() {
   const [isEditingCustomer, setIsEditingCustomer] = useState(false);
   const [previewDocument, setPreviewDocument] = useState<{ url: string; name: string; type: string } | null>(null);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
-  const [isGeneratingReport, setIsGeneratingReport] = useState(false);
   const [customerForm, setCustomerForm] = useState({
     fullName: "",
     email: "",
@@ -805,49 +803,6 @@ export default function JobDetail() {
               </span>
               {canEdit && (
                 <>
-                  <Button
-                    onClick={async () => {
-                      setIsGeneratingReport(true);
-                      try {
-                        const fullAddress = `${job.address}, ${job.cityStateZip}`;
-                        // Pass stored coordinates if available to skip geocoding
-                        const { blob, fileName } = await generateRoofReportPDF(
-                          fullAddress, 
-                          job.fullName,
-                          job.latitude || undefined,
-                          job.longitude || undefined
-                        );
-                        
-                        // Convert blob to base64 for upload
-                        const reader = new FileReader();
-                        reader.onloadend = async () => {
-                          const base64 = (reader.result as string).split(",")[1];
-                          
-                          // Upload to job documents
-                          await uploadDocument.mutateAsync({
-                            leadId: jobId,
-                            fileName: fileName,
-                            fileData: base64,
-                            fileType: "application/pdf",
-                            category: "report",
-                          });
-                        };
-                        reader.readAsDataURL(blob);
-                        
-                        toast.success("Roof report generated and saved to documents!");
-                      } catch (error) {
-                        console.error("Error generating report:", error);
-                        toast.error("Failed to generate roof report. Please check the address and try again.");
-                      } finally {
-                        setIsGeneratingReport(false);
-                      }
-                    }}
-                    disabled={isGeneratingReport}
-                    className="bg-gradient-to-r from-[#00d4aa] to-[#00b894] hover:from-[#00e6bc] hover:to-[#00d4aa] text-black font-semibold"
-                  >
-                    <FileDown className="w-4 h-4 mr-2" />
-                    {isGeneratingReport ? "Generating..." : "Generate Roof Report"}
-                  </Button>
                   <Select
                     value={job.status}
                     onValueChange={(value) => updateLead.mutate({ id: jobId, status: value as any })}
