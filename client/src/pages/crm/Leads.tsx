@@ -643,7 +643,8 @@ export default function CRMLeads() {
             </div>
           </DialogContent>
         </Dialog>
-      </GoogleMapsLoader>
+      </div>
     </CRMLayout>
+    </GoogleMapsLoader>
   );
 }
