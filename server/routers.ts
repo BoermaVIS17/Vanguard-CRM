@@ -2,7 +2,7 @@
 import { COOKIE_NAME } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
-import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
+import { publicProcedure, protectedProcedure, ownerOfficeProcedure, router } from "./_core/trpc";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { getDb } from "./db";
@@ -528,10 +528,8 @@ export const appRouter = router({
         const db = await getDb();
         if (!db) throw new Error("Database not available");
 
-        // Only owners and admins can create jobs
-        if (!isOwner(ctx.user) && !isAdmin(ctx.user)) {
-          throw new Error("Only owners and admins can create new jobs");
-        }
+        // All authenticated users (including Sales Reps) can create jobs
+        // Sales Reps will be assigned as the owner of jobs they create
 
         const [result] = await db.insert(reportRequests).values({
           fullName: input.fullName,
@@ -944,8 +942,8 @@ export const appRouter = router({
         }
       }),
 
-    // Generate Beacon Material Order
-    generateBeaconOrder: protectedProcedure
+    // Generate Beacon Material Order (Owner/Office only)
+    generateBeaconOrder: ownerOfficeProcedure
       .input(z.object({
         jobId: z.number(),
         shingleColor: z.string().optional(),
@@ -1087,8 +1085,8 @@ export const appRouter = router({
         }));
       }),
 
-    // Generate Material Order PDF
-    generateMaterialOrderPDF: protectedProcedure
+    // Generate Material Order PDF (Owner/Office only)
+    generateMaterialOrderPDF: ownerOfficeProcedure
       .input(z.object({
         jobId: z.number(),
         jobAddress: z.string(),
