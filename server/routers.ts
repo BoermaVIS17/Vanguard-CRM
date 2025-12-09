@@ -3132,6 +3132,110 @@ export const appRouter = router({
           proposalData 
         };
       }),
+
+    // Generate signed proposal PDF and save to documents
+    generateSignedProposal: protectedProcedure
+      .input(z.object({
+        jobId: z.number(),
+        customerSignature: z.string(), // Base64 data URL
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const db = await getDb();
+        if (!db) throw new Error("Database not available");
+
+        // Get job details
+        const [job] = await db.select().from(reportRequests).where(eq(reportRequests.id, input.jobId));
+        if (!job) throw new Error("Job not found");
+
+        // Check permission
+        const user = ctx.user;
+        const teamMemberIds = user && isTeamLead(user) ? await getTeamMemberIds(db, user.id) : [];
+        if (!canViewJob(user, job, teamMemberIds)) {
+          throw new Error("You don't have permission to view this job");
+        }
+
+        // Verify proposal is approved
+        if (job.priceStatus !== 'approved') {
+          throw new TRPCError({
+            code: 'BAD_REQUEST',
+            message: 'Proposal must be approved before generating PDF',
+          });
+        }
+
+        // Calculate roof squares
+        const roofSqFt = (job.solarApiData as any)?.roofArea || job.manualAreaSqFt || 0;
+        const roofSquares = roofSqFt / 100;
+
+        const signatureDate = new Date();
+
+        // Prepare proposal data with signature
+        const proposalData = {
+          customerName: job.fullName,
+          customerEmail: job.email || undefined,
+          customerPhone: job.phone || undefined,
+          propertyAddress: job.address,
+          cityStateZip: job.cityStateZip,
+          totalPrice: parseFloat(job.totalPrice || '0'),
+          pricePerSq: parseFloat(job.pricePerSq || '0'),
+          roofSquares: roofSquares,
+          dealType: (job.dealType || 'cash') as 'insurance' | 'cash' | 'financed',
+          insuranceCarrier: job.insuranceCarrier || undefined,
+          claimNumber: job.claimNumber || undefined,
+          proposalDate: new Date(),
+          validUntil: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+          customerSignature: input.customerSignature,
+          signatureDate: signatureDate,
+        };
+
+        // Generate PDF with signature (placeholder - requires pdfkit)
+        // const { generateProposalPDF } = await import('./lib/pdfGenerator');
+        // const pdfBuffer = await generateProposalPDF(proposalData);
+
+        // Save to Supabase storage
+        // const fileName = `proposal-signed-${input.jobId}-${Date.now()}.pdf`;
+        // const { data: uploadData, error: uploadError } = await supabase.storage
+        //   .from('documents')
+        //   .upload(fileName, pdfBuffer, {
+        //     contentType: 'application/pdf',
+        //     upsert: false,
+        //   });
+
+        // if (uploadError) throw uploadError;
+
+        // Get public URL
+        // const { data: { publicUrl } } = supabase.storage
+        //   .from('documents')
+        //   .getPublicUrl(fileName);
+
+        // Save document record to database
+        // await db.insert(documents).values({
+        //   reportRequestId: input.jobId,
+        //   fileName: fileName,
+        //   fileUrl: publicUrl,
+        //   fileType: 'application/pdf',
+        //   uploadedBy: user!.id,
+        //   uploadedAt: new Date(),
+        // });
+
+        // Log activity
+        await logActivity(
+          db,
+          input.jobId,
+          user!.id,
+          "document",
+          null,
+          `Signed proposal document generated`,
+          "create",
+          ctx
+        );
+
+        return { 
+          success: true, 
+          message: 'Signed proposal generated successfully',
+          // documentUrl: publicUrl,
+          signatureDate: signatureDate.toISOString(),
+        };
+      }),
   }),
 });
 

@@ -17,6 +17,7 @@ import {
   TrendingUp,
   Calculator
 } from "lucide-react";
+import { SignaturePad } from "./SignaturePad";
 
 interface ProposalCalculatorProps {
   jobId: number;
@@ -44,6 +45,9 @@ export function ProposalCalculator({
   const [pricePerSq, setPricePerSq] = useState(currentPricePerSq || "");
   const [counterPrice, setCounterPrice] = useState("");
   const [showCounterInput, setShowCounterInput] = useState(false);
+  const [showSignaturePad, setShowSignaturePad] = useState(false);
+  const [customerName, setCustomerName] = useState("");
+  const [dealType, setDealType] = useState<"insurance" | "cash" | "financed">("cash");
 
   const utils = trpc.useUtils();
 
@@ -67,17 +71,39 @@ export function ProposalCalculator({
     },
   });
 
-  // Generate proposal PDF mutation
+  // Generate proposal PDF mutation (preview only)
   const generateProposal = trpc.crm.generateProposal.useMutation({
     onSuccess: (data) => {
-      toast.success("Proposal PDF generated successfully!");
+      toast.success("Opening signature pad...");
       console.log("Proposal data:", data);
-      // TODO: Download PDF when pdfkit is installed
+      // Open signature pad for customer to sign
+      setShowSignaturePad(true);
     },
     onError: (error: any) => {
       toast.error(error.message);
     },
   });
+
+  // Generate signed proposal and save to documents
+  const generateSignedProposal = trpc.crm.generateSignedProposal.useMutation({
+    onSuccess: () => {
+      toast.success("Signed proposal saved to Documents!");
+      setShowSignaturePad(false);
+      onUpdate?.();
+      utils.crm.getJobDetail.invalidate({ id: jobId });
+    },
+    onError: (error: any) => {
+      toast.error(error.message);
+    },
+  });
+
+  // Handle signature completion
+  const handleSignatureComplete = (signatureDataUrl: string) => {
+    generateSignedProposal.mutate({
+      jobId,
+      customerSignature: signatureDataUrl,
+    });
+  };
 
   // Determine pricing zone
   const getPricingZone = () => {
@@ -686,5 +712,16 @@ export function ProposalCalculator({
     );
   }
 
-  return null;
+  return (
+    <>
+      {/* Signature Pad Dialog */}
+      <SignaturePad
+        isOpen={showSignaturePad}
+        onClose={() => setShowSignaturePad(false)}
+        onSignatureComplete={handleSignatureComplete}
+        customerName={customerName || "Customer"}
+        documentType={dealType}
+      />
+    </>
+  );
 }

@@ -42,6 +42,10 @@ interface ProposalData {
   // Dates
   proposalDate: Date;
   validUntil?: Date;
+  
+  // Signature
+  customerSignature?: string; // Base64 data URL
+  signatureDate?: Date;
 }
 
 export class ProposalPDFGenerator {
@@ -437,9 +441,43 @@ export class ProposalPDFGenerator {
     this.doc.text('By signing below, I accept the terms and conditions outlined in this proposal.');
     this.doc.moveDown(2);
     
-    // Signature Lines
+    // Customer Signature Area
     const signatureY = this.doc.y;
-    this.doc.moveTo(50, signatureY).lineTo(250, signatureY).stroke();
+    
+    // If signature image provided, embed it
+    if (this.data.customerSignature) {
+      try {
+        // Convert base64 data URL to buffer
+        const base64Data = this.data.customerSignature.replace(/^data:image\/\w+;base64,/, '');
+        const imageBuffer = Buffer.from(base64Data, 'base64');
+        
+        // Embed signature image
+        this.doc.image(imageBuffer, 50, signatureY - 40, {
+          width: 200,
+          height: 60,
+          fit: [200, 60],
+        });
+        
+        // Add date if provided
+        if (this.data.signatureDate) {
+          this.doc.fontSize(9).fillColor(this.LIGHT_GRAY);
+          this.doc.text(
+            this.data.signatureDate.toLocaleDateString(),
+            350,
+            signatureY - 20
+          );
+        }
+      } catch (error) {
+        console.error('Error embedding signature:', error);
+        // Fall back to signature line
+        this.doc.moveTo(50, signatureY).lineTo(250, signatureY).stroke();
+      }
+    } else {
+      // No signature - draw line
+      this.doc.moveTo(50, signatureY).lineTo(250, signatureY).stroke();
+    }
+    
+    // Draw date line
     this.doc.moveTo(350, signatureY).lineTo(550, signatureY).stroke();
     
     this.doc.fontSize(9).fillColor(this.LIGHT_GRAY);
