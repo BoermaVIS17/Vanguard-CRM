@@ -47,6 +47,36 @@ import { useRealtimeJob } from "@/hooks/useRealtimeJob";
 import { JobPipelineTracker } from "@/components/JobPipelineTracker";
 import { MentionInput } from "@/components/MentionInput";
 
+// Helper function to format mentions in messages
+const formatMentions = (text: string) => {
+  // Replace @[userId:userName] with styled mention
+  const mentionRegex = /@\[(\d+):([^\]]+)\]/g;
+  const parts = [];
+  let lastIndex = 0;
+  let match;
+
+  while ((match = mentionRegex.exec(text)) !== null) {
+    // Add text before mention
+    if (match.index > lastIndex) {
+      parts.push(text.substring(lastIndex, match.index));
+    }
+    // Add styled mention
+    parts.push(
+      <span key={match.index} className="text-[#00d4aa] font-semibold">
+        @{match[2]}
+      </span>
+    );
+    lastIndex = match.index + match[0].length;
+  }
+
+  // Add remaining text
+  if (lastIndex < text.length) {
+    parts.push(text.substring(lastIndex));
+  }
+
+  return parts.length > 0 ? parts : text;
+};
+
 // Pipeline stage order for navigation
 const PIPELINE_ORDER = [
   "lead",
@@ -1759,7 +1789,7 @@ export default function JobDetail() {
                                   {new Date(msg.createdAt).toLocaleString()}
                                 </span>
                               </div>
-                              <p className="text-slate-300 whitespace-pre-wrap">{msg.description}</p>
+                              <p className="text-slate-300 whitespace-pre-wrap">{formatMentions(msg.description)}</p>
                             </div>
                           </div>
                         </CardContent>

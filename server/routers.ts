@@ -1941,6 +1941,30 @@ export const appRouter = router({
           metadata: JSON.stringify({ isInternal: input.isInternal }),
         });
 
+        // Extract mentions from message and create notifications
+        // Format: @[userId:userName]
+        const mentionRegex = /@\[(\d+):([^\]]+)\]/g;
+        const mentions = [...input.message.matchAll(mentionRegex)];
+        
+        if (mentions.length > 0 && ctx.user?.id) {
+          for (const match of mentions) {
+            const mentionedUserId = parseInt(match[1]);
+            const mentionedUserName = match[2];
+            
+            // Don't notify yourself
+            if (mentionedUserId !== ctx.user.id) {
+              await db.insert(notifications).values({
+                userId: mentionedUserId,
+                createdBy: ctx.user.id,
+                resourceId: input.jobId,
+                type: 'mention',
+                content: `${ctx.user.name || ctx.user.email} mentioned you in Job #${input.jobId}${lead.fullName ? ` (${lead.fullName})` : ''}`,
+                isRead: false,
+              });
+            }
+          }
+        }
+
         return { success: true };
       }),
 
