@@ -28,6 +28,7 @@ import {
   Eye,
   Copy,
   Link2,
+  Truck,
   ChevronLeft,
   ChevronRight,
   ZoomIn,
@@ -48,6 +49,7 @@ import { useRealtimeJob } from "@/hooks/useRealtimeJob";
 import { JobPipelineTracker } from "@/components/JobPipelineTracker";
 import { MentionInput } from "@/components/MentionInput";
 import { RoofingReportView } from "@/components/RoofingReportView";
+import { MaterialEmailDialog } from "@/components/crm/MaterialEmailDialog";
 
 // Helper function to format mentions in messages
 const formatMentions = (text: string) => {
@@ -485,6 +487,7 @@ export default function JobDetail() {
   const [isEditingCustomer, setIsEditingCustomer] = useState(false);
   const [previewDocument, setPreviewDocument] = useState<{ url: string; name: string; type: string } | null>(null);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+  const [showMaterialDialog, setShowMaterialDialog] = useState(false);
   const [customerForm, setCustomerForm] = useState({
     fullName: "",
     email: "",
@@ -819,6 +822,17 @@ export default function JobDetail() {
                     </SelectContent>
                   </Select>
                 </>
+              )}
+              {/* Draft Supplier Order - Owner/Office Only */}
+              {permissions && (permissions.role === 'owner' || permissions.role === 'office') && job.solarApiData?.roofArea && (
+                <Button
+                  onClick={() => setShowMaterialDialog(true)}
+                  className="bg-[#00d4aa] hover:bg-[#00b894] text-slate-900 font-semibold"
+                  size="sm"
+                >
+                  <Truck className="w-4 h-4 mr-2" />
+                  Draft Supplier Order
+                </Button>
               )}
               {canDelete && (
                 <Button 
@@ -2200,6 +2214,19 @@ export default function JobDetail() {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Material Email Dialog */}
+      {showMaterialDialog && job.solarApiData && (
+        <MaterialEmailDialog
+          open={showMaterialDialog}
+          onOpenChange={setShowMaterialDialog}
+          jobAddress={`${job.address}, ${job.cityStateZip}`}
+          roofArea={job.solarApiData.roofArea || 0}
+          perimeter={job.solarApiData.perimeter}
+          ridgeLength={job.solarApiData.ridgeLength}
+          shingleColor={job.solarApiData.shingleColor}
+        />
       )}
     </CRMLayout>
   );
