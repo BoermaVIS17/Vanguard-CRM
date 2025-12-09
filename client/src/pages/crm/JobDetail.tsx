@@ -772,6 +772,13 @@ export default function JobDetail() {
 
   const { job, assignedUser, documents, photos, messages, timeline, permissions: jobPermissions } = jobData;
   const statusConfig = STATUS_CONFIG[job.status] || STATUS_CONFIG.lead || { label: "Unknown", color: "bg-gray-500", icon: AlertCircle };
+  // Extra safety: ensure color property exists
+  const safeStatusConfig = {
+    ...statusConfig,
+    color: statusConfig?.color || "bg-gray-500",
+    label: statusConfig?.label || "Unknown",
+    icon: statusConfig?.icon || AlertCircle
+  };
   const canEdit = jobPermissions?.canEdit ?? false;
   const canDelete = jobPermissions?.canDelete ?? false;
   const canViewHistory = jobPermissions?.canViewHistory ?? false;
@@ -840,8 +847,8 @@ export default function JobDetail() {
                   {permissions.roleDisplayName}
                 </span>
               )}
-              <span className={`px-3 py-1 rounded-full text-sm font-medium text-white ${statusConfig.color}`}>
-                {statusConfig.label}
+              <span className={`px-3 py-1 rounded-full text-sm font-medium text-white ${safeStatusConfig.color}`}>
+                {safeStatusConfig.label}
               </span>
               {canEdit && (
                 <>

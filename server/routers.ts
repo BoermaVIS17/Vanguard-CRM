@@ -160,69 +160,95 @@ export const appRouter = router({
         repCode: z.string().optional(),
       }))
       .mutation(async ({ ctx, input }) => {
+        const startTime = Date.now();
         console.log(`[Sync] Attempting sync for: ${input.email}`);
         
         try {
-          const db = await getDb();
-          if (!db) {
-            console.error('[Sync] Database not available');
-            throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Database not available' });
-          }
-          
-          // 1. Check if it's the very first user (Owner logic)
-          const allUsers = await db.select({ id: users.id }).from(users).limit(1);
-          const isFirstUser = allUsers.length === 0;
-          
-          // 2. Determine Role
-          let targetRole = input.role || 'user';
-          if (isFirstUser) targetRole = 'owner';
-          
-          // 3. UPSERT (Insert or Update if Email exists)
-          const [result] = await db
-            .insert(users)
-            .values({
-              openId: input.supabaseUserId,
-              email: input.email,
-              name: input.name || input.email.split('@')[0],
-              role: targetRole as any,
-              isActive: true,
-              lastSignedIn: new Date(),
-              repCode: input.repCode || null,
-            })
-            .onConflictDoUpdate({
-              target: users.email,
-              set: {
-                openId: input.supabaseUserId,
-                lastSignedIn: new Date(),
-              },
-            })
-            .returning();
-          
-          console.log(`[Sync] Successfully synced user: ${result.email} (Role: ${result.role})`);
-          
-          // Set session cookie
-          const { sdk } = await import("./_core/sdk");
-          const ONE_YEAR_MS = 365 * 24 * 60 * 60 * 1000;
-          const sessionToken = await sdk.createSessionToken(input.supabaseUserId, {
-            name: result.name || input.name || "",
-            expiresInMs: ONE_YEAR_MS,
+          // Timeout wrapper - fail fast if database hangs
+          const timeoutPromise = new Promise((_, reject) => {
+            setTimeout(() => reject(new Error('Sync timeout after 10 seconds')), 10000);
           });
-          const cookieOptions = getSessionCookieOptions(ctx.req);
-          ctx.res.cookie(COOKIE_NAME, sessionToken, { ...cookieOptions, maxAge: ONE_YEAR_MS });
           
-          return { 
-            success: true, 
-            user: { id: result.id, name: result.name, role: result.role, email: result.email },
-            isNewUser: isFirstUser,
-            isOwner: result.role === 'owner',
-            sessionToken, // Return token for cross-origin auth via Authorization header
-          };
+          const syncPromise = (async () => {
+            const db = await getDb();
+            if (!db) {
+              console.error('[Sync] Database not available');
+              throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Database not available' });
+            }
+            
+            // 1. Check if it's the very first user (Owner logic)
+            console.log('[Sync] Checking for existing users...');
+            const allUsers = await db.select({ id: users.id }).from(users).limit(1);
+            const isFirstUser = allUsers.length === 0;
+            console.log(`[Sync] Is first user: ${isFirstUser}`);
+            
+            // 2. Determine Role
+            let targetRole = input.role || 'user';
+            if (isFirstUser) targetRole = 'owner';
+            console.log(`[Sync] Target role: ${targetRole}`);
+            
+            // 3. UPSERT (Insert or Update if Email exists)
+            console.log('[Sync] Performing upsert...');
+            const [result] = await db
+              .insert(users)
+              .values({
+                openId: input.supabaseUserId,
+                email: input.email,
+                name: input.name || input.email.split('@')[0],
+                role: targetRole as any,
+                isActive: true,
+                lastSignedIn: new Date(),
+                repCode: input.repCode || null,
+              })
+              .onConflictDoUpdate({
+                target: users.email,
+                set: {
+                  openId: input.supabaseUserId,
+                  lastSignedIn: new Date(),
+                },
+              })
+              .returning();
+            
+            if (!result) {
+              throw new Error('Upsert returned no result');
+            }
+            
+            console.log(`[Sync] Successfully synced user: ${result.email} (Role: ${result.role}) in ${Date.now() - startTime}ms`);
+            
+            // Set session cookie
+            console.log('[Sync] Creating session token...');
+            const { sdk } = await import("./_core/sdk");
+            const ONE_YEAR_MS = 365 * 24 * 60 * 60 * 1000;
+            const sessionToken = await sdk.createSessionToken(input.supabaseUserId, {
+              name: result.name || input.name || "",
+              expiresInMs: ONE_YEAR_MS,
+            });
+            const cookieOptions = getSessionCookieOptions(ctx.req);
+            ctx.res.cookie(COOKIE_NAME, sessionToken, { ...cookieOptions, maxAge: ONE_YEAR_MS });
+            
+            console.log(`[Sync] ✅ Complete sync in ${Date.now() - startTime}ms`);
+            
+            return { 
+              success: true, 
+              user: { id: result.id, name: result.name, role: result.role, email: result.email },
+              isNewUser: isFirstUser,
+              isOwner: result.role === 'owner',
+              sessionToken, // Return token for cross-origin auth via Authorization header
+            };
+          })();
+          
+          // Race between sync and timeout
+          return await Promise.race([syncPromise, timeoutPromise]) as any;
+          
         } catch (error: any) {
-          console.error('❌ CRITICAL ERROR in syncSupabaseUser:');
+          const duration = Date.now() - startTime;
+          console.error(`❌ CRITICAL ERROR in syncSupabaseUser after ${duration}ms:`);
           console.error('Message:', error.message);
           console.error('Code:', error.code);
           console.error('Detail:', error.detail);
+          console.error('Stack:', error.stack);
           
+          // Always return a proper error response, never hang
           throw new TRPCError({
             code: 'INTERNAL_SERVER_ERROR',
             message: `Sync failed: ${error.message}`,
@@ -3192,8 +3218,8 @@ export const appRouter = router({
           validUntil: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days from now
         };
 
-        // Generate PDF preview (without signature) using template
-        const { generateProposalPDF } = await import('./lib/pdfTemplateGenerator');
+        // Generate PDF preview (without signature) using form filler
+        const { generateProposalPDF } = await import('./lib/pdfFormFiller');
         const pdfBuffer = await generateProposalPDF(proposalData);
 
         // Return PDF as base64 for preview
