@@ -194,12 +194,16 @@ export default function CRMPipeline() {
           {/* Deal Type Badge */}
           {lead.dealType && (
             <div className="mt-2">
-              {DEAL_TYPES.filter(dt => dt.key === lead.dealType).map(dt => (
-                <span key={dt.key} className={`inline-flex items-center gap-1 px-2 py-0.5 bg-slate-600 text-xs rounded font-medium ${dt.color}`}>
-                  <dt.icon className="w-3 h-3" />
-                  {dt.label}
-                </span>
-              ))}
+              {(() => {
+                const dealType = DEAL_TYPES.find(dt => dt.key === lead.dealType);
+                const dt = dealType || { key: lead.dealType, label: lead.dealType, icon: Shield, color: "text-gray-400" };
+                return (
+                  <span key={dt.key} className={`inline-flex items-center gap-1 px-2 py-0.5 bg-slate-600 text-xs rounded font-medium ${dt.color}`}>
+                    <dt.icon className="w-3 h-3" />
+                    {dt.label}
+                  </span>
+                );
+              })()}
             </div>
           )}
 
