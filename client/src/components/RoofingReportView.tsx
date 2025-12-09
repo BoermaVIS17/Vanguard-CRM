@@ -1,0 +1,369 @@
+import { useState, useRef, useEffect } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { calculateRoofMetrics, calculateMaterialRequirements, formatLinearFeet, RoofMetrics, RoofSegment } from '@/utils/roofMath';
+import { Download, Ruler, Home } from 'lucide-react';
+
+interface RoofingReportViewProps {
+  solarApiData: any;
+  jobData: {
+    fullName: string;
+    address: string;
+    cityStateZip: string;
+  };
+}
+
+export function RoofingReportView({ solarApiData, jobData }: RoofingReportViewProps) {
+  const [metrics, setMetrics] = useState<RoofMetrics | null>(null);
+  const [wallFlashingAdder, setWallFlashingAdder] = useState<number>(0);
+  const [wasteFactorPercent, setWasteFactorPercent] = useState<number>(10);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [imageLoaded, setImageLoaded] = useState(false);
+
+  // Calculate metrics on mount
+  useEffect(() => {
+    if (solarApiData) {
+      const calculated = calculateRoofMetrics(solarApiData);
+      setMetrics(calculated);
+    }
+  }, [solarApiData]);
+
+  // Draw satellite image with SVG overlay
+  useEffect(() => {
+    if (!metrics || !canvasRef.current || !solarApiData) return;
+
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    // Get imagery URL from Solar API
+    const imageryUrl = solarApiData.imageryUrl;
+    if (!imageryUrl) {
+      console.error('[RoofingReport] No imagery URL found');
+      return;
+    }
+
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => {
+      // Set canvas size to match image
+      canvas.width = img.width;
+      canvas.height = img.height;
+
+      // Draw satellite image
+      ctx.drawImage(img, 0, 0);
+
+      // Draw roof segments with color coding
+      drawRoofSegments(ctx, metrics.segments, canvas.width, canvas.height);
+
+      setImageLoaded(true);
+    };
+    img.onerror = () => {
+      console.error('[RoofingReport] Failed to load imagery');
+    };
+    img.src = imageryUrl;
+  }, [metrics, solarApiData]);
+
+  const drawRoofSegments = (
+    ctx: CanvasRenderingContext2D,
+    segments: RoofSegment[],
+    width: number,
+    height: number
+  ) => {
+    // Get bounding box from solar data to map coordinates
+    const buildingInsights = solarApiData.buildingInsights;
+    if (!buildingInsights?.boundingBox) return;
+
+    const bbox = buildingInsights.boundingBox;
+    const sw = bbox.sw;
+    const ne = bbox.ne;
+
+    // Helper function to convert lat/lng to canvas coordinates
+    const latLngToCanvas = (lng: number, lat: number): [number, number] => {
+      const x = ((lng - sw.longitude) / (ne.longitude - sw.longitude)) * width;
+      const y = height - ((lat - sw.latitude) / (ne.latitude - sw.latitude)) * height;
+      return [x, y];
+    };
+
+    // Color mapping for edge types
+    const colorMap: Record<RoofSegment['type'], string> = {
+      eave: '#EF4444', // Red
+      rake: '#3B82F6', // Blue
+      valley: '#10B981', // Green
+      ridge: '#F59E0B', // Yellow/Orange
+      hip: '#F59E0B', // Yellow/Orange
+    };
+
+    // Draw each segment
+    segments.forEach((segment) => {
+      if (segment.coordinates.length < 2) return;
+
+      const [start, end] = segment.coordinates;
+      const [x1, y1] = latLngToCanvas(start[0], start[1]);
+      const [x2, y2] = latLngToCanvas(end[0], end[1]);
+
+      // Draw line
+      ctx.strokeStyle = colorMap[segment.type];
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(x1, y1);
+      ctx.lineTo(x2, y2);
+      ctx.stroke();
+
+      // Draw label with length
+      const midX = (x1 + x2) / 2;
+      const midY = (y1 + y2) / 2;
+      const label = formatLinearFeet(segment.length);
+
+      ctx.fillStyle = 'white';
+      ctx.strokeStyle = 'black';
+      ctx.lineWidth = 3;
+      ctx.font = 'bold 12px Arial';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      
+      // Draw text outline
+      ctx.strokeText(label, midX, midY);
+      // Draw text fill
+      ctx.fillText(label, midX, midY);
+    });
+  };
+
+  const handleDownloadPDF = () => {
+    // TODO: Implement PDF generation
+    console.log('[RoofingReport] Download PDF clicked');
+  };
+
+  if (!metrics) {
+    return (
+      <div className="flex items-center justify-center h-96">
+        <div className="animate-spin w-8 h-8 border-2 border-[#00d4aa] border-t-transparent rounded-full" />
+      </div>
+    );
+  }
+
+  const materials = calculateMaterialRequirements(metrics, wasteFactorPercent);
+
+  return (
+    <div className="space-y-6 bg-slate-900 p-6">
+      {/* Header */}
+      <div className="bg-gradient-to-r from-blue-900 to-blue-800 text-white p-6 rounded-lg shadow-lg">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold mb-2">Production Measurement Report</h1>
+            <p className="text-blue-200 text-lg">{jobData.fullName}</p>
+            <p className="text-blue-300 text-sm">{jobData.address}, {jobData.cityStateZip}</p>
+          </div>
+          <div className="flex items-center gap-4">
+            <div className="text-right">
+              <p className="text-sm text-blue-200">Report Date</p>
+              <p className="text-lg font-semibold">{new Date().toLocaleDateString()}</p>
+            </div>
+            <Button
+              onClick={handleDownloadPDF}
+              className="bg-orange-500 hover:bg-orange-600 text-white"
+            >
+              <Download className="w-4 h-4 mr-2" />
+              Download PDF
+            </Button>
+          </div>
+        </div>
+      </div>
+
+      {/* Section A: Visual Map with SVG Overlay */}
+      <Card className="bg-slate-800 border-slate-700">
+        <CardHeader>
+          <CardTitle className="text-white flex items-center gap-2">
+            <Home className="w-5 h-5 text-blue-400" />
+            Roof Visualization
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="relative bg-slate-900 rounded-lg overflow-hidden">
+            <canvas
+              ref={canvasRef}
+              className="w-full h-auto"
+              style={{ maxHeight: '600px', objectFit: 'contain' }}
+            />
+            {!imageLoaded && (
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="animate-spin w-8 h-8 border-2 border-[#00d4aa] border-t-transparent rounded-full" />
+              </div>
+            )}
+          </div>
+
+          {/* Legend */}
+          <div className="mt-4 grid grid-cols-2 md:grid-cols-5 gap-3">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-1 bg-red-500"></div>
+              <span className="text-sm text-slate-300">Eaves (Gutters)</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-1 bg-blue-500"></div>
+              <span className="text-sm text-slate-300">Rakes (Gables)</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-1 bg-green-500"></div>
+              <span className="text-sm text-slate-300">Valleys</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-1 bg-yellow-500"></div>
+              <span className="text-sm text-slate-300">Ridges</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-1 bg-orange-500"></div>
+              <span className="text-sm text-slate-300">Hips</span>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Roof Summary Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <Card className="bg-slate-800 border-slate-700">
+          <CardContent className="pt-6">
+            <div className="text-center">
+              <p className="text-sm text-slate-400 mb-1">Total Area</p>
+              <p className="text-2xl font-bold text-white">{Math.round(metrics.totalArea)} sq ft</p>
+              <p className="text-xs text-[#00d4aa] mt-1">{(metrics.totalArea / 100).toFixed(1)} squares</p>
+            </div>
+          </CardContent>
+        </Card>
+        <Card className="bg-slate-800 border-slate-700">
+          <CardContent className="pt-6">
+            <div className="text-center">
+              <p className="text-sm text-slate-400 mb-1">Predominant Pitch</p>
+              <p className="text-2xl font-bold text-white">{metrics.predominantPitch}:12</p>
+              <p className="text-xs text-slate-500 mt-1">Rise : Run</p>
+            </div>
+          </CardContent>
+        </Card>
+        <Card className="bg-slate-800 border-slate-700">
+          <CardContent className="pt-6">
+            <div className="text-center">
+              <p className="text-sm text-slate-400 mb-1">Total Perimeter</p>
+              <p className="text-2xl font-bold text-white">{formatLinearFeet(metrics.perimeter)}</p>
+              <p className="text-xs text-slate-500 mt-1">Linear feet</p>
+            </div>
+          </CardContent>
+        </Card>
+        <Card className="bg-slate-800 border-slate-700">
+          <CardContent className="pt-6">
+            <div className="text-center">
+              <p className="text-sm text-slate-400 mb-1">Waste Factor</p>
+              <Input
+                type="number"
+                value={wasteFactorPercent}
+                onChange={(e) => setWasteFactorPercent(Number(e.target.value))}
+                className="text-center text-2xl font-bold bg-slate-700 border-slate-600 text-white w-20 mx-auto"
+                min="0"
+                max="50"
+              />
+              <p className="text-xs text-slate-500 mt-1">Percent</p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Section B: Material Breakdown Table */}
+      <Card className="bg-slate-800 border-slate-700">
+        <CardHeader>
+          <CardTitle className="text-white flex items-center gap-2">
+            <Ruler className="w-5 h-5 text-orange-400" />
+            Material Order List
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-slate-700">
+                  <th className="text-left py-3 px-4 text-sm font-semibold text-slate-300">Component</th>
+                  <th className="text-left py-3 px-4 text-sm font-semibold text-slate-300">Source Measurement</th>
+                  <th className="text-right py-3 px-4 text-sm font-semibold text-slate-300">Raw Footage</th>
+                  <th className="text-right py-3 px-4 text-sm font-semibold text-slate-300">With Waste ({wasteFactorPercent}%)</th>
+                  <th className="text-center py-3 px-4 text-sm font-semibold text-slate-300">Unit</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr className="border-b border-slate-700/50 hover:bg-slate-700/30">
+                  <td className="py-3 px-4 text-white font-medium">Starter Strip</td>
+                  <td className="py-3 px-4 text-slate-300">{materials.starterStrip.source}</td>
+                  <td className="py-3 px-4 text-right text-white">{formatLinearFeet(materials.starterStrip.rawFootage)}</td>
+                  <td className="py-3 px-4 text-right text-[#00d4aa] font-semibold">{formatLinearFeet(materials.starterStrip.withWaste)}</td>
+                  <td className="py-3 px-4 text-center text-slate-400 text-sm">{materials.starterStrip.unit}</td>
+                </tr>
+                <tr className="border-b border-slate-700/50 hover:bg-slate-700/30">
+                  <td className="py-3 px-4 text-white font-medium">Drip Edge</td>
+                  <td className="py-3 px-4 text-slate-300">{materials.dripEdge.source}</td>
+                  <td className="py-3 px-4 text-right text-white">{formatLinearFeet(materials.dripEdge.rawFootage)}</td>
+                  <td className="py-3 px-4 text-right text-[#00d4aa] font-semibold">{formatLinearFeet(materials.dripEdge.withWaste)}</td>
+                  <td className="py-3 px-4 text-center text-slate-400 text-sm">{materials.dripEdge.unit}</td>
+                </tr>
+                <tr className="border-b border-slate-700/50 hover:bg-slate-700/30">
+                  <td className="py-3 px-4 text-white font-medium">Hip & Ridge Cap</td>
+                  <td className="py-3 px-4 text-slate-300">{materials.hipRidgeCap.source}</td>
+                  <td className="py-3 px-4 text-right text-white">{formatLinearFeet(materials.hipRidgeCap.rawFootage)}</td>
+                  <td className="py-3 px-4 text-right text-[#00d4aa] font-semibold">{formatLinearFeet(materials.hipRidgeCap.withWaste)}</td>
+                  <td className="py-3 px-4 text-center text-slate-400 text-sm">{materials.hipRidgeCap.unit}</td>
+                </tr>
+                <tr className="border-b border-slate-700/50 hover:bg-slate-700/30">
+                  <td className="py-3 px-4 text-white font-medium">Valley Metal</td>
+                  <td className="py-3 px-4 text-slate-300">{materials.valleyMetal.source}</td>
+                  <td className="py-3 px-4 text-right text-white">{formatLinearFeet(materials.valleyMetal.rawFootage)}</td>
+                  <td className="py-3 px-4 text-right text-[#00d4aa] font-semibold">{formatLinearFeet(materials.valleyMetal.withWaste)}</td>
+                  <td className="py-3 px-4 text-center text-slate-400 text-sm">{materials.valleyMetal.unit}</td>
+                </tr>
+                <tr className="border-b border-slate-700/50 hover:bg-slate-700/30">
+                  <td className="py-3 px-4 text-white font-medium">Ice & Water Shield</td>
+                  <td className="py-3 px-4 text-slate-300">{materials.iceWaterShield.source}</td>
+                  <td className="py-3 px-4 text-right text-white">{formatLinearFeet(materials.iceWaterShield.rawFootage)}</td>
+                  <td className="py-3 px-4 text-right text-[#00d4aa] font-semibold">{formatLinearFeet(materials.iceWaterShield.withWaste)}</td>
+                  <td className="py-3 px-4 text-center text-slate-400 text-sm">{materials.iceWaterShield.unit}</td>
+                </tr>
+                <tr className="border-b border-slate-700/50 hover:bg-slate-700/30 bg-blue-900/20">
+                  <td className="py-3 px-4 text-white font-medium">Shingles</td>
+                  <td className="py-3 px-4 text-slate-300">{materials.shingles.source}</td>
+                  <td className="py-3 px-4 text-right text-white">{Math.round(materials.shingles.rawFootage)} sq ft</td>
+                  <td className="py-3 px-4 text-right text-[#00d4aa] font-semibold">{materials.shingles.squares} squares</td>
+                  <td className="py-3 px-4 text-center text-slate-400 text-sm">100 sq ft/square</td>
+                </tr>
+                {/* Section C: Manual Override - Wall Flashing */}
+                <tr className="border-b-2 border-orange-500/50 hover:bg-slate-700/30">
+                  <td className="py-3 px-4 text-white font-medium">
+                    Wall Flashing
+                    <span className="text-xs text-orange-400 ml-2">(Manual)</span>
+                  </td>
+                  <td className="py-3 px-4 text-slate-300">
+                    <Input
+                      type="number"
+                      value={wallFlashingAdder}
+                      onChange={(e) => setWallFlashingAdder(Number(e.target.value))}
+                      placeholder="Enter footage"
+                      className="bg-slate-700 border-slate-600 text-white w-32"
+                      min="0"
+                    />
+                  </td>
+                  <td className="py-3 px-4 text-right text-white">{formatLinearFeet(wallFlashingAdder)}</td>
+                  <td className="py-3 px-4 text-right text-orange-400 font-semibold">
+                    {formatLinearFeet(wallFlashingAdder * (1 + wasteFactorPercent / 100))}
+                  </td>
+                  <td className="py-3 px-4 text-center text-slate-400 text-sm">linear feet</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          {/* Summary Note */}
+          <div className="mt-6 p-4 bg-blue-900/20 border border-blue-700/50 rounded-lg">
+            <p className="text-sm text-blue-200">
+              <strong>Note:</strong> All measurements include a {wasteFactorPercent}% waste factor. 
+              Wall flashing must be measured manually as it cannot be detected from aerial imagery.
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
