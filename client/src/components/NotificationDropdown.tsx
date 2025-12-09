@@ -16,9 +16,12 @@ export function NotificationDropdown() {
   const [, setLocation] = useLocation();
   const utils = trpc.useUtils();
 
-  const { data: notifications = [], refetch } = trpc.crm.getNotifications.useQuery(undefined, {
+  const { data: notifications, isLoading, refetch } = trpc.crm.getNotifications.useQuery(undefined, {
     refetchInterval: 30000, // Refetch every 30 seconds
   });
+
+  // Safely handle undefined data - treat as empty array, NOT as loading
+  const notificationList = notifications ?? [];
 
   const markAsRead = trpc.crm.markNotificationRead.useMutation({
     onSuccess: () => {
@@ -33,7 +36,7 @@ export function NotificationDropdown() {
     },
   });
 
-  const unreadCount = notifications.filter((n: any) => !n.isRead).length;
+  const unreadCount = notificationList.filter((n: any) => !n.isRead).length;
 
   const handleNotificationClick = (notification: any) => {
     // Mark as read
@@ -91,14 +94,19 @@ export function NotificationDropdown() {
           )}
         </div>
 
-        {notifications.length === 0 ? (
+        {isLoading ? (
+          <div className="py-8 text-center">
+            <div className="animate-spin w-8 h-8 border-2 border-[#00d4aa] border-t-transparent rounded-full mx-auto mb-2" />
+            <p className="text-sm text-muted-foreground">Loading notifications...</p>
+          </div>
+        ) : notificationList.length === 0 ? (
           <div className="py-8 text-center text-muted-foreground">
             <Bell className="w-12 h-12 mx-auto mb-2 opacity-50" />
             <p className="text-sm">No notifications yet</p>
           </div>
         ) : (
           <div className="divide-y">
-            {notifications.map((notification: any) => (
+            {notificationList.map((notification: any) => (
               <DropdownMenuItem
                 key={notification.id}
                 className={`px-3 py-3 cursor-pointer ${
@@ -136,7 +144,7 @@ export function NotificationDropdown() {
           </div>
         )}
 
-        {notifications.length > 0 && (
+        {!isLoading && notificationList.length > 0 && (
           <>
             <DropdownMenuSeparator />
             <div className="px-3 py-2 text-center">
