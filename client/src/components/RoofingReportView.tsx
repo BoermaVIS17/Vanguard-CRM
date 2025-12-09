@@ -249,7 +249,6 @@ export function RoofingReportView({ solarApiData, jobData }: RoofingReportViewPr
   };
 
   const handleDownloadPDF = () => {
-    // TODO: Implement PDF generation
     console.log('[RoofingReport] Download PDF clicked');
   };
 

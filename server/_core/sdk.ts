@@ -31,7 +31,6 @@ const GET_USER_INFO_WITH_JWT_PATH = `/webdev.v1.WebDevAuthPublicService/GetUserI
 
 class OAuthService {
   constructor(private client: ReturnType<typeof axios.create>) {
-    console.log("[OAuth] Initialized with baseURL:", ENV.oAuthServerUrl);
     if (!ENV.oAuthServerUrl) {
       console.error(
         "[OAuth] ERROR: OAUTH_SERVER_URL is not configured! Set OAUTH_SERVER_URL environment variable."
@@ -264,14 +263,10 @@ class SDKServer {
     
     if (authHeader && authHeader.startsWith('Bearer ')) {
       sessionToken = authHeader.substring(7);
-      console.log('[Auth] Using Authorization header token');
     } else {
       // Fall back to cookie
       const cookies = this.parseCookies(req.headers.cookie);
       sessionToken = cookies.get(COOKIE_NAME);
-      if (sessionToken) {
-        console.log('[Auth] Using cookie token');
-      }
     }
     
     const session = await this.verifySession(sessionToken);

@@ -56,15 +56,11 @@ export async function serveStatic(app: any) {
       ? path.resolve(import.meta.dirname, "../..", "dist", "public")
       : path.resolve(import.meta.dirname, "public");
   
-  console.log(`[Static] Serving static files from: ${distPath}`);
-  
   if (!fs.existsSync(distPath)) {
     console.error(
       `[Static] Could not find the build directory: ${distPath}, make sure to build the client first`
     );
-  } else {
-    console.log(`[Static] ✓ Static directory exists`);
-  }
+  } 
 
   // Serve static files (images, css, js, etc.)
   app.use(express.default.static(distPath));
