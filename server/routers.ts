@@ -19,6 +19,7 @@ import { storagePut, storageGet, STORAGE_BUCKET } from "./storage";
 import { supabaseAdmin } from "./lib/supabase";
 import { extractExifMetadata } from "./lib/exif";
 import { fetchSolarApiData, hasValidCoordinates } from "./lib/solarApi";
+import { fetchEstimatorLeads, parseEstimatorAddress, formatEstimateData } from "./lib/estimatorApi";
 import { 
   normalizeRole, 
   isOwner, 
@@ -832,6 +833,95 @@ export const appRouter = router({
           solarCoverage: solarData.solarCoverage,
           solarApiData: updatedJob.solarApiData,
         };
+      }),
+
+    // Import Leads from Estimator
+    importEstimatorLeads: protectedProcedure
+      .input(z.object({
+        estimatorUrl: z.string().url(),
+        sessionCookie: z.string().optional(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const db = await getDb();
+        if (!db) throw new Error("Database not available");
+
+        // Only owners and admins can import leads
+        if (!isOwner(ctx.user) && !isAdmin(ctx.user)) {
+          throw new Error("Only owners and admins can import leads");
+        }
+
+        console.log(`[ImportEstimatorLeads] Fetching leads from: ${input.estimatorUrl}`);
+
+        try {
+          // Fetch leads from estimator API
+          const estimatorLeads = await fetchEstimatorLeads(input.estimatorUrl, input.sessionCookie);
+          
+          const importResults = {
+            total: estimatorLeads.length,
+            imported: 0,
+            skipped: 0,
+            errors: [] as string[],
+          };
+
+          // Import each lead
+          for (const lead of estimatorLeads) {
+            try {
+              // Parse address
+              const { streetAddress, cityStateZip } = parseEstimatorAddress(lead.address);
+              
+              // Check if lead already exists by email or phone
+              const existingLead = await db
+                .select()
+                .from(reportRequests)
+                .where(
+                  or(
+                    eq(reportRequests.email, lead.email),
+                    eq(reportRequests.phone, lead.phone)
+                  )
+                )
+                .limit(1);
+
+              if (existingLead.length > 0) {
+                console.log(`[ImportEstimatorLeads] Skipping duplicate lead: ${lead.email}`);
+                importResults.skipped++;
+                continue;
+              }
+
+              // Format estimate data
+              const estimatorData = formatEstimateData(lead.estimate);
+
+              // Create new job
+              await db.insert(reportRequests).values({
+                fullName: lead.name,
+                email: lead.email || null,
+                phone: lead.phone || null,
+                address: streetAddress,
+                cityStateZip: cityStateZip,
+                estimatorData: estimatorData as any,
+                status: "lead",
+                priority: "medium" as const,
+                leadSource: "estimator",
+                handsOnInspection: false,
+                amountPaid: 0,
+                internalNotes: lead.notes || null,
+                createdAt: new Date(lead.createdAt),
+                updatedAt: new Date(),
+              });
+
+              importResults.imported++;
+              console.log(`[ImportEstimatorLeads] Imported lead: ${lead.name}`);
+            } catch (error) {
+              console.error(`[ImportEstimatorLeads] Error importing lead ${lead.name}:`, error);
+              importResults.errors.push(`${lead.name}: ${error instanceof Error ? error.message : 'Unknown error'}`);
+            }
+          }
+
+          console.log(`[ImportEstimatorLeads] Import complete:`, importResults);
+          return importResults;
+        } catch (error) {
+          console.error('[ImportEstimatorLeads] Error fetching leads:', error);
+          throw new Error(`Failed to fetch leads from estimator: ${error instanceof Error ? error.message : 'Unknown error'}`);
+        }
       }),
 
     // Delete lead (Owner only)

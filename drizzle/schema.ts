@@ -120,6 +120,7 @@ export const reportRequests = pgTable("report_requests", {
   latitude: doublePrecision("latitude"), // Geocoded latitude for instant roof reports
   longitude: doublePrecision("longitude"), // Geocoded longitude for instant roof reports
   solarApiData: jsonb("solar_api_data"), // Google Solar API response (JSONB) - includes solarCoverage flag
+  estimatorData: jsonb("estimator_data"), // Imported estimate data from NextDoor Exterior Solutions estimator
   roofAge: varchar("roof_age", { length: 50 }),
   roofConcerns: text("roof_concerns"),
   handsOnInspection: boolean("hands_on_inspection").default(false).notNull(),
