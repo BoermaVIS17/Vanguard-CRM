@@ -389,43 +389,49 @@ export default function CRMDashboard() {
           </Card>
         </div>
 
-        {/* Deal Type Summary */}
+        {/* Deal Type Summary - Clickable */}
         <div className="grid grid-cols-3 gap-4 mb-6">
-          <Card className="bg-slate-800 border-slate-700 border-l-4 border-l-blue-500">
-            <CardContent className="pt-4">
-              <div className="flex items-center gap-3">
-                <Shield className="w-8 h-8 text-blue-400" />
-                <div>
-                  <p className="text-sm text-slate-400">Insurance Deals</p>
-                  <p className="text-xl font-bold text-white">{stats?.insuranceCount || 0}</p>
+          <Link href="/crm/leads?dealType=insurance">
+            <Card className="bg-slate-800 border-slate-700 border-l-4 border-l-blue-500 cursor-pointer hover:bg-slate-750 transition-all">
+              <CardContent className="pt-4">
+                <div className="flex items-center gap-3">
+                  <Shield className="w-8 h-8 text-blue-400" />
+                  <div>
+                    <p className="text-sm text-slate-400">Insurance Deals</p>
+                    <p className="text-xl font-bold text-white">{stats?.insuranceCount || 0}</p>
+                  </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          </Link>
           
-          <Card className="bg-slate-800 border-slate-700 border-l-4 border-l-green-500">
-            <CardContent className="pt-4">
-              <div className="flex items-center gap-3">
-                <Banknote className="w-8 h-8 text-green-400" />
-                <div>
-                  <p className="text-sm text-slate-400">Cash Deals</p>
-                  <p className="text-xl font-bold text-white">{stats?.cashCount || 0}</p>
+          <Link href="/crm/leads?dealType=cash">
+            <Card className="bg-slate-800 border-slate-700 border-l-4 border-l-green-500 cursor-pointer hover:bg-slate-750 transition-all">
+              <CardContent className="pt-4">
+                <div className="flex items-center gap-3">
+                  <Banknote className="w-8 h-8 text-green-400" />
+                  <div>
+                    <p className="text-sm text-slate-400">Cash Deals</p>
+                    <p className="text-xl font-bold text-white">{stats?.cashCount || 0}</p>
+                  </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          </Link>
           
-          <Card className="bg-slate-800 border-slate-700 border-l-4 border-l-purple-500">
-            <CardContent className="pt-4">
-              <div className="flex items-center gap-3">
-                <CreditCard className="w-8 h-8 text-purple-400" />
-                <div>
-                  <p className="text-sm text-slate-400">Financed Deals</p>
-                  <p className="text-xl font-bold text-white">{stats?.financedCount || 0}</p>
+          <Link href="/crm/leads?dealType=financed">
+            <Card className="bg-slate-800 border-slate-700 border-l-4 border-l-purple-500 cursor-pointer hover:bg-slate-750 transition-all">
+              <CardContent className="pt-4">
+                <div className="flex items-center gap-3">
+                  <CreditCard className="w-8 h-8 text-purple-400" />
+                  <div>
+                    <p className="text-sm text-slate-400">Financed Deals</p>
+                    <p className="text-xl font-bold text-white">{stats?.financedCount || 0}</p>
+                  </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          </Link>
         </div>
 
         {/* Pipeline Tracker */}

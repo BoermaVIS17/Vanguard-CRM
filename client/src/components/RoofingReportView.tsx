@@ -310,12 +310,10 @@ export function RoofingReportView({ solarApiData, jobData }: RoofingReportViewPr
               {solarApiData?.coverage === false && (
                 <div className="mb-4 p-4 bg-orange-900/30 border border-orange-500/50 rounded-lg">
                   <p className="text-orange-200 font-semibold">
-                    ⚠️ {solarApiData?.manualMeasure ? 'Manual Measurements Required' : '3D Roof Data Not Available'}
+                    ⚠️ Manual Measurements Required
                   </p>
                   <p className="text-orange-300 text-sm mt-1">
-                    {solarApiData?.manualMeasure 
-                      ? 'The Solar API does not have 3D coverage for this location. Use the satellite image below to perform manual roof measurements and enter values in the fields provided.'
-                      : 'Automated measurements unavailable for this location. Please perform manual takeoff using the satellite image below.'}
+                    Automated measurements are not available for this location. Use the measurement tools below to manually calculate the roof area.
                   </p>
                 </div>
               )}
@@ -391,18 +389,16 @@ export function RoofingReportView({ solarApiData, jobData }: RoofingReportViewPr
                     </div>
                   )}
                   
-                  {/* Start Manual Measurement Button Overlay */}
-                  {imageLoaded && !isDrawingMode && solarApiData?.lat && solarApiData?.lng && (
-                    <div className="absolute top-4 left-4">
-                      <Button
-                        onClick={() => setIsDrawingMode(true)}
-                        className="bg-[#00d4aa] hover:bg-[#00b894] text-slate-900 font-semibold shadow-lg"
-                      >
-                        <Ruler className="w-4 h-4 mr-2" />
-                        Start Manual Measurement
-                      </Button>
-                    </div>
-                  )}
+                  {/* Start Manual Measurement Button Overlay - ALWAYS VISIBLE */}
+                  <div className="absolute top-4 left-4 z-10">
+                    <Button
+                      onClick={() => setIsDrawingMode(true)}
+                      className="bg-[#00d4aa] hover:bg-[#00b894] text-slate-900 font-semibold shadow-lg"
+                    >
+                      <Ruler className="w-4 h-4 mr-2" />
+                      Start Manual Measurement
+                    </Button>
+                  </div>
                 </div>
               )}
 

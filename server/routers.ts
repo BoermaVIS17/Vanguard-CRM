@@ -554,7 +554,7 @@ export const appRouter = router({
           // Insurance
           insuranceCarrier: input.insuranceCarrier || null,
           claimNumber: input.claimNumber || null,
-          status: "lead",
+          status: "prospect",
           priority: "medium" as const,
           handsOnInspection: false,
           amountPaid: 0,

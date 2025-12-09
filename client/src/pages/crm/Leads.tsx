@@ -32,15 +32,22 @@ export default function CRMLeads() {
   const [, setLocation] = useLocation();
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [dealTypeFilter, setDealTypeFilter] = useState<string>("all");
   const [showNewJobDialog, setShowNewJobDialog] = useState(false);
   const [showImportDialog, setShowImportDialog] = useState(false);
 
-  // Read status filter from URL params on mount
+  // Read filters from URL params on mount
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const statusParam = params.get("status");
+    const dealTypeParam = params.get("dealType");
+    
     if (statusParam && STATUS_OPTIONS.some(opt => opt.value === statusParam)) {
       setStatusFilter(statusParam);
+    }
+    
+    if (dealTypeParam && ["insurance", "cash", "financed"].includes(dealTypeParam)) {
+      setDealTypeFilter(dealTypeParam);
     }
   }, []);
   const [newJobForm, setNewJobForm] = useState({
@@ -157,7 +164,8 @@ export default function CRMLeads() {
       lead.address.toLowerCase().includes(search.toLowerCase()) ||
       (lead.email || '').toLowerCase().includes(search.toLowerCase());
     const matchesStatus = statusFilter === "all" || lead.status === statusFilter;
-    return matchesSearch && matchesStatus;
+    const matchesDealType = dealTypeFilter === "all" || lead.dealType === dealTypeFilter;
+    return matchesSearch && matchesStatus && matchesDealType;
   });
 
   const getStatusColor = (status: string) => {
@@ -245,6 +253,18 @@ export default function CRMLeads() {
                 {STATUS_OPTIONS.map((status) => (
                   <SelectItem key={status.value} value={status.value} className="text-white hover:bg-slate-700">{status.label}</SelectItem>
                 ))}
+              </SelectContent>
+            </Select>
+            <Select value={dealTypeFilter} onValueChange={setDealTypeFilter}>
+              <SelectTrigger className="w-48 bg-slate-800 border-slate-600 text-white">
+                <Shield className="w-4 h-4 mr-2 text-slate-400" />
+                <SelectValue placeholder="Filter by deal type" />
+              </SelectTrigger>
+              <SelectContent className="bg-slate-800 border-slate-600">
+                <SelectItem value="all" className="text-white hover:bg-slate-700">All Deal Types</SelectItem>
+                <SelectItem value="insurance" className="text-white hover:bg-slate-700">Insurance</SelectItem>
+                <SelectItem value="cash" className="text-white hover:bg-slate-700">Cash</SelectItem>
+                <SelectItem value="financed" className="text-white hover:bg-slate-700">Financed</SelectItem>
               </SelectContent>
             </Select>
             <Button 
