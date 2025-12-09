@@ -6,7 +6,7 @@ import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { getDb } from "./db";
-import { reportRequests, users, activities, documents, editHistory, jobAttachments, jobMessageReads, notifications } from "../drizzle/schema";
+import { reportRequests, users, activities, documents, editHistory, jobAttachments, jobMessageReads, notifications, materialOrders, materialKits } from "../drizzle/schema";
 import { PRODUCTS, validatePromoCode } from "./products";
 import { notifyOwner } from "./_core/notification";
 import { sendSMSNotification } from "./sms";
@@ -20,6 +20,8 @@ import { supabaseAdmin } from "./lib/supabase";
 import { extractExifMetadata } from "./lib/exif";
 import { fetchSolarApiData, hasValidCoordinates } from "./lib/solarApi";
 import { fetchEstimatorLeads, parseEstimatorAddress, formatEstimateData } from "./lib/estimatorApi";
+import { calculateMaterialOrder, generateBeaconCSV, generateOrderNumber } from "./lib/materialCalculator";
+import { MATERIAL_DEFAULTS } from "./lib/materialConstants";
 import { 
   normalizeRole, 
   isOwner, 
@@ -929,6 +931,149 @@ export const appRouter = router({
           console.error('[ImportEstimatorLeads] Error fetching leads:', error);
           throw new Error(`Failed to fetch leads from estimator: ${error instanceof Error ? error.message : 'Unknown error'}`);
         }
+      }),
+
+    // Generate Beacon Material Order
+    generateBeaconOrder: protectedProcedure
+      .input(z.object({
+        jobId: z.number(),
+        shingleColor: z.string().optional(),
+        materialSystem: z.string().optional(),
+        roofComplexity: z.enum(["simple", "moderate", "complex"]).default("moderate"),
+        accessories: z.array(z.object({
+          name: z.string(),
+          quantity: z.number(),
+        })).optional(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const db = await getDb();
+        if (!db) throw new Error("Database not available");
+
+        // Get job data
+        const [job] = await db.select().from(reportRequests).where(eq(reportRequests.id, input.jobId));
+        if (!job) throw new Error("Job not found");
+
+        // Check permissions
+        if (!canViewJob(ctx.user, job)) {
+          throw new Error("You don't have permission to access this job");
+        }
+
+        console.log(`[GenerateBeaconOrder] Generating material order for job ${input.jobId}`);
+
+        // Extract roof measurements from solarApiData or manual measurements
+        const solarData = job.solarApiData as any;
+        
+        if (!solarData) {
+          throw new Error("No roof measurements available. Please generate a roof report first.");
+        }
+
+        // Calculate roof metrics
+        const measurements = {
+          totalArea: solarData.solarPotential?.wholeRoofStats?.areaMeters2 
+            ? solarData.solarPotential.wholeRoofStats.areaMeters2 * 10.764 
+            : 0,
+          perimeter: 0, // Will be calculated from segments
+          eaves: 0,
+          rakes: 0,
+          ridges: 0,
+          valleys: 0,
+          hips: 0,
+        };
+
+        // If we have segment stats, calculate linear measurements
+        if (solarData.solarPotential?.roofSegmentStats) {
+          // Simplified calculation - in production, use proper geometry
+          const segments = solarData.solarPotential.roofSegmentStats;
+          const estimatedPerimeter = Math.sqrt(measurements.totalArea) * 4;
+          measurements.perimeter = estimatedPerimeter;
+          measurements.eaves = estimatedPerimeter * 0.5;
+          measurements.rakes = estimatedPerimeter * 0.3;
+          measurements.ridges = estimatedPerimeter * 0.2;
+          measurements.valleys = 0; // Would need valley detection
+          measurements.hips = 0;
+        }
+
+        // Calculate material order
+        const materialOrder = calculateMaterialOrder(
+          measurements,
+          { roofComplexity: input.roofComplexity },
+          input.accessories
+        );
+
+        // Generate order number
+        const orderNumber = generateOrderNumber();
+
+        // Generate CSV for Beacon PRO+
+        const csvContent = generateBeaconCSV(materialOrder.lineItems);
+        const csvBlob = Buffer.from(csvContent);
+        const csvFilename = `beacon-order-${orderNumber}.csv`;
+
+        // Upload CSV to storage
+        let csvUrl = null;
+        try {
+          const csvPath = `material-orders/${job.id}/${csvFilename}`;
+          await storagePut(csvPath, csvBlob, "text/csv");
+          csvUrl = await storageGet(csvPath);
+        } catch (error) {
+          console.error("[GenerateBeaconOrder] Error uploading CSV:", error);
+        }
+
+        // Save material order to database
+        const [savedOrder] = await db.insert(materialOrders).values({
+          reportRequestId: input.jobId,
+          orderNumber,
+          status: "draft",
+          shingleColor: input.shingleColor,
+          materialSystem: input.materialSystem,
+          lineItems: materialOrder.lineItems,
+          accessories: input.accessories || [],
+          totalSquares: materialOrder.totalSquares,
+          csvUrl,
+          createdBy: ctx.user?.id,
+        }).returning();
+
+        console.log(`[GenerateBeaconOrder] Order created: ${orderNumber}`);
+
+        return {
+          success: true,
+          order: savedOrder,
+          materialOrder,
+          csvUrl,
+        };
+      }),
+
+    // Get material orders for a job
+    getMaterialOrders: protectedProcedure
+      .input(z.object({ jobId: z.number() }))
+      .query(async ({ input, ctx }) => {
+        const db = await getDb();
+        if (!db) throw new Error("Database not available");
+
+        // Get job to check permissions
+        const [job] = await db.select().from(reportRequests).where(eq(reportRequests.id, input.jobId));
+        if (!job) throw new Error("Job not found");
+
+        if (!canViewJob(ctx.user, job)) {
+          throw new Error("You don't have permission to access this job");
+        }
+
+        const orders = await db.select()
+          .from(materialOrders)
+          .where(eq(materialOrders.reportRequestId, input.jobId))
+          .orderBy(desc(materialOrders.createdAt));
+
+        return orders;
+      }),
+
+    // Get material kit defaults
+    getMaterialKits: protectedProcedure
+      .query(async ({ ctx }) => {
+        // Return the material constants for now
+        // In the future, this could query the materialKits table
+        return Object.entries(MATERIAL_DEFAULTS).map(([key, value]) => ({
+          id: key,
+          ...value,
+        }));
       }),
 
     // Delete lead (Owner only)
