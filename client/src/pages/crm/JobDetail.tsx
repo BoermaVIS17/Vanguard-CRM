@@ -34,6 +34,7 @@ import {
   Grid3X3,
   Maximize2,
   Paperclip,
+  FileDown,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -46,6 +47,7 @@ import CRMLayout from "@/components/crm/CRMLayout";
 import { useRealtimeJob } from "@/hooks/useRealtimeJob";
 import { JobPipelineTracker } from "@/components/JobPipelineTracker";
 import { MentionInput } from "@/components/MentionInput";
+import { generateRoofReportPDF } from "@/utils/roofReportService";
 
 // Helper function to format mentions in messages
 const formatMentions = (text: string) => {
@@ -482,6 +484,7 @@ export default function JobDetail() {
   const [isEditingCustomer, setIsEditingCustomer] = useState(false);
   const [previewDocument, setPreviewDocument] = useState<{ url: string; name: string; type: string } | null>(null);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+  const [isGeneratingReport, setIsGeneratingReport] = useState(false);
   const [customerForm, setCustomerForm] = useState({
     fullName: "",
     email: "",
@@ -787,21 +790,43 @@ export default function JobDetail() {
                 {statusConfig.label}
               </span>
               {canEdit && (
-                <Select
-                  value={job.status}
-                  onValueChange={(value) => updateLead.mutate({ id: jobId, status: value as any })}
-                >
-                  <SelectTrigger className="w-[180px] bg-slate-700 border-slate-600 text-white">
-                    <SelectValue placeholder="Change Status" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-slate-700 border-slate-600">
-                    {Object.entries(STATUS_CONFIG).map(([key, config]) => (
-                      <SelectItem key={key} value={key} className="text-white hover:bg-slate-600">
-                        {config.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <>
+                  <Button
+                    onClick={async () => {
+                      setIsGeneratingReport(true);
+                      try {
+                        const fullAddress = `${job.address}, ${job.cityStateZip}`;
+                        await generateRoofReportPDF(fullAddress, job.fullName);
+                        toast.success("Roof report generated successfully!");
+                      } catch (error) {
+                        console.error("Error generating report:", error);
+                        toast.error("Failed to generate roof report. Please check the address and try again.");
+                      } finally {
+                        setIsGeneratingReport(false);
+                      }
+                    }}
+                    disabled={isGeneratingReport}
+                    className="bg-gradient-to-r from-[#00d4aa] to-[#00b894] hover:from-[#00e6bc] hover:to-[#00d4aa] text-black font-semibold"
+                  >
+                    <FileDown className="w-4 h-4 mr-2" />
+                    {isGeneratingReport ? "Generating..." : "Generate Roof Report"}
+                  </Button>
+                  <Select
+                    value={job.status}
+                    onValueChange={(value) => updateLead.mutate({ id: jobId, status: value as any })}
+                  >
+                    <SelectTrigger className="w-[180px] bg-slate-700 border-slate-600 text-white">
+                      <SelectValue placeholder="Change Status" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-slate-700 border-slate-600">
+                      {Object.entries(STATUS_CONFIG).map(([key, config]) => (
+                        <SelectItem key={key} value={key} className="text-white hover:bg-slate-600">
+                          {config.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </>
               )}
               {canDelete && (
                 <Button 
