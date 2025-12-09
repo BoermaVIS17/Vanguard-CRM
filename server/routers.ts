@@ -18,7 +18,7 @@ import { eq, desc, and, or, like, sql, gte, lte, inArray, isNotNull } from "driz
 import { storagePut, storageGet, STORAGE_BUCKET } from "./storage";
 import { supabaseAdmin } from "./lib/supabase";
 import { extractExifMetadata } from "./lib/exif";
-import { fetchSolarApiData, hasValidCoordinates } from "./lib/solarApi";
+import * as solarApi from "./lib/solarApi";
 import { fetchEstimatorLeads, parseEstimatorAddress, formatEstimateData } from "./lib/estimatorApi";
 import { calculateMaterialOrder, generateBeaconCSV, generateOrderNumber } from "./lib/materialCalculator";
 import { MATERIAL_DEFAULTS } from "./lib/materialConstants";
@@ -800,7 +800,7 @@ export const appRouter = router({
         }
 
         // Validate coordinates
-        if (!hasValidCoordinates(job.latitude, job.longitude)) {
+        if (!solarApi.hasValidCoordinates(job.latitude, job.longitude)) {
           throw new Error("Job does not have valid coordinates. Please update the address first.");
         }
 
@@ -809,7 +809,7 @@ export const appRouter = router({
         // Fetch Solar API data with error handling
         let solarData;
         try {
-          solarData = await fetchSolarApiData(job.latitude!, job.longitude!);
+          solarData = await solarApi.fetchSolarApiData(job.latitude!, job.longitude!);
           console.log(`[GenerateRoofReport] Solar API response received:`, {
             coverage: solarData.coverage,
             hasImageryUrl: !!solarData.imageryUrl,
