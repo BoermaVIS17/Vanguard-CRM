@@ -485,8 +485,10 @@ export default function CRMLeads() {
                       <span className="text-xs text-slate-500 ml-2">(Start typing to search)</span>
                     </label>
                     <Autocomplete
+                      key={`address-${showNewJobDialog}`}
                       apiKey={import.meta.env.VITE_GOOGLE_MAPS_KEY || "AIzaSyA7QSM-fqUn4grHM6OYddNgKzK7uMlBY1I"}
                       onPlaceSelected={(place: any) => {
+                        console.log('Place selected:', place);
                         if (!place.geometry) {
                           toast.error("Please select a valid address from the dropdown");
                           return;
@@ -524,6 +526,8 @@ export default function CRMLeads() {
                         const lat = place.geometry.location.lat();
                         const lng = place.geometry.location.lng();
 
+                        console.log('Extracted data:', { streetAddress, cityStateZip, lat, lng });
+
                         setNewJobForm({
                           ...newJobForm,
                           address: streetAddress,
@@ -538,7 +542,7 @@ export default function CRMLeads() {
                         types: ["address"],
                         componentRestrictions: { country: "us" },
                       }}
-                      defaultValue={newJobForm.address}
+                      defaultValue=""
                       className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-md text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#00d4aa] focus:border-transparent"
                       placeholder="Start typing address..."
                     />
