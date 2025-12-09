@@ -34,7 +34,13 @@ export interface EstimatorApiResponse {
 /**
  * Fetch leads from the estimator API
  * @param baseUrl - The estimator API base URL (e.g., https://your-domain.manus.space)
- * @param sessionCookie - Session cookie for authentication
+ * @param sessionCookie - Session cookie for authentication (OPTIONAL)
+ * 
+ * WARNING: Session cookies expire (typically 7-30 days). This means:
+ * - You'll need to manually update the cookie when it expires
+ * - Imports will fail silently when the cookie is invalid
+ * - Consider requesting a permanent API key from your estimator provider
+ * 
  * @returns Array of estimator leads
  */
 export async function fetchEstimatorLeads(

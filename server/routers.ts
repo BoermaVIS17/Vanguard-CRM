@@ -869,20 +869,21 @@ export const appRouter = router({
               // Parse address
               const { streetAddress, cityStateZip } = parseEstimatorAddress(lead.address);
               
-              // Check if lead already exists by email or phone
+              // Check if lead already exists by ADDRESS (most important for roofing)
+              // This allows same person to have multiple estimates at different properties
               const existingLead = await db
                 .select()
                 .from(reportRequests)
                 .where(
-                  or(
-                    eq(reportRequests.email, lead.email),
-                    eq(reportRequests.phone, lead.phone)
+                  and(
+                    eq(reportRequests.address, streetAddress),
+                    eq(reportRequests.cityStateZip, cityStateZip)
                   )
                 )
                 .limit(1);
 
               if (existingLead.length > 0) {
-                console.log(`[ImportEstimatorLeads] Skipping duplicate lead: ${lead.email}`);
+                console.log(`[ImportEstimatorLeads] Skipping duplicate lead for address: ${streetAddress}`);
                 importResults.skipped++;
                 continue;
               }

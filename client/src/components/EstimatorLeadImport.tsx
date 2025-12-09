@@ -84,9 +84,18 @@ export function EstimatorLeadImport() {
             onChange={(e) => setSessionCookie(e.target.value)}
             className="bg-slate-700 border-slate-600 text-white"
           />
-          <p className="text-xs text-slate-500 mt-1">
-            Required if the estimator requires authentication
-          </p>
+          <div className="mt-2 space-y-1">
+            <p className="text-xs text-slate-500">
+              Required if the estimator requires authentication
+            </p>
+            <div className="bg-yellow-900/20 border border-yellow-700/50 rounded p-2">
+              <p className="text-xs text-yellow-400">
+                ⚠️ <strong>Warning:</strong> Session cookies expire (usually after 7-30 days). 
+                You'll need to manually update this cookie when it expires. 
+                Consider asking your estimator provider for a permanent API key instead.
+              </p>
+            </div>
+          </div>
         </div>
 
         <Button
