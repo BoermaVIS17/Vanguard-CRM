@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
-import { ShoppingCart, Download, Mail, Plus, Trash2 } from 'lucide-react';
+import { ShoppingCart, Download, Mail, FileDown } from 'lucide-react';
 import { trpc } from '@/lib/trpc';
 import { toast } from 'sonner';
 
@@ -13,20 +13,36 @@ interface MaterialOrderBuilderProps {
   jobAddress: string;
 }
 
-interface Accessory {
-  name: string;
-  quantity: number;
-}
+// Common accessories that can't be seen from satellite
+const COMMON_ACCESSORIES = [
+  { name: 'Pipe Boots (Lead/3-in-1)', key: 'pipeBoots' },
+  { name: 'Box Vents', key: 'boxVents' },
+  { name: 'Goose Necks', key: 'gooseNecks' },
+  { name: 'Chimney Flashing Kits', key: 'chimneyFlashing' },
+  { name: 'Turbine Vents', key: 'turbineVents' },
+  { name: 'Skylight Flashing', key: 'skylightFlashing' },
+];
 
 export function MaterialOrderBuilder({ jobId, jobAddress }: MaterialOrderBuilderProps) {
+  // Section A: Settings
   const [shingleColor, setShingleColor] = useState('');
-  const [materialSystem, setMaterialSystem] = useState('GAF');
+  const [shingleBrand, setShingleBrand] = useState('GAF Timberline HDZ');
   const [roofComplexity, setRoofComplexity] = useState<'simple' | 'moderate' | 'complex'>('moderate');
-  const [accessories, setAccessories] = useState<Accessory[]>([]);
-  const [newAccessoryName, setNewAccessoryName] = useState('');
-  const [newAccessoryQty, setNewAccessoryQty] = useState(1);
+  
+  // Section B: Accessories Board
+  const [accessoryQuantities, setAccessoryQuantities] = useState<Record<string, number>>({
+    pipeBoots: 0,
+    boxVents: 0,
+    gooseNecks: 0,
+    chimneyFlashing: 0,
+    turbineVents: 0,
+    skylightFlashing: 0,
+  });
 
   const { data: existingOrders, refetch } = trpc.crm.getMaterialOrders.useQuery({ jobId });
+  const { data: latestOrder } = trpc.crm.getMaterialOrders.useQuery({ jobId }, {
+    select: (data) => data[0], // Get most recent order
+  });
 
   const generateOrder = trpc.crm.generateBeaconOrder.useMutation({
     onSuccess: (data) => {
@@ -38,30 +54,31 @@ export function MaterialOrderBuilder({ jobId, jobAddress }: MaterialOrderBuilder
     },
   });
 
-  const handleAddAccessory = () => {
-    if (!newAccessoryName.trim()) {
-      toast.error('Please enter accessory name');
-      return;
-    }
-    setAccessories([...accessories, { name: newAccessoryName, quantity: newAccessoryQty }]);
-    setNewAccessoryName('');
-    setNewAccessoryQty(1);
-  };
-
-  const handleRemoveAccessory = (index: number) => {
-    setAccessories(accessories.filter((_, i) => i !== index));
+  const handleUpdateAccessory = (key: string, value: number) => {
+    setAccessoryQuantities(prev => ({
+      ...prev,
+      [key]: Math.max(0, value),
+    }));
   };
 
   const handleGenerateOrder = () => {
     if (!shingleColor.trim()) {
-      toast.error('Please select a shingle color');
+      toast.error('Please enter a shingle color');
       return;
     }
+
+    // Convert accessories to array format
+    const accessories = COMMON_ACCESSORIES
+      .filter(acc => accessoryQuantities[acc.key] > 0)
+      .map(acc => ({
+        name: acc.name,
+        quantity: accessoryQuantities[acc.key],
+      }));
 
     generateOrder.mutate({
       jobId,
       shingleColor,
-      materialSystem,
+      materialSystem: shingleBrand.split(' ')[0], // Extract brand (GAF, OC, etc.)
       roofComplexity,
       accessories: accessories.length > 0 ? accessories : undefined,
     });
@@ -95,111 +112,79 @@ export function MaterialOrderBuilder({ jobId, jobAddress }: MaterialOrderBuilder
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
-          {/* Step A: Inputs */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="shingleColor" className="text-slate-300">
-                Shingle Color *
-              </Label>
-              <Input
-                id="shingleColor"
-                value={shingleColor}
-                onChange={(e) => setShingleColor(e.target.value)}
-                placeholder="e.g., Charcoal"
-                className="bg-slate-700 border-slate-600 text-white"
-              />
-            </div>
+          {/* Section A: Settings */}
+          <div>
+            <h3 className="text-white font-semibold mb-3">Settings</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="roofComplexity" className="text-slate-300">
+                  Roof Complexity
+                </Label>
+                <Select value={roofComplexity} onValueChange={(v: any) => setRoofComplexity(v)}>
+                  <SelectTrigger className="bg-slate-700 border-slate-600 text-white">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="bg-slate-800 border-slate-600">
+                    <SelectItem value="simple" className="text-white hover:bg-slate-700">
+                      Simple (7% waste)
+                    </SelectItem>
+                    <SelectItem value="moderate" className="text-white hover:bg-slate-700">
+                      Moderate (12% waste)
+                    </SelectItem>
+                    <SelectItem value="complex" className="text-white hover:bg-slate-700">
+                      Complex (17% waste)
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="materialSystem" className="text-slate-300">
-                Material System
-              </Label>
-              <Select value={materialSystem} onValueChange={setMaterialSystem}>
-                <SelectTrigger className="bg-slate-700 border-slate-600 text-white">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent className="bg-slate-800 border-slate-600">
-                  <SelectItem value="GAF" className="text-white hover:bg-slate-700">GAF</SelectItem>
-                  <SelectItem value="Owens Corning" className="text-white hover:bg-slate-700">Owens Corning</SelectItem>
-                  <SelectItem value="CertainTeed" className="text-white hover:bg-slate-700">CertainTeed</SelectItem>
-                  <SelectItem value="Tamko" className="text-white hover:bg-slate-700">Tamko</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+              <div className="space-y-2">
+                <Label htmlFor="shingleColor" className="text-slate-300">
+                  Shingle Color *
+                </Label>
+                <Input
+                  id="shingleColor"
+                  value={shingleColor}
+                  onChange={(e) => setShingleColor(e.target.value)}
+                  placeholder="e.g., Charcoal, Weathered Wood"
+                  className="bg-slate-700 border-slate-600 text-white"
+                />
+              </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="roofComplexity" className="text-slate-300">
-                Roof Complexity
-              </Label>
-              <Select value={roofComplexity} onValueChange={(v: any) => setRoofComplexity(v)}>
-                <SelectTrigger className="bg-slate-700 border-slate-600 text-white">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent className="bg-slate-800 border-slate-600">
-                  <SelectItem value="simple" className="text-white hover:bg-slate-700">
-                    Simple (7% waste)
-                  </SelectItem>
-                  <SelectItem value="moderate" className="text-white hover:bg-slate-700">
-                    Moderate (12% waste)
-                  </SelectItem>
-                  <SelectItem value="complex" className="text-white hover:bg-slate-700">
-                    Complex (17% waste)
-                  </SelectItem>
-                </SelectContent>
-              </Select>
+              <div className="space-y-2">
+                <Label htmlFor="shingleBrand" className="text-slate-300">
+                  Shingle Brand
+                </Label>
+                <Input
+                  id="shingleBrand"
+                  value={shingleBrand}
+                  onChange={(e) => setShingleBrand(e.target.value)}
+                  placeholder="e.g., GAF Timberline HDZ"
+                  className="bg-slate-700 border-slate-600 text-white"
+                />
+              </div>
             </div>
           </div>
 
-          {/* Accessories Section */}
-          <div className="space-y-3">
-            <Label className="text-slate-300 font-semibold">Manual Accessories</Label>
-            <p className="text-xs text-slate-400">
-              Add items that cannot be detected from aerial imagery (pipe boots, vents, etc.)
+          {/* Section B: Accessories Board */}
+          <div>
+            <h3 className="text-white font-semibold mb-2">Accessories Board</h3>
+            <p className="text-xs text-slate-400 mb-3">
+              Items that cannot be detected from satellite imagery
             </p>
-
-            {/* Existing Accessories */}
-            {accessories.length > 0 && (
-              <div className="space-y-2">
-                {accessories.map((acc, index) => (
-                  <div key={index} className="flex items-center gap-2 bg-slate-700 p-2 rounded">
-                    <span className="text-white flex-1">{acc.name}</span>
-                    <span className="text-slate-300">Qty: {acc.quantity}</span>
-                    <Button
-                      onClick={() => handleRemoveAccessory(index)}
-                      variant="ghost"
-                      size="sm"
-                      className="text-red-400 hover:text-red-300 hover:bg-slate-600"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {/* Add Accessory Form */}
-            <div className="flex gap-2">
-              <Input
-                value={newAccessoryName}
-                onChange={(e) => setNewAccessoryName(e.target.value)}
-                placeholder="Accessory name (e.g., Pipe Boot)"
-                className="bg-slate-700 border-slate-600 text-white flex-1"
-              />
-              <Input
-                type="number"
-                value={newAccessoryQty}
-                onChange={(e) => setNewAccessoryQty(Number(e.target.value))}
-                min="1"
-                className="bg-slate-700 border-slate-600 text-white w-20"
-              />
-              <Button
-                onClick={handleAddAccessory}
-                variant="outline"
-                className="bg-slate-700 border-slate-600 text-white hover:bg-slate-600"
-              >
-                <Plus className="w-4 h-4 mr-2" />
-                Add
-              </Button>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+              {COMMON_ACCESSORIES.map((accessory) => (
+                <div key={accessory.key} className="bg-slate-700 p-3 rounded-lg space-y-2">
+                  <Label className="text-slate-300 text-sm">{accessory.name}</Label>
+                  <Input
+                    type="number"
+                    value={accessoryQuantities[accessory.key]}
+                    onChange={(e) => handleUpdateAccessory(accessory.key, Number(e.target.value))}
+                    min="0"
+                    className="bg-slate-600 border-slate-500 text-white text-center"
+                  />
+                </div>
+              ))}
             </div>
           </div>
 
@@ -214,65 +199,96 @@ export function MaterialOrderBuilder({ jobId, jobAddress }: MaterialOrderBuilder
         </CardContent>
       </Card>
 
-      {/* Existing Orders */}
-      {existingOrders && existingOrders.length > 0 && (
+      {/* Section C: Results - Live Preview */}
+      {latestOrder && latestOrder.lineItems && (
         <Card className="bg-slate-800 border-slate-700">
           <CardHeader>
-            <CardTitle className="text-white">Previous Orders</CardTitle>
+            <CardTitle className="text-white flex items-center justify-between">
+              <span>Order Preview</span>
+              <span className="text-sm font-normal text-slate-400">
+                {latestOrder.orderNumber}
+              </span>
+            </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            {existingOrders.map((order) => (
-              <div key={order.id} className="bg-slate-700 p-4 rounded-lg space-y-3">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-white font-semibold">{order.orderNumber}</p>
-                    <p className="text-sm text-slate-400">
-                      {new Date(order.createdAt).toLocaleDateString()} • {order.totalSquares} squares
-                    </p>
-                    <p className="text-sm text-slate-300">
-                      {order.shingleColor} • {order.materialSystem}
-                    </p>
-                  </div>
-                  <div className="flex gap-2">
-                    {order.csvUrl && (
-                      <Button
-                        onClick={() => handleDownloadCSV(order.csvUrl!)}
-                        variant="outline"
-                        size="sm"
-                        className="bg-slate-600 border-slate-500 text-white hover:bg-slate-500"
-                      >
-                        <Download className="w-4 h-4 mr-2" />
-                        CSV
-                      </Button>
-                    )}
+            {/* Live Preview Table */}
+            <div className="bg-slate-900 rounded-lg overflow-hidden">
+              <table className="w-full">
+                <thead className="bg-slate-700">
+                  <tr>
+                    <th className="text-left p-3 text-slate-300 text-sm">Product</th>
+                    <th className="text-right p-3 text-slate-300 text-sm">Quantity</th>
+                    <th className="text-right p-3 text-slate-300 text-sm">Unit</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {(latestOrder.lineItems as any[]).map((item, idx) => (
+                    <tr key={idx} className="border-t border-slate-700">
+                      <td className="p-3 text-white">{item.productName}</td>
+                      <td className="p-3 text-right text-[#00d4aa] font-semibold">{item.quantity}</td>
+                      <td className="p-3 text-right text-slate-400">{item.unit}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex gap-3">
+              {latestOrder.csvUrl && (
+                <Button
+                  onClick={() => handleDownloadCSV(latestOrder.csvUrl!)}
+                  className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+                >
+                  <FileDown className="w-4 h-4 mr-2" />
+                  Download Beacon CSV
+                </Button>
+              )}
+              <Button
+                onClick={() => handleSendToSupplier(latestOrder)}
+                className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
+              >
+                <Mail className="w-4 h-4 mr-2" />
+                Send to Supplier
+              </Button>
+            </div>
+
+            <div className="p-3 bg-blue-900/20 border border-blue-500/50 rounded-lg">
+              <p className="text-blue-200 text-sm">
+                <strong>Beacon PRO+ Upload:</strong> Download the CSV file and upload it directly to your Beacon PRO+ cart to instantly add all materials.
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Previous Orders History */}
+      {existingOrders && existingOrders.length > 1 && (
+        <Card className="bg-slate-800 border-slate-700">
+          <CardHeader>
+            <CardTitle className="text-white">Order History</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {existingOrders.slice(1).map((order) => (
+              <div key={order.id} className="bg-slate-700 p-3 rounded-lg flex items-center justify-between">
+                <div>
+                  <p className="text-white font-semibold">{order.orderNumber}</p>
+                  <p className="text-xs text-slate-400">
+                    {new Date(order.createdAt).toLocaleDateString()} • {order.totalSquares} squares
+                  </p>
+                </div>
+                <div className="flex gap-2">
+                  {order.csvUrl && (
                     <Button
-                      onClick={() => handleSendToSupplier(order)}
+                      onClick={() => handleDownloadCSV(order.csvUrl!)}
                       variant="outline"
                       size="sm"
-                      className="bg-blue-600 border-blue-500 text-white hover:bg-blue-500"
+                      className="bg-slate-600 border-slate-500 text-white hover:bg-slate-500"
                     >
-                      <Mail className="w-4 h-4 mr-2" />
-                      Email
+                      <Download className="w-4 h-4" />
                     </Button>
-                  </div>
+                  )}
                 </div>
-
-                {/* Line Items Preview */}
-                {order.lineItems && (
-                  <div className="text-sm space-y-1">
-                    {(order.lineItems as any[]).slice(0, 3).map((item, idx) => (
-                      <div key={idx} className="flex justify-between text-slate-300">
-                        <span>{item.productName}</span>
-                        <span>{item.quantity} {item.unit}</span>
-                      </div>
-                    ))}
-                    {(order.lineItems as any[]).length > 3 && (
-                      <p className="text-slate-400 text-xs">
-                        +{(order.lineItems as any[]).length - 3} more items
-                      </p>
-                    )}
-                  </div>
-                )}
               </div>
             ))}
           </CardContent>
