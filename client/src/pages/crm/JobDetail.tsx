@@ -2217,15 +2217,15 @@ export default function JobDetail() {
       )}
 
       {/* Material Email Dialog */}
-      {showMaterialDialog && job.solarApiData && (
+      {showMaterialDialog && (job as any).solarApiData && (
         <MaterialEmailDialog
           open={showMaterialDialog}
           onOpenChange={setShowMaterialDialog}
           jobAddress={`${job.address}, ${job.cityStateZip}`}
-          roofArea={job.solarApiData.roofArea || 0}
-          perimeter={job.solarApiData.perimeter}
-          ridgeLength={job.solarApiData.ridgeLength}
-          shingleColor={job.solarApiData.shingleColor}
+          roofArea={(job as any).solarApiData?.roofArea || 0}
+          perimeter={(job as any).solarApiData?.perimeter}
+          ridgeLength={(job as any).solarApiData?.ridgeLength}
+          shingleColor={(job as any).solarApiData?.shingleColor}
         />
       )}
     </CRMLayout>

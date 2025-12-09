@@ -10,7 +10,7 @@ import { useTheme } from "@/contexts/ThemeContext";
 import SettingsLayout from "./SettingsLayout";
 
 export default function GeneralSettings() {
-  const { theme, setTheme } = useTheme();
+  const { theme, toggleTheme } = useTheme();
   
   // Notification preferences
   const [emailNotifications, setEmailNotifications] = useState(true);
@@ -50,7 +50,7 @@ export default function GeneralSettings() {
               </div>
               <div className="flex items-center gap-4">
                 <button
-                  onClick={() => setTheme("light")}
+                  onClick={toggleTheme}
                   className={`p-3 rounded-lg border-2 transition-all ${
                     theme === "light"
                       ? "border-[#00d4aa] bg-white"
@@ -60,7 +60,7 @@ export default function GeneralSettings() {
                   <Sun className={`w-5 h-5 ${theme === "light" ? "text-yellow-500" : "text-slate-400"}`} />
                 </button>
                 <button
-                  onClick={() => setTheme("dark")}
+                  onClick={toggleTheme}
                   className={`p-3 rounded-lg border-2 transition-all ${
                     theme === "dark"
                       ? "border-[#00d4aa] bg-slate-900"

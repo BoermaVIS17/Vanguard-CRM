@@ -7,7 +7,6 @@ import { Separator } from "@/components/ui/separator";
 import { User, Mail, Lock, Save, Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
-import { trpc } from "@/lib/trpc";
 import SettingsLayout from "./SettingsLayout";
 
 export default function ProfileSettings() {
@@ -54,15 +53,6 @@ export default function ProfileSettings() {
     fetchProfile();
   }, []);
 
-  const updateProfile = trpc.crm.updateUserProfile.useMutation({
-    onSuccess: () => {
-      toast.success("Profile updated successfully!");
-    },
-    onError: (error) => {
-      toast.error(error.message);
-    },
-  });
-
   const handleSaveProfile = async () => {
     if (!userId) {
       toast.error("User not found");
@@ -71,11 +61,24 @@ export default function ProfileSettings() {
 
     setIsLoading(true);
     try {
-      await updateProfile.mutateAsync({
-        userId,
-        name,
-        email,
-      });
+      if (!supabase) {
+        toast.error("Database not available");
+        return;
+      }
+
+      const { error } = await supabase
+        .from('users')
+        .update({ name, email })
+        .eq('id', userId);
+
+      if (error) {
+        toast.error(error.message);
+        return;
+      }
+
+      toast.success("Profile updated successfully!");
+    } catch (error) {
+      toast.error("Failed to update profile");
     } finally {
       setIsLoading(false);
     }
