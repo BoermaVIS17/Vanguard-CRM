@@ -797,13 +797,30 @@ export default function JobDetail() {
                       try {
                         const fullAddress = `${job.address}, ${job.cityStateZip}`;
                         // Pass stored coordinates if available to skip geocoding
-                        await generateRoofReportPDF(
+                        const { blob, fileName } = await generateRoofReportPDF(
                           fullAddress, 
                           job.fullName,
                           job.latitude || undefined,
                           job.longitude || undefined
                         );
-                        toast.success("Roof report generated successfully!");
+                        
+                        // Convert blob to base64 for upload
+                        const reader = new FileReader();
+                        reader.onloadend = async () => {
+                          const base64 = (reader.result as string).split(",")[1];
+                          
+                          // Upload to job documents
+                          await uploadDocument.mutateAsync({
+                            leadId: jobId,
+                            fileName: fileName,
+                            fileData: base64,
+                            fileType: "application/pdf",
+                            category: "report",
+                          });
+                        };
+                        reader.readAsDataURL(blob);
+                        
+                        toast.success("Roof report generated and saved to documents!");
                       } catch (error) {
                         console.error("Error generating report:", error);
                         toast.error("Failed to generate roof report. Please check the address and try again.");

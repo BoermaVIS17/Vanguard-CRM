@@ -142,13 +142,14 @@ function calculateWasteFactorTable(baseAreaSqFt: number) {
  * @param customerName - Customer name for the report
  * @param storedLat - Optional pre-geocoded latitude (skips geocoding step)
  * @param storedLng - Optional pre-geocoded longitude (skips geocoding step)
+ * @returns Object with PDF blob and suggested filename
  */
 export async function generateRoofReportPDF(
   address: string, 
   customerName: string,
   storedLat?: number,
   storedLng?: number
-): Promise<void> {
+): Promise<{ blob: Blob; fileName: string }> {
   try {
     // Fetch roof data (use stored coordinates if available)
     let roofData: RoofData;
@@ -359,9 +360,18 @@ export async function generateRoofReportPDF(
     doc.setLineWidth(2);
     doc.line(10, 28, pageWidth - 10, 28);
     
-    // Save the PDF
-    const fileName = `Roof_Report_${address.replace(/[^a-zA-Z0-9]/g, '_')}_${Date.now()}.pdf`;
+    // Extract last name from customer name
+    const nameParts = customerName.trim().split(' ');
+    const lastName = nameParts.length > 1 ? nameParts[nameParts.length - 1] : nameParts[0];
+    const fileName = `${lastName}_Roof_Report.pdf`;
+    
+    // Download to browser
     doc.save(fileName);
+    
+    // Also return blob for uploading to documents
+    const pdfBlob = doc.output('blob');
+    
+    return { blob: pdfBlob, fileName };
     
   } catch (error) {
     console.error('Error generating roof report:', error);
