@@ -1,5 +1,5 @@
 // @ts-nocheck
-import express, { type Express } from "express";
+import { type Express } from "express";
 import fs from "fs";
 import { type Server } from "http";
 import { nanoid } from "nanoid";
@@ -48,7 +48,7 @@ export async function setupVite(app: Express, server: Server) {
   });
 }
 
-export function serveStatic(app: Express) {
+export function serveStatic(app: Express, expressModule: any) {
   const distPath =
     process.env.NODE_ENV === "development"
       ? path.resolve(import.meta.dirname, "../..", "dist", "public")
@@ -65,7 +65,7 @@ export function serveStatic(app: Express) {
   }
 
   // Serve static files (images, css, js, etc.)
-  app.use(express.static(distPath));
+  app.use(expressModule.static(distPath));
 
   // Serve index.html for frontend routes (SPA fallback)
   // This should be registered BEFORE the 404 handler
