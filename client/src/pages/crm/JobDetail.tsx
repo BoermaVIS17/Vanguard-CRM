@@ -152,7 +152,7 @@ const FIELD_TYPE_CONFIG: Record<string, { icon: typeof CheckCircle; color: strin
 // Tab configuration
 const TABS = [
   { key: "overview", label: "Overview", icon: User },
-  { key: "proposal", label: "Proposal", icon: Calculator, requiresStage: ["prospect", "approved", "project_scheduled", "completed", "invoiced", "closed_deal"] },
+  { key: "proposal", label: "Proposal & Contract", icon: Calculator }, // Always visible
   { key: "production_report", label: "Production Report", icon: Grid3X3 },
   { key: "documents", label: "Documents", icon: FileText },
   { key: "photos", label: "Photos", icon: Image },
@@ -1333,7 +1333,7 @@ export default function JobDetail() {
               </Card>
 
               {/* Insurance Information Card */}
-              {job.dealType === 'insurance' && (
+              {(job.dealType === 'insurance' || job.paymentType === 'insurance') && (
                 <InsuranceInfoCard
                   jobId={jobId}
                   insuranceCarrier={job.insuranceCarrier}
