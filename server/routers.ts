@@ -805,11 +805,21 @@ export const appRouter = router({
 
         console.log(`[GenerateRoofReport] Fetching Solar API data for job ${input.jobId}`);
         
-        // Fetch Solar API data
-        const solarData = await fetchSolarApiData(job.latitude!, job.longitude!);
+        // Fetch Solar API data with error handling
+        let solarData;
+        try {
+          solarData = await fetchSolarApiData(job.latitude!, job.longitude!);
+          console.log(`[GenerateRoofReport] Solar API response received:`, {
+            coverage: solarData.coverage,
+            hasImageryUrl: !!solarData.imageryUrl,
+            hasSolarPotential: !!solarData.solarPotential,
+          });
+        } catch (error) {
+          console.error(`[GenerateRoofReport] Error calling fetchSolarApiData:`, error);
+          throw new Error(`Failed to fetch roof data: ${error instanceof Error ? error.message : 'Unknown error'}`);
+        }
         
         // Debug: Verify imageryUrl is present
-        console.log(`[GenerateRoofReport] Solar API response includes imageryUrl: ${!!solarData.imageryUrl}`);
         if (!solarData.imageryUrl) {
           console.error(`[GenerateRoofReport] WARNING: No imageryUrl in response!`, solarData);
         }
