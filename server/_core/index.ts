@@ -247,19 +247,26 @@ if (process.env.NODE_ENV === "development") {
   })();
 } else {
   // Production mode (Render)
-  // IMPORTANT: Middleware order matters!
-  // 1. Serve static files (images, css, js) and SPA fallback
-  console.log('[Server] Setting up static file serving for production');
-  serveStatic(app, express);
-  
-  // 2. Register 404 handler (only for API routes that don't match)
-  console.log('[Server] Registering 404 and error handlers for production');
-  register404Handler();
-  
-  // 3. Register error handler (MUST be last)
-  registerErrorHandler();
-  
-  app.listen(port, () => {
-    console.log(`[Server] Production server running on port ${port}`);
-  });
+  (async () => {
+    try {
+      // IMPORTANT: Middleware order matters!
+      // 1. Serve static files (images, css, js) and SPA fallback
+      console.log('[Server] Setting up static file serving for production');
+      await serveStatic(app);
+      
+      // 2. Register 404 handler (only for API routes that don't match)
+      console.log('[Server] Registering 404 and error handlers for production');
+      register404Handler();
+      
+      // 3. Register error handler (MUST be last)
+      registerErrorHandler();
+      
+      app.listen(port, () => {
+        console.log(`[Server] Production server running on port ${port}`);
+      });
+    } catch (err) {
+      console.error("[Server] Failed to start production server:", err);
+      process.exit(1);
+    }
+  })();
 }
