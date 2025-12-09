@@ -11,7 +11,8 @@ import { trpc } from "@/lib/trpc";
 import { Search, Phone, Mail, MapPin, Clock, FileText, ChevronRight, Upload, File, Image, Trash2, Download, Plus, Filter, Shield, Eye, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 import CRMLayout from "@/components/crm/CRMLayout";
-import Autocomplete from "react-google-autocomplete";
+import { AddressAutocomplete } from "@/components/AddressAutocomplete";
+import { GoogleMapsLoader } from "@/components/GoogleMapsLoader";
 
 const STATUS_OPTIONS = [
   { value: "lead", label: "Lead", color: "bg-slate-500/20 text-slate-300 border-slate-400/30" },
@@ -197,6 +198,7 @@ export default function CRMLeads() {
   }
 
   return (
+    <GoogleMapsLoader>
     <CRMLayout>
       <div className="p-6 bg-slate-900 min-h-screen">
         {/* Page Header */}
@@ -484,75 +486,24 @@ export default function CRMLeads() {
                       Property Address * 
                       <span className="text-xs text-slate-500 ml-2">(Start typing to search)</span>
                     </label>
-                    <Autocomplete
-                      key={`address-${showNewJobDialog}`}
-                      apiKey={import.meta.env.VITE_GOOGLE_MAPS_KEY || "AIzaSyA7QSM-fqUn4grHM6OYddNgKzK7uMlBY1I"}
-                      onPlaceSelected={(place: any) => {
-                        console.log('[Autocomplete] Place selected:', place);
+                    <AddressAutocomplete
+                      onPlaceSelected={(data) => {
+                        console.log('[AddressAutocomplete] Data received:', data);
                         
-                        if (!place || !place.geometry) {
-                          console.error('[Autocomplete] Invalid place object:', place);
-                          toast.error("Please select a valid address from the dropdown");
-                          return;
-                        }
-
-                        // Extract address components
-                        const addressComponents = place.address_components || [];
-                        let streetNumber = "";
-                        let route = "";
-                        let city = "";
-                        let state = "";
-                        let zip = "";
-
-                        addressComponents.forEach((component: any) => {
-                          const types = component.types;
-                          if (types.includes("street_number")) {
-                            streetNumber = component.long_name;
-                          }
-                          if (types.includes("route")) {
-                            route = component.long_name;
-                          }
-                          if (types.includes("locality")) {
-                            city = component.long_name;
-                          }
-                          if (types.includes("administrative_area_level_1")) {
-                            state = component.short_name;
-                          }
-                          if (types.includes("postal_code")) {
-                            zip = component.long_name;
-                          }
-                        });
-
-                        const streetAddress = `${streetNumber} ${route}`.trim();
-                        const cityStateZip = `${city}, ${state} ${zip}`.trim();
-                        const lat = place.geometry.location.lat();
-                        const lng = place.geometry.location.lng();
-
-                        console.log('[Autocomplete] Extracted data:', { streetAddress, cityStateZip, lat, lng });
-
-                        // Update form state
+                        const cityStateZip = `${data.city}, ${data.state} ${data.zip}`.trim();
+                        
                         setNewJobForm({
                           ...newJobForm,
-                          address: streetAddress,
+                          address: data.address,
                           cityStateZip: cityStateZip,
-                          latitude: lat,
-                          longitude: lng,
+                          latitude: data.latitude,
+                          longitude: data.longitude,
                         });
 
-                        console.log('[Autocomplete] Form state updated successfully');
                         toast.success("Address auto-filled with coordinates!");
                       }}
-                      onChange={(e: any) => {
-                        // Track manual input changes
-                        console.log('[Autocomplete] Input changed:', e.target.value);
-                      }}
-                      options={{
-                        types: ["address"],
-                        componentRestrictions: { country: "us" },
-                      }}
-                      defaultValue=""
-                      className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-md text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#00d4aa] focus:border-transparent"
                       placeholder="Start typing address..."
+                      className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-md text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#00d4aa] focus:border-transparent"
                     />
                   </div>
                   <div className="space-y-2">
@@ -667,5 +618,6 @@ export default function CRMLeads() {
 
       </div>
     </CRMLayout>
+    </GoogleMapsLoader>
   );
 }
