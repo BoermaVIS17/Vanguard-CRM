@@ -3120,16 +3120,16 @@ export const appRouter = router({
           validUntil: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days from now
         };
 
-        // Generate PDF (placeholder - actual implementation requires pdfkit)
-        // const { generateProposalPDF } = await import('./lib/pdfGenerator');
-        // const pdfBuffer = await generateProposalPDF(proposalData);
+        // Generate PDF preview (without signature)
+        const { generateProposalPDF } = await import('./lib/pdfGenerator');
+        const pdfBuffer = await generateProposalPDF(proposalData);
 
-        // For now, return success with proposal data
-        // In production, you would return the PDF buffer or a download URL
+        // Return PDF as base64 for preview
         return { 
           success: true, 
-          message: 'PDF generation feature ready - install pdfkit package to enable',
-          proposalData 
+          message: 'PDF preview generated',
+          proposalData,
+          pdfPreview: pdfBuffer.toString('base64')
         };
       }),
 
@@ -3187,35 +3187,35 @@ export const appRouter = router({
           signatureDate: signatureDate,
         };
 
-        // Generate PDF with signature (placeholder - requires pdfkit)
-        // const { generateProposalPDF } = await import('./lib/pdfGenerator');
-        // const pdfBuffer = await generateProposalPDF(proposalData);
+        // Generate PDF with signature
+        const { generateProposalPDF } = await import('./lib/pdfGenerator');
+        const pdfBuffer = await generateProposalPDF(proposalData);
 
         // Save to Supabase storage
-        // const fileName = `proposal-signed-${input.jobId}-${Date.now()}.pdf`;
-        // const { data: uploadData, error: uploadError } = await supabase.storage
-        //   .from('documents')
-        //   .upload(fileName, pdfBuffer, {
-        //     contentType: 'application/pdf',
-        //     upsert: false,
-        //   });
+        const fileName = `proposal-signed-${input.jobId}-${Date.now()}.pdf`;
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from('documents')
+          .upload(fileName, pdfBuffer, {
+            contentType: 'application/pdf',
+            upsert: false,
+          });
 
-        // if (uploadError) throw uploadError;
+        if (uploadError) throw uploadError;
 
         // Get public URL
-        // const { data: { publicUrl } } = supabase.storage
-        //   .from('documents')
-        //   .getPublicUrl(fileName);
+        const { data: { publicUrl } } = supabase.storage
+          .from('documents')
+          .getPublicUrl(fileName);
 
         // Save document record to database
-        // await db.insert(documents).values({
-        //   reportRequestId: input.jobId,
-        //   fileName: fileName,
-        //   fileUrl: publicUrl,
-        //   fileType: 'application/pdf',
-        //   uploadedBy: user!.id,
-        //   uploadedAt: new Date(),
-        // });
+        await db.insert(documents).values({
+          reportRequestId: input.jobId,
+          fileName: fileName,
+          fileUrl: publicUrl,
+          fileType: 'application/pdf',
+          uploadedBy: user!.id,
+          uploadedAt: new Date(),
+        });
 
         // Log activity
         await logActivity(
@@ -3232,7 +3232,7 @@ export const appRouter = router({
         return { 
           success: true, 
           message: 'Signed proposal generated successfully',
-          // documentUrl: publicUrl,
+          documentUrl: publicUrl,
           signatureDate: signatureDate.toISOString(),
         };
       }),

@@ -48,6 +48,7 @@ export function ProposalCalculator({
   const [showSignaturePad, setShowSignaturePad] = useState(false);
   const [customerName, setCustomerName] = useState("");
   const [dealType, setDealType] = useState<"insurance" | "cash" | "financed">("cash");
+  const [pdfPreviewUrl, setPdfPreviewUrl] = useState<string>();
 
   const utils = trpc.useUtils();
 
@@ -73,9 +74,21 @@ export function ProposalCalculator({
 
   // Generate proposal PDF mutation (preview only)
   const generateProposal = trpc.crm.generateProposal.useMutation({
-    onSuccess: (data) => {
+    onSuccess: (data: any) => {
       toast.success("Opening signature pad...");
-      console.log("Proposal data:", data);
+      
+      // Convert base64 PDF to blob URL for preview
+      if (data.pdfPreview) {
+        const binaryString = atob(data.pdfPreview);
+        const bytes = new Uint8Array(binaryString.length);
+        for (let i = 0; i < binaryString.length; i++) {
+          bytes[i] = binaryString.charCodeAt(i);
+        }
+        const blob = new Blob([bytes], { type: 'application/pdf' });
+        const url = URL.createObjectURL(blob);
+        setPdfPreviewUrl(url);
+      }
+      
       // Open signature pad for customer to sign
       setShowSignaturePad(true);
     },
@@ -721,6 +734,7 @@ export function ProposalCalculator({
         onSignatureComplete={handleSignatureComplete}
         customerName={customerName || "Customer"}
         documentType={dealType}
+        pdfPreviewUrl={pdfPreviewUrl}
       />
     </>
   );
