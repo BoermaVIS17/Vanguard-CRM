@@ -488,8 +488,10 @@ export default function CRMLeads() {
                       key={`address-${showNewJobDialog}`}
                       apiKey={import.meta.env.VITE_GOOGLE_MAPS_KEY || "AIzaSyA7QSM-fqUn4grHM6OYddNgKzK7uMlBY1I"}
                       onPlaceSelected={(place: any) => {
-                        console.log('Place selected:', place);
-                        if (!place.geometry) {
+                        console.log('[Autocomplete] Place selected:', place);
+                        
+                        if (!place || !place.geometry) {
+                          console.error('[Autocomplete] Invalid place object:', place);
                           toast.error("Please select a valid address from the dropdown");
                           return;
                         }
@@ -526,8 +528,9 @@ export default function CRMLeads() {
                         const lat = place.geometry.location.lat();
                         const lng = place.geometry.location.lng();
 
-                        console.log('Extracted data:', { streetAddress, cityStateZip, lat, lng });
+                        console.log('[Autocomplete] Extracted data:', { streetAddress, cityStateZip, lat, lng });
 
+                        // Update form state
                         setNewJobForm({
                           ...newJobForm,
                           address: streetAddress,
@@ -536,7 +539,12 @@ export default function CRMLeads() {
                           longitude: lng,
                         });
 
+                        console.log('[Autocomplete] Form state updated successfully');
                         toast.success("Address auto-filled with coordinates!");
+                      }}
+                      onChange={(e: any) => {
+                        // Track manual input changes
+                        console.log('[Autocomplete] Input changed:', e.target.value);
                       }}
                       options={{
                         types: ["address"],
