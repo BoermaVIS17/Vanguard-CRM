@@ -2223,7 +2223,7 @@ export const appRouter = router({
           role: users.role,
         })
         .from(users)
-        .where(isNotNull(users.name))
+        .where(eq(users.isActive, true)) // Only show active users
         .orderBy(users.name);
 
         return allUsers;
