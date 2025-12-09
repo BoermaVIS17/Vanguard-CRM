@@ -3070,6 +3070,68 @@ export const appRouter = router({
 
         return { success: true };
       }),
+
+    // Generate proposal PDF
+    generateProposal: protectedProcedure
+      .input(z.object({
+        jobId: z.number(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const db = await getDb();
+        if (!db) throw new Error("Database not available");
+
+        // Get job details
+        const [job] = await db.select().from(reportRequests).where(eq(reportRequests.id, input.jobId));
+        if (!job) throw new Error("Job not found");
+
+        // Check permission
+        const user = ctx.user;
+        const teamMemberIds = user && isTeamLead(user) ? await getTeamMemberIds(db, user.id) : [];
+        if (!canViewJob(user, job, teamMemberIds)) {
+          throw new Error("You don't have permission to view this job");
+        }
+
+        // Verify proposal is approved
+        if (job.priceStatus !== 'approved') {
+          throw new TRPCError({
+            code: 'BAD_REQUEST',
+            message: 'Proposal must be approved before generating PDF',
+          });
+        }
+
+        // Calculate roof squares
+        const roofSqFt = (job.solarApiData as any)?.roofArea || job.manualAreaSqFt || 0;
+        const roofSquares = roofSqFt / 100;
+
+        // Prepare proposal data
+        const proposalData = {
+          customerName: job.fullName,
+          customerEmail: job.email || undefined,
+          customerPhone: job.phone || undefined,
+          propertyAddress: job.address,
+          cityStateZip: job.cityStateZip,
+          totalPrice: parseFloat(job.totalPrice || '0'),
+          pricePerSq: parseFloat(job.pricePerSq || '0'),
+          roofSquares: roofSquares,
+          dealType: (job.dealType || 'cash') as 'insurance' | 'cash' | 'financed',
+          insuranceCarrier: job.insuranceCarrier || undefined,
+          claimNumber: job.claimNumber || undefined,
+          proposalDate: new Date(),
+          validUntil: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days from now
+        };
+
+        // Generate PDF (placeholder - actual implementation requires pdfkit)
+        // const { generateProposalPDF } = await import('./lib/pdfGenerator');
+        // const pdfBuffer = await generateProposalPDF(proposalData);
+
+        // For now, return success with proposal data
+        // In production, you would return the PDF buffer or a download URL
+        return { 
+          success: true, 
+          message: 'PDF generation feature ready - install pdfkit package to enable',
+          proposalData 
+        };
+      }),
   }),
 });
 

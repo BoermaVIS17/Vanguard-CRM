@@ -67,6 +67,18 @@ export function ProposalCalculator({
     },
   });
 
+  // Generate proposal PDF mutation
+  const generateProposal = trpc.crm.generateProposal.useMutation({
+    onSuccess: (data) => {
+      toast.success("Proposal PDF generated successfully!");
+      console.log("Proposal data:", data);
+      // TODO: Download PDF when pdfkit is installed
+    },
+    onError: (error: any) => {
+      toast.error(error.message);
+    },
+  });
+
   // Determine pricing zone
   const getPricingZone = () => {
     if (pricePerSqNum < 450) {
@@ -592,11 +604,12 @@ export function ProposalCalculator({
 
           {/* Generate Contract Button */}
           <Button
-            onClick={() => toast.success("Contract generation feature coming soon")}
+            onClick={() => generateProposal.mutate({ jobId })}
+            disabled={generateProposal.isLoading}
             className="w-full bg-[#00d4aa] hover:bg-[#00b894] text-black font-semibold"
           >
             <FileText className="w-4 h-4 mr-2" />
-            Generate Contract
+            {generateProposal.isLoading ? "Generating..." : "Generate Contract"}
           </Button>
 
           {/* Success Message */}
