@@ -22,7 +22,6 @@ import JobDetail from "./pages/crm/JobDetail";
 
 // Settings pages
 import ProfileSettings from "./pages/settings/ProfileSettings";
-import CompanySettings from "./pages/settings/CompanySettings";
 import GeneralSettings from "./pages/settings/GeneralSettings";
 
 // Public pages
@@ -99,11 +98,6 @@ function Router() {
       <Route path={"/settings/profile"}>
         <ProtectedRoute>
           <ProfileSettings />
-        </ProtectedRoute>
-      </Route>
-      <Route path={"/settings/company"}>
-        <ProtectedRoute>
-          <CompanySettings />
         </ProtectedRoute>
       </Route>
       <Route path={"/settings"}>
