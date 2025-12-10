@@ -210,9 +210,6 @@ export interface Job {
   counterPrice?: string | null; // numeric stored as string
   priceStatus?: PriceStatus | null;
   
-  // Manual measurements (if solar API fails)
-  manualAreaSqFt?: number | null;
-  
   // Timestamps
   createdAt: Date | string;
   updatedAt: Date | string;
@@ -232,21 +229,11 @@ export function hasSolarData(job: Job): job is Job & { solarApiData: SolarApiDat
 }
 
 /**
- * Type guard to check if job has manual area measurement
- */
-export function hasManualArea(job: Job): job is Job & { manualAreaSqFt: number } {
-  return job.manualAreaSqFt !== null && job.manualAreaSqFt !== undefined && job.manualAreaSqFt > 0;
-}
-
-/**
- * Get roof area in square feet, preferring solar data over manual entry
+ * Get roof area in square feet from solar data
  */
 export function getRoofAreaSqFt(job: Job): number | null {
   if (hasSolarData(job)) {
     return job.solarApiData.totalArea;
-  }
-  if (hasManualArea(job)) {
-    return job.manualAreaSqFt;
   }
   return null;
 }
@@ -254,8 +241,7 @@ export function getRoofAreaSqFt(job: Job): number | null {
 /**
  * Get the source of the roof area measurement
  */
-export function getRoofAreaSource(job: Job): 'solar' | 'manual' | 'none' {
+export function getRoofAreaSource(job: Job): 'solar' | 'none' {
   if (hasSolarData(job)) return 'solar';
-  if (hasManualArea(job)) return 'manual';
   return 'none';
 }

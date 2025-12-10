@@ -512,7 +512,7 @@ export default function JobDetail() {
     { id: jobId },
     { enabled: jobId > 0 }
   );
-  const { data: permissions } = trpc.crm.getMyPermissions.useQuery();
+  const { data: permissions } = trpc.users.getMyPermissions.useQuery();
 
   // Real-time updates - auto-refresh when other users make changes
   const { broadcast } = useRealtimeJob({
@@ -531,8 +531,8 @@ export default function JobDetail() {
     { jobId, query: searchQuery, type: "all" },
     { enabled: searchQuery.length > 2 }
   );
-  const { data: team } = trpc.crm.getTeam.useQuery();
-  const { data: teamLeads } = trpc.crm.getTeamLeads.useQuery();
+  const { data: team } = trpc.users.getTeam.useQuery();
+  const { data: teamLeads } = trpc.users.getTeamLeads.useQuery();
   const { data: editHistoryData } = trpc.crm.getEditHistory.useQuery(
     { jobId, limit: 100 },
     { enabled: jobId > 0 && permissions?.canViewEditHistory }
@@ -618,9 +618,9 @@ export default function JobDetail() {
     onError: (error) => toast.error(error.message),
   });
 
-  const markMessagesAsRead = trpc.crm.markMessagesAsRead.useMutation();
+  const markMessagesAsRead = trpc.activities.markMessagesAsRead.useMutation();
 
-  const uploadDocument = trpc.crm.uploadDocument.useMutation({
+  const uploadDocument = trpc.documents.uploadDocument.useMutation({
     onSuccess: () => {
       toast.success("Document uploaded");
       setIsUploading(false);
@@ -644,7 +644,7 @@ export default function JobDetail() {
     },
   });
 
-  const deleteDocument = trpc.crm.deleteDocument.useMutation({
+  const deleteDocument = trpc.documents.deleteDocument.useMutation({
     onSuccess: () => {
       toast.success("Document deleted");
       refetch();
@@ -2071,7 +2071,7 @@ export default function JobDetail() {
               <ProposalCalculator
                 jobId={jobId}
                 roofArea={job.solarApiData?.totalArea}
-                manualAreaSqFt={job.manualAreaSqFt}
+                manualAreaSqFt={undefined}
                 solarCoverage={job.solarApiData?.solarCoverage || false}
                 currentPricePerSq={job.pricePerSq}
                 currentTotalPrice={job.totalPrice}
