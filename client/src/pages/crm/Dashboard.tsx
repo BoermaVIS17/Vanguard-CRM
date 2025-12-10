@@ -246,7 +246,7 @@ export default function CRMDashboard() {
     { staleTime: 2 * 60 * 1000 } // Lien rights data can be stale for 2 minutes
   );
   const { data: categoryLeads } = trpc.crm.getLeadsByCategory.useQuery(
-    { category: activeTab as any },
+    { category: activeTab as "prospect" | "completed" | "invoiced" | "closed_deal" },
     { enabled: activeTab !== "all" }
   );
 

@@ -92,7 +92,7 @@ export default function CRMTeam() {
     
     updateMember.mutate({
       userId: editingMember.id,
-      role: selectedRole as any,
+      role: selectedRole as "user" | "admin" | "owner" | "office" | "sales_rep" | "project_manager" | "team_lead" | "field_crew",
       teamLeadId: selectedTeamLead === "none" ? null : selectedTeamLead ? parseInt(selectedTeamLead) : undefined,
     });
     setEditingMember(null);
@@ -123,7 +123,7 @@ export default function CRMTeam() {
         name: editName !== editingMember.name ? editName : undefined,
         email: editEmail !== editingMember.email ? editEmail : undefined,
         phone: editPhone !== editingMember.phone ? editPhone : undefined,
-        role: selectedRole !== editingMember.role ? selectedRole as any : undefined,
+        role: selectedRole !== editingMember.role ? selectedRole as "user" | "admin" | "owner" | "office" | "sales_rep" | "project_manager" | "team_lead" | "field_crew" : undefined,
         repCode: editRepCode !== editingMember.repCode ? editRepCode : undefined,
         teamLeadId: selectedTeamLead === "none" 
           ? (editingMember.teamLeadId ? null : undefined) 

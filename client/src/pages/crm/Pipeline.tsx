@@ -118,12 +118,12 @@ export default function CRMPipeline() {
   };
 
   // Get leads for a stage, optionally filtered by deal type
-  const getLeadsForStage = (stageKey: string) => {
+  const getLeadsForStage = (stageKey: string): any[] => {
     const leads = pipeline?.[stageKey as keyof typeof pipeline] || [];
     if (stageKey === "approved" && selectedDealType) {
-      return (leads as any[]).filter((lead: any) => lead.dealType === selectedDealType);
+      return Array.isArray(leads) ? leads.filter((lead) => lead.dealType === selectedDealType) : [];
     }
-    return leads as any[];
+    return Array.isArray(leads) ? leads : [];
   };
 
   // Get lien rights urgency indicator

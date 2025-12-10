@@ -6,6 +6,7 @@ import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 import CRMLayout from "@/components/crm/CRMLayout";
 import { useRealtimeJob } from "@/hooks/useRealtimeJob";
+import type { Job } from "@/types/job";
 
 // Tab Components
 import { JobOverviewTab } from "@/components/crm/job-detail/JobOverviewTab";
@@ -275,10 +276,10 @@ export default function JobDetail() {
         <div className="p-6">
           {activeTab === "overview" && (
             <JobOverviewTab
-              job={job as any}
+              job={job as Job} // Backend returns job with activities/documents arrays
               jobId={jobId}
               canEdit={canEdit}
-              onCustomerSave={(data) => updateCustomerInfo.mutate({ id: jobId, ...data } as any)}
+              onCustomerSave={(data) => updateCustomerInfo.mutate({ id: jobId, ...data })}
               onStatusChange={(newStatus) => updateLead.mutate({ id: jobId, status: newStatus })}
               isSaving={updateCustomerInfo.isPending}
             />
@@ -286,7 +287,7 @@ export default function JobDetail() {
 
           {activeTab === "production_report" && (
             <JobProductionTab
-              job={job as any}
+              job={job as Job} // Backend returns job with activities/documents arrays
               jobId={jobId}
               onGenerateReport={() => generateReport.mutate({ jobId })}
               isGenerating={generateReport.isPending}
@@ -340,7 +341,7 @@ export default function JobDetail() {
           {activeTab === "proposal" && (
             <JobProposalTab
               jobId={jobId}
-              job={job as any}
+              job={job as Job} // Backend returns job with activities/documents arrays
               userRole={permissions?.role || "user"}
               onUpdate={() => refetch()}
             />
