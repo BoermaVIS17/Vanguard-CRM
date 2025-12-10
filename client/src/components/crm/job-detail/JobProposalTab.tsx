@@ -2,8 +2,8 @@ import { useState, useEffect } from "react";
 import { ProposalCalculator } from "../ProposalCalculator";
 import { ProductSelector } from "../proposal/ProductSelector";
 import { ProposalPDF } from "../proposal/ProposalPDF";
-import { PDFDownloadLink } from "@react-pdf/renderer";
-import { FileDown, Sparkles } from "lucide-react";
+import { PDFDownloadLink, pdf } from "@react-pdf/renderer";
+import { FileDown, Sparkles, Save } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
@@ -19,6 +19,7 @@ interface JobProposalTabProps {
 export function JobProposalTab({ jobId, job, userRole, onUpdate }: JobProposalTabProps) {
   const [selectedShingleId, setSelectedShingleId] = useState<number | null>(null);
   const [proposalData, setProposalData] = useState<any>(null);
+  const [isSaving, setIsSaving] = useState(false);
   
   // Initialize from job data
   useEffect(() => {
@@ -37,6 +38,22 @@ export function JobProposalTab({ jobId, job, userRole, onUpdate }: JobProposalTa
       toast.error(`Failed to save product: ${error.message}`);
     }
   });
+  
+  // Mutation to upload document
+  const uploadDocument = trpc.documents.uploadDocument.useMutation({
+    onSuccess: () => {
+      toast.success("Proposal saved to Documents!");
+      setIsSaving(false);
+      // Invalidate documents query to refresh the list
+      trpcUtils.documents.getDocuments.invalidate({ leadId: jobId });
+    },
+    onError: (error) => {
+      toast.error(`Failed to save proposal: ${error.message}`);
+      setIsSaving(false);
+    }
+  });
+  
+  const trpcUtils = trpc.useUtils();
   
   // Query to generate proposal content
   const { data: proposalQueryData, refetch: generateProposal, isFetching: isGenerating, error: proposalError } = trpc.ai.generateProposalContent.useQuery(
@@ -71,6 +88,45 @@ export function JobProposalTab({ jobId, job, userRole, onUpdate }: JobProposalTa
   
   const handleGenerateProposal = () => {
     generateProposal();
+  };
+  
+  const handleSaveProposal = async () => {
+    if (!proposalData) return;
+    
+    setIsSaving(true);
+    
+    try {
+      // Generate PDF blob
+      const pdfDoc = <ProposalPDF
+        job={proposalData.job}
+        company={proposalData.company}
+        product={proposalData.product}
+        aiContent={proposalData.aiContent}
+      />;
+      
+      const blob = await pdf(pdfDoc).toBlob();
+      
+      // Convert blob to base64
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64 = (reader.result as string).split(',')[1];
+        const fileName = `Proposal - ${job.fullName} - ${new Date().toLocaleDateString()}.pdf`;
+        
+        // Upload to documents
+        uploadDocument.mutate({
+          leadId: jobId,
+          fileName,
+          fileData: base64,
+          fileType: 'application/pdf',
+          category: 'proposal',
+        });
+      };
+      reader.readAsDataURL(blob);
+    } catch (error) {
+      console.error('Failed to generate PDF blob:', error);
+      toast.error('Failed to save proposal');
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -107,36 +163,57 @@ export function JobProposalTab({ jobId, job, userRole, onUpdate }: JobProposalTa
               )}
             </Button>
           ) : (
-            <PDFDownloadLink
-              document={
-                <ProposalPDF
-                  job={proposalData.job}
-                  company={proposalData.company}
-                  product={proposalData.product}
-                  aiContent={proposalData.aiContent}
-                />
-              }
-              fileName={`proposal-${job.fullName.replace(/\s+/g, '-')}-${new Date().toISOString().split('T')[0]}.pdf`}
-            >
-              {({ loading }) => (
-                <Button
-                  disabled={loading}
-                  className="bg-[#00d4aa] hover:bg-[#00b894] text-slate-900 font-medium"
-                >
-                  {loading ? (
-                    <>
-                      <FileDown className="w-4 h-4 mr-2 animate-bounce" />
-                      Preparing PDF...
-                    </>
-                  ) : (
-                    <>
-                      <FileDown className="w-4 h-4 mr-2" />
-                      Download Proposal PDF
-                    </>
-                  )}
-                </Button>
-              )}
-            </PDFDownloadLink>
+            <>
+              <Button
+                onClick={handleSaveProposal}
+                disabled={isSaving}
+                className="bg-[#00d4aa] hover:bg-[#00b894] text-slate-900 font-medium"
+              >
+                {isSaving ? (
+                  <>
+                    <Save className="w-4 h-4 mr-2 animate-pulse" />
+                    Saving to Documents...
+                  </>
+                ) : (
+                  <>
+                    <Save className="w-4 h-4 mr-2" />
+                    Save to Documents
+                  </>
+                )}
+              </Button>
+              
+              <PDFDownloadLink
+                document={
+                  <ProposalPDF
+                    job={proposalData.job}
+                    company={proposalData.company}
+                    product={proposalData.product}
+                    aiContent={proposalData.aiContent}
+                  />
+                }
+                fileName={`proposal-${job.fullName.replace(/\s+/g, '-')}-${new Date().toISOString().split('T')[0]}.pdf`}
+              >
+                {({ loading }) => (
+                  <Button
+                    variant="outline"
+                    disabled={loading}
+                    className="bg-slate-700 border-slate-600 text-white hover:bg-slate-600"
+                  >
+                    {loading ? (
+                      <>
+                        <FileDown className="w-4 h-4 mr-2 animate-bounce" />
+                        Preparing...
+                      </>
+                    ) : (
+                      <>
+                        <FileDown className="w-4 h-4 mr-2" />
+                        Download PDF
+                      </>
+                    )}
+                  </Button>
+                )}
+              </PDFDownloadLink>
+            </>
           )}
           
           {proposalData && (

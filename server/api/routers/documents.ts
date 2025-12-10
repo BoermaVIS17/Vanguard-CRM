@@ -49,7 +49,7 @@ export const documentsRouter = router({
       fileName: z.string(),
       fileData: z.string(), // Base64 encoded file data
       fileType: z.string(),
-      category: z.enum(["drone_photo", "inspection_photo", "report", "contract", "invoice", "other"]),
+      category: z.enum(["drone_photo", "inspection_photo", "report", "contract", "invoice", "proposal", "other"]),
     }))
     .mutation(async ({ input, ctx }) => {
       const db = await getDb();
