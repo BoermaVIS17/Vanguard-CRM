@@ -39,19 +39,26 @@ export function JobProposalTab({ jobId, job, userRole, onUpdate }: JobProposalTa
   });
   
   // Query to generate proposal content
-  const { refetch: generateProposal, isFetching: isGenerating } = trpc.ai.generateProposalContent.useQuery(
+  const { data: proposalQueryData, refetch: generateProposal, isFetching: isGenerating, error: proposalError } = trpc.ai.generateProposalContent.useQuery(
     { jobId },
     {
       enabled: false, // Don't run automatically
-      onSuccess: (data) => {
-        setProposalData(data);
-        toast.success("Proposal content generated!");
-      },
-      onError: (error) => {
-        toast.error(`Failed to generate proposal: ${error.message}`);
-      }
     }
   );
+  
+  // Handle proposal generation success/error
+  useEffect(() => {
+    if (proposalQueryData && !isGenerating) {
+      setProposalData(proposalQueryData);
+      toast.success("Proposal content generated!");
+    }
+  }, [proposalQueryData, isGenerating]);
+  
+  useEffect(() => {
+    if (proposalError) {
+      toast.error(`Failed to generate proposal: ${proposalError.message}`);
+    }
+  }, [proposalError]);
   
   const handleProductChange = (productId: number) => {
     setSelectedShingleId(productId);
