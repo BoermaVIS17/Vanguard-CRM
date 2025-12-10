@@ -57,6 +57,7 @@ import { ProposalCalculator } from "@/components/crm/ProposalCalculator";
 import { GoogleMapsLoader } from "@/components/GoogleMapsLoader";
 import { JobProposalTab } from "@/components/crm/job-detail/JobProposalTab";
 import { JobProductionTab } from "@/components/crm/job-detail/JobProductionTab";
+import { JobDocumentsTab } from "@/components/crm/job-detail/JobDocumentsTab";
 
 // Helper function to format mentions in messages
 const formatMentions = (text: string) => {
@@ -1467,103 +1468,15 @@ export default function JobDetail() {
 
           {/* Documents Tab */}
           {activeTab === "documents" && (
-            <div>
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-lg font-semibold text-white">Documents ({filteredDocuments.length})</h2>
-                {canEdit && (
-                  <div>
-                    <input
-                      type="file"
-                      ref={fileInputRef}
-                      onChange={(e) => handleFileUpload(e, "document")}
-                      className="hidden"
-                      accept=".pdf,.doc,.docx,.xls,.xlsx,.txt"
-                    />
-                    <Button 
-                      onClick={() => fileInputRef.current?.click()}
-                      disabled={isUploading}
-                      className="bg-[#00d4aa] hover:bg-[#00b894] text-black"
-                    >
-                      <Upload className="w-4 h-4 mr-2" />
-                      {isUploading ? "Uploading..." : "Upload Document"}
-                    </Button>
-                  </div>
-                )}
-              </div>
-              
-              {filteredDocuments.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {filteredDocuments.map((doc) => (
-                    <Card 
-                      key={doc.id} 
-                      className="bg-slate-800 border-slate-700 hover:border-[#00d4aa] transition-colors cursor-pointer group"
-                      onClick={() => setPreviewDocument({ url: doc.fileUrl, name: doc.fileName, type: doc.fileType || '' })}
-                    >
-                      <CardContent className="pt-4">
-                        <div className="flex items-start gap-3">
-                          <div className="w-10 h-10 rounded-lg bg-blue-500/20 flex items-center justify-center flex-shrink-0 group-hover:bg-[#00d4aa]/20 transition-colors">
-                            <FileText className="w-5 h-5 text-blue-400 group-hover:text-[#00d4aa] transition-colors" />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <p className="font-medium text-white truncate group-hover:text-[#00d4aa] transition-colors">{doc.fileName}</p>
-                            <p className="text-sm text-slate-400">
-                              {doc.fileSize ? `${(doc.fileSize / 1024).toFixed(1)} KB` : "Unknown size"}
-                            </p>
-                            <p className="text-xs text-slate-500 mt-1">
-                              {new Date(doc.createdAt).toLocaleDateString()}
-                            </p>
-                            <p className="text-xs text-[#00d4aa] mt-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                              Click to view
-                            </p>
-                          </div>
-                          <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
-                            <Button 
-                              variant="ghost" 
-                              size="sm" 
-                              className="text-slate-400 hover:text-white hover:bg-slate-700"
-                              onClick={() => setPreviewDocument({ url: doc.fileUrl, name: doc.fileName, type: doc.fileType || '' })}
-                            >
-                              <Eye className="w-4 h-4" />
-                            </Button>
-                            <a href={doc.fileUrl} target="_blank" rel="noopener noreferrer">
-                              <Button variant="ghost" size="sm" className="text-slate-400 hover:text-white hover:bg-slate-700">
-                                <Download className="w-4 h-4" />
-                              </Button>
-                            </a>
-                            {canDelete && (
-                              <Button 
-                                variant="ghost" 
-                                size="sm" 
-                                className="text-red-400 hover:text-red-300 hover:bg-red-900/20"
-                                onClick={() => deleteDocument.mutate({ documentId: doc.id })}
-                              >
-                                <Trash2 className="w-4 h-4" />
-                              </Button>
-                            )}
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-              ) : (
-                <Card className="bg-slate-800 border-slate-700">
-                  <CardContent className="py-12 text-center">
-                    <FileText className="w-12 h-12 mx-auto mb-3 text-slate-500" />
-                    <p className="text-slate-400">No documents uploaded yet</p>
-                    {canEdit && (
-                      <Button 
-                        variant="link" 
-                        className="mt-2 text-[#00d4aa]"
-                        onClick={() => fileInputRef.current?.click()}
-                      >
-                        Upload your first document
-                      </Button>
-                    )}
-                  </CardContent>
-                </Card>
-              )}
-            </div>
+            <JobDocumentsTab
+              documents={filteredDocuments}
+              canEdit={canEdit}
+              canDelete={canDelete}
+              isUploading={isUploading}
+              onFileUpload={(e) => handleFileUpload(e, "document")}
+              onDeleteDocument={(documentId) => deleteDocument.mutate({ documentId })}
+              onPreviewDocument={setPreviewDocument}
+            />
           )}
 
           {/* Photos Tab - Gallery View */}
