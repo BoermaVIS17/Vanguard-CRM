@@ -1,8 +1,17 @@
+/**
+ * @deprecated This service is deprecated and should not be used.
+ * Solar API calls must be made from the backend using GEMINI_API_KEY.
+ * Use trpc.crm.getSolarBuildingData() instead for Solar API access.
+ * 
+ * SECURITY: VITE_GOOGLE_MAPS_KEY is restricted to Maps JS, Places, and Static Maps only.
+ * It cannot access Solar API or Geocoding API.
+ */
+
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
-// Get Google Maps API key from environment variable (with fallback)
-const GOOGLE_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_KEY || "AIzaSyA7QSM-fqUn4grHM6OYddNgKzK7uMlBY1I";
+// DEPRECATED: This key is restricted and cannot access Solar API
+const GOOGLE_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_KEY || "";
 
 // Company branding colors
 const BRAND_BLUE = '#1e40af'; // Deep blue

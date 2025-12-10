@@ -78,10 +78,14 @@ export async function fetchSolarApiData(
   longitude: number;
   [key: string]: any;
 }> {
-  const apiKey = process.env.GOOGLE_MAPS_API_KEY || "AIzaSyD9aUoEaPhMZGbEwU8KPajIu3zxPHI3uQE";
+  // 1. Private Key for SERVER-SIDE Solar API data fetching
+  const privateKey = process.env.GEMINI_API_KEY;
   
-  if (!apiKey) {
-    console.warn("[SolarAPI] Missing GOOGLE_MAPS_API_KEY - returning fallback");
+  // 2. Public Key for CLIENT-SIDE Static Maps image display
+  const publicKey = process.env.VITE_GOOGLE_MAPS_KEY;
+  
+  if (!privateKey) {
+    console.warn("[SolarAPI] Missing GEMINI_API_KEY - returning fallback");
     // Still provide a basic satellite image without API key (will show watermark)
     return {
       solarCoverage: false,
@@ -95,8 +99,8 @@ export async function fetchSolarApiData(
   console.log(`[SolarAPI] Fetching data for coordinates: ${latitude}, ${longitude}`);
 
   try {
-    // Call Google Solar API
-    const solarUrl = `https://solar.googleapis.com/v1/buildingInsights:findClosest?location.latitude=${latitude}&location.longitude=${longitude}&key=${apiKey}`;
+    // Call Google Solar API using private key
+    const solarUrl = `https://solar.googleapis.com/v1/buildingInsights:findClosest?location.latitude=${latitude}&location.longitude=${longitude}&key=${privateKey}`;
     
     const solarRes = await fetch(solarUrl);
     
@@ -107,7 +111,7 @@ export async function fetchSolarApiData(
           solarCoverage: false, 
           latitude,
           longitude,
-          imageryUrl: `https://maps.googleapis.com/maps/api/staticmap?center=${latitude},${longitude}&zoom=19&size=600x600&maptype=satellite&key=${apiKey}`,
+          imageryUrl: `https://maps.googleapis.com/maps/api/staticmap?center=${latitude},${longitude}&zoom=19&size=600x600&maptype=satellite&key=${publicKey}`,
           message: "No solar data available for this location - use manual measurements"
         };
       }
@@ -126,8 +130,8 @@ export async function fetchSolarApiData(
     const imgLat = buildingInsights.center?.latitude || latitude;
     const imgLng = buildingInsights.center?.longitude || longitude;
     
-    // Use Static Maps API for satellite imagery
-    const imageryUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${imgLat},${imgLng}&zoom=20&size=800x800&maptype=satellite&key=${apiKey}`;
+    // Use Static Maps API for satellite imagery with PUBLIC key (for client-side display)
+    const imageryUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${imgLat},${imgLng}&zoom=20&size=800x800&maptype=satellite&key=${publicKey}`;
     
     // Calculate roof area if available (in square meters)
     const roofAreaSqMeters = buildingInsights.solarPotential?.wholeRoofStats?.areaMeters2;
@@ -146,7 +150,7 @@ export async function fetchSolarApiData(
       solarCoverage: false,
       latitude,
       longitude,
-      imageryUrl: `https://maps.googleapis.com/maps/api/staticmap?center=${latitude},${longitude}&zoom=19&size=600x600&maptype=satellite&key=${apiKey}`,
+      imageryUrl: `https://maps.googleapis.com/maps/api/staticmap?center=${latitude},${longitude}&zoom=19&size=600x600&maptype=satellite&key=${publicKey}`,
       error: error instanceof Error ? error.message : "Unknown error",
     };
   }
@@ -154,10 +158,11 @@ export async function fetchSolarApiData(
 
 // 4. Main Function to Fetch Data by Address (alternative method)
 export async function getSolarData(address: string) {
-  const apiKey = process.env.GOOGLE_MAPS_API_KEY || "AIzaSyD9aUoEaPhMZGbEwU8KPajIu3zxPHI3uQE";
+  // Use GEMINI_API_KEY for Solar API and Geocoding (unrestricted key)
+  const apiKey = process.env.GEMINI_API_KEY;
   
   if (!apiKey) {
-    throw new Error("Missing GOOGLE_MAPS_API_KEY");
+    throw new Error("Missing GEMINI_API_KEY");
   }
 
   // A. Geocode the address to get Lat/Lng

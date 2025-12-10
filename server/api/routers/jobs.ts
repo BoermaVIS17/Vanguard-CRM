@@ -1734,4 +1734,51 @@ export const jobsRouter = router({
         return allUsers;
       }),
 
+    // ============ SOLAR API ============
+
+    // Get solar building data (moved from frontend for API key security)
+    getSolarBuildingData: protectedProcedure
+      .input(z.object({
+        lat: z.number(),
+        lng: z.number(),
+      }))
+      .query(async ({ input }) => {
+        const apiKey = process.env.GEMINI_API_KEY;
+        
+        if (!apiKey) {
+          throw new Error("GEMINI_API_KEY not configured");
+        }
+
+        try {
+          // Call Google Solar API
+          const solarUrl = `https://solar.googleapis.com/v1/buildingInsights:findClosest?location.latitude=${input.lat}&location.longitude=${input.lng}&key=${apiKey}`;
+          
+          const response = await fetch(solarUrl);
+          
+          if (!response.ok) {
+            if (response.status === 404) {
+              return {
+                success: false,
+                error: "No solar data available for this location",
+                status: 404
+              };
+            }
+            
+            const errorText = await response.text();
+            console.error(`[Solar API] Error (${response.status}):`, errorText);
+            throw new Error(`Solar API Error: ${response.status}`);
+          }
+
+          const data = await response.json();
+          
+          return {
+            success: true,
+            data
+          };
+        } catch (error) {
+          console.error("[Solar API] Error:", error);
+          throw new Error(error instanceof Error ? error.message : "Failed to fetch solar data");
+        }
+      }),
+
 });
