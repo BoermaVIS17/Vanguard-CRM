@@ -20,6 +20,7 @@ export { solarRouter } from "./solar";
 export { reportRouter } from "./report";
 export { proposalsRouter } from "./proposals";
 export { materialsRouter } from "./materials";
+export { usersRouter } from "./users";
 
 // Re-export the main router from the legacy file for now
 export { appRouter, type AppRouter } from "../../routers";
