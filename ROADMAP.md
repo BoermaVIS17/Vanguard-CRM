@@ -313,3 +313,17 @@
 - [x] Fix useSupabaseAuth.ts - null check for supabase
 - [x] Fix JobDetail.tsx - solarApiData type assertions
 - [x] Verify all TypeScript errors resolved - BUILD PASSES
+
+## 🚧 Next Priorities (Post-Refactor)
+
+### 1. Feature: Persist Manual Roof Override
+- [ ] Create DB migration: Add `manual_area_sqft` (int) to `report_requests`.
+- [ ] Update Backend: `jobs.updateJob` should accept manual area.
+- [ ] Update Frontend: `ProposalCalculator` should save on blur/change.
+
+### 2. Tech Debt: Type Safety
+- [ ] Audit: Search for remaining `as any` casts in `/client`.
+- [ ] Fix: Replace with shared `Job` or `SolarApiData` types.
+
+### 3. Refinement: Solar Data Validation
+- [ ] Add Zod schema for `solar_api_data` JSONB field in `server/api/routers/solar.ts`.
