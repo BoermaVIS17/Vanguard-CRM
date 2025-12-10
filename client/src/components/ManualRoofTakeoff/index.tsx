@@ -132,6 +132,12 @@ export function ManualRoofTakeoff({ latitude, longitude, onSave, forceShow = fal
     };
 
     const handleRightClick = (e: MouseEvent) => {
+      // Don't interfere with button clicks
+      const target = e.target as HTMLElement;
+      if (target.closest('button')) {
+        return;
+      }
+      
       if (isDrawing && mapContainerRef.current?.contains(e.target as Node)) {
         e.preventDefault();
         handleCancelDrawing();
