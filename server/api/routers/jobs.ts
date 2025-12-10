@@ -321,6 +321,7 @@ export const jobsRouter = router({
 
         const newJobId = result.id;
         const [newJob] = await db.select().from(reportRequests).where(eq(reportRequests.id, newJobId));
+        if (!newJob) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Failed to retrieve created job' });
 
         // Create dedicated folder in Supabase Storage for this job
         try {
@@ -692,6 +693,8 @@ export const jobsRouter = router({
 
         // Return updated job data
         const [updatedJob] = await db.select().from(reportRequests).where(eq(reportRequests.id, input.jobId));
+        if (!updatedJob) throw new TRPCError({ code: 'NOT_FOUND', message: 'Job not found after update' });
+        
         return {
           success: true,
           coverage: solarData.coverage,
@@ -1329,7 +1332,7 @@ export const jobsRouter = router({
         let assignedUser = null;
         if (job.assignedTo) {
           const [assignedUserData] = await db.select().from(users).where(eq(users.id, job.assignedTo));
-          assignedUser = assignedUserData;
+          assignedUser = assignedUserData || null; // Handle case where user might not exist
         }
 
         // Get all activities (timeline)
