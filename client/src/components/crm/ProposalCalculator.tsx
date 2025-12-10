@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { SignaturePad } from "./SignaturePad";
 import { convertSqFeetToSquares, SQUARE_FEET_PER_SQUARE } from "@/utils/roofingMath";
+import ErrorBoundary from "@/components/ErrorBoundary";
 
 interface ProposalCalculatorProps {
   jobId: number;
