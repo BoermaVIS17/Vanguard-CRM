@@ -46,8 +46,7 @@ export function ProposalBuilder({
   const pricePerSqNum = parseFloat(pricePerSq) || 0;
 
   // Update proposal mutation
-  // @ts-ignore - procedure exists in routers.ts but types not inferred due to @ts-nocheck
-  const updateProposal = (trpc.crm as any).updateProposal.useMutation({
+  const updateProposal = trpc.proposals.updateProposal.useMutation({
     onSuccess: () => {
       toast.success("Proposal updated successfully");
       onUpdate?.();
@@ -212,10 +211,10 @@ export function ProposalBuilder({
           {/* Action Button */}
           <Button
             onClick={handleSave}
-            disabled={buttonConfig.disabled || !pricePerSq || updateProposal.isLoading}
+            disabled={buttonConfig.disabled || !pricePerSq || updateProposal.isPending}
             className={`w-full ${buttonConfig.color} text-white font-semibold`}
           >
-            {updateProposal.isLoading ? "Saving..." : buttonConfig.label}
+            {updateProposal.isPending ? "Saving..." : buttonConfig.label}
           </Button>
 
           {/* Pricing Guide */}
@@ -305,7 +304,7 @@ export function ProposalBuilder({
               <div className="flex gap-2">
                 <Button
                   onClick={handleCounter}
-                  disabled={!counterPrice || updateProposal.isLoading}
+                  disabled={!counterPrice || updateProposal.isPending}
                   className="flex-1 bg-orange-500 hover:bg-orange-600 text-white"
                 >
                   Submit Counter
@@ -329,7 +328,7 @@ export function ProposalBuilder({
             <div className="flex gap-3">
               <Button
                 onClick={handleApprove}
-                disabled={updateProposal.isLoading}
+                disabled={updateProposal.isPending}
                 className="flex-1 bg-green-500 hover:bg-green-600 text-white font-semibold"
               >
                 <CheckCircle className="w-4 h-4 mr-2" />
@@ -337,7 +336,7 @@ export function ProposalBuilder({
               </Button>
               <Button
                 onClick={() => setShowCounterInput(true)}
-                disabled={updateProposal.isLoading}
+                disabled={updateProposal.isPending}
                 className="flex-1 bg-red-500 hover:bg-red-600 text-white font-semibold"
               >
                 <XCircle className="w-4 h-4 mr-2" />
@@ -405,7 +404,7 @@ export function ProposalBuilder({
           <div className="flex gap-3">
             <Button
               onClick={handleAcceptCounter}
-              disabled={updateProposal.isLoading}
+              disabled={updateProposal.isPending}
               className="flex-1 bg-green-500 hover:bg-green-600 text-white font-semibold"
             >
               <CheckCircle className="w-4 h-4 mr-2" />
@@ -413,7 +412,7 @@ export function ProposalBuilder({
             </Button>
             <Button
               onClick={handleDenyCounter}
-              disabled={updateProposal.isLoading}
+              disabled={updateProposal.isPending}
               variant="outline"
               className="flex-1 border-slate-600 text-slate-400 hover:bg-slate-700"
             >

@@ -67,8 +67,7 @@ export function ProposalCalculator({
   const totalPrice = pricePerSqNum * roofSquares;
 
   // Update proposal mutation
-  // @ts-ignore - procedure exists in routers.ts but types not inferred due to @ts-nocheck
-  const updateProposal = (trpc.crm as any).updateProposal.useMutation({
+  const updateProposal = trpc.proposals.updateProposal.useMutation({
     onSuccess: () => {
       toast.success("Proposal updated successfully");
       onUpdate?.();
@@ -80,8 +79,7 @@ export function ProposalCalculator({
   });
 
   // Generate proposal PDF mutation (preview only)
-  // @ts-ignore - procedure exists in routers.ts but types not inferred due to @ts-nocheck
-  const generateProposal = (trpc.crm as any).generateProposal.useMutation({
+  const generateProposal = trpc.proposals.generateProposal.useMutation({
     onSuccess: (data: any) => {
       toast.success("Opening signature pad...");
       
@@ -106,8 +104,7 @@ export function ProposalCalculator({
   });
 
   // Generate signed proposal and save to documents
-  // @ts-ignore - procedure exists in routers.ts but types not inferred due to @ts-nocheck
-  const generateSignedProposal = (trpc.crm as any).generateSignedProposal.useMutation({
+  const generateSignedProposal = trpc.proposals.generateSignedProposal.useMutation({
     onSuccess: () => {
       toast.success("Signed proposal saved to Documents!");
       setShowSignaturePad(false);
@@ -436,11 +433,11 @@ export function ProposalCalculator({
             {pricingZone.zone === "green" && (
               <Button
                 onClick={handleGenerateContract}
-                disabled={!pricePerSq || updateProposal.isLoading}
+                disabled={!pricePerSq || updateProposal.isPending}
                 className="w-full bg-green-500 hover:bg-green-600 text-white font-semibold"
               >
                 <FileText className="w-4 h-4 mr-2" />
-                {updateProposal.isLoading ? "Saving..." : "Save & Generate Contract"}
+                {updateProposal.isPending ? "Saving..." : "Save & Generate Contract"}
               </Button>
             )}
 
@@ -450,20 +447,20 @@ export function ProposalCalculator({
                 {isOwner ? (
                   <Button
                     onClick={handleGenerateContract}
-                    disabled={!pricePerSq || updateProposal.isLoading}
+                    disabled={!pricePerSq || updateProposal.isPending}
                     className="w-full bg-green-500 hover:bg-green-600 text-white font-semibold"
                   >
                     <Shield className="w-4 h-4 mr-2" />
-                    {updateProposal.isLoading ? "Saving..." : "Owner Override - Generate Contract"}
+                    {updateProposal.isPending ? "Saving..." : "Owner Override - Generate Contract"}
                   </Button>
                 ) : (
                   <Button
                     onClick={handleSave}
-                    disabled={!pricePerSq || updateProposal.isLoading}
+                    disabled={!pricePerSq || updateProposal.isPending}
                     className="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-semibold"
                   >
                     <AlertTriangle className="w-4 h-4 mr-2" />
-                    {updateProposal.isLoading ? "Submitting..." : "Submit for Owner Approval"}
+                    {updateProposal.isPending ? "Submitting..." : "Submit for Owner Approval"}
                   </Button>
                 )}
               </>
@@ -568,7 +565,7 @@ export function ProposalCalculator({
               <div className="flex gap-2">
                 <Button
                   onClick={handleCounter}
-                  disabled={!counterPrice || updateProposal.isLoading}
+                  disabled={!counterPrice || updateProposal.isPending}
                   className="flex-1 bg-orange-500 hover:bg-orange-600 text-white"
                 >
                   Submit Counter
@@ -592,7 +589,7 @@ export function ProposalCalculator({
             <div className="flex gap-3">
               <Button
                 onClick={handleApprove}
-                disabled={updateProposal.isLoading}
+                disabled={updateProposal.isPending}
                 className="flex-1 bg-green-500 hover:bg-green-600 text-white font-semibold"
               >
                 <CheckCircle className="w-4 h-4 mr-2" />
@@ -600,7 +597,7 @@ export function ProposalCalculator({
               </Button>
               <Button
                 onClick={() => setShowCounterInput(true)}
-                disabled={updateProposal.isLoading}
+                disabled={updateProposal.isPending}
                 className="flex-1 bg-red-500 hover:bg-red-600 text-white font-semibold"
               >
                 <XCircle className="w-4 h-4 mr-2" />
@@ -668,7 +665,7 @@ export function ProposalCalculator({
           <div className="flex gap-3">
             <Button
               onClick={handleAcceptCounter}
-              disabled={updateProposal.isLoading}
+              disabled={updateProposal.isPending}
               className="flex-1 bg-green-500 hover:bg-green-600 text-white font-semibold"
             >
               <CheckCircle className="w-4 h-4 mr-2" />
@@ -676,7 +673,7 @@ export function ProposalCalculator({
             </Button>
             <Button
               onClick={handleDenyCounter}
-              disabled={updateProposal.isLoading}
+              disabled={updateProposal.isPending}
               variant="outline"
               className="flex-1 border-slate-600 text-slate-400 hover:bg-slate-700"
             >
@@ -730,11 +727,11 @@ export function ProposalCalculator({
           {/* Generate Contract Button */}
           <Button
             onClick={() => generateProposal.mutate({ jobId })}
-            disabled={generateProposal.isLoading}
+            disabled={generateProposal.isPending}
             className="w-full bg-[#00d4aa] hover:bg-[#00b894] text-black font-semibold"
           >
             <FileText className="w-4 h-4 mr-2" />
-            {generateProposal.isLoading ? "Generating..." : "Generate Contract"}
+            {generateProposal.isPending ? "Generating..." : "Generate Contract"}
           </Button>
 
           {/* Success Message */}
