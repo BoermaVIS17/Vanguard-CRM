@@ -336,5 +336,8 @@
 - [x] Fix: Replaced 7 instances with proper types (Job, role enums, union types).
 - [x] Documented: Kept 17 legitimate casts (IME events, external library types, tRPC inference issues).
 
-### 3. Refinement: Solar Data Validation
-- [ ] Add Zod schema for `solar_api_data` JSONB field in `server/api/routers/solar.ts`.
+### 3. Refinement: Solar Data Validation ✅ COMPLETE
+- [x] Add comprehensive Zod schemas for solar API data structure.
+- [x] Validate data before storing in `solar_api_data` JSONB field.
+- [x] Remove `@ts-nocheck` and `as any` casts from solar router.
+- [x] Runtime validation ensures data integrity.
