@@ -415,3 +415,175 @@
   - Email notifications for critical errors
   - Slack/Discord webhooks for deployment failures
   - Daily summary of error rates and API usage
+
+---
+
+## 🚀 Development Sprints
+
+### Sprint 1: Complete Router Refactor (High Priority)
+**Goal:** Clean up legacy `server/routers.ts` monolith and organize into focused routers.
+
+**Estimated Time:** 7 hours
+
+#### 1. Extract CRM Router (4 hrs)
+- [ ] Move `crm` router logic → `server/api/routers/jobs.ts`
+- [ ] Keep backward compatibility mapping: `crm: jobsRouter`
+- [ ] Update imports in `server/_core/index.ts`
+- [ ] Test all CRM endpoints still work
+- [ ] Update frontend imports if needed
+
+#### 2. Extract Portal Router (2 hrs)
+- [ ] Move `portal` router → `server/api/routers/portal.ts`
+- [ ] Add to exports in `server/api/routers/index.ts`
+- [ ] Test customer portal functionality
+- [ ] Verify public access still works
+
+#### 3. Delete Legacy Helpers (1 hr)
+- [ ] Keep only: `filterLeadsByRole`, `getTeamMemberIds`, `logEditHistory`
+- [ ] Move `filterLeadsByRole` → `server/lib/rbac.ts`
+- [ ] Move `getTeamMemberIds` → `server/lib/rbac.ts`
+- [ ] Move `logEditHistory` → `server/lib/editHistory.ts`
+- [ ] Delete unused helper functions
+- [ ] Update all imports
+
+### Sprint 2: Type Safety Cleanup (Medium Priority)
+**Goal:** Eliminate `@ts-nocheck` and reduce `as any` usage.
+
+**Estimated Time:** 5 hours
+
+#### 1. Remove @ts-nocheck (3 hrs)
+- [ ] Fix types in `server/routers.ts`
+- [ ] Fix types in `server/api/routers/index.ts`
+- [ ] Document legitimate type issues with `// @ts-expect-error` + explanation
+- [ ] Run `tsc --noEmit` to verify no new errors
+- [ ] Update build script to include type checking
+
+#### 2. Replace Top 5 as any Casts (2 hrs)
+- [ ] ProposalCalculator.tsx (3 instances)
+  - Define proper types for tRPC responses
+  - Add type guards for data validation
+- [ ] Team.tsx callbacks (2 instances)
+  - Type callback parameters properly
+  - Use proper event types
+
+### Sprint 3: Stability & Monitoring (High Priority)
+**Goal:** Add error handling and logging to catch issues before users report them.
+
+**Estimated Time:** 5 hours
+
+#### 1. Add Error Boundaries (2 hrs)
+- [ ] Create `ErrorBoundary` component in `client/src/components/ErrorBoundary.tsx`
+- [ ] Wrap `<JobDetail />` with error boundary
+- [ ] Wrap `<Dashboard />` with error boundary
+- [ ] Wrap `<Pipeline />` with error boundary
+- [ ] Log errors to console (later: monitoring service)
+- [ ] Show user-friendly error messages
+
+#### 2. Improve Logging (1 hr)
+- [ ] Add request IDs to all tRPC calls
+- [ ] Log all 500 errors with stack traces
+- [ ] Create `server/lib/logger.ts` wrapper
+- [ ] Add timestamp and context to all logs
+- [ ] Implement log levels (debug, info, warn, error)
+
+#### 3. Validate Solar API Data (2 hrs)
+- [ ] Add frontend validation before using `solarApiData`
+- [ ] Show user-friendly error if data malformed
+- [ ] Add error boundary around `ProposalCalculator`
+- [ ] Add fallback UI when solar data unavailable
+- [ ] Log validation failures for monitoring
+
+### Sprint 4: Security Hardening (Medium Priority)
+**Goal:** Lock down API access and prevent abuse.
+
+**Estimated Time:** 4 hours
+
+#### 1. Split API Keys (1 hr)
+- [ ] Create frontend key in Google Cloud Console (domain-restricted)
+- [ ] Create backend key in Google Cloud Console (IP-restricted)
+- [ ] Update env vars: `VITE_GOOGLE_MAPS_KEY`, `GOOGLE_MAPS_API_KEY`
+- [ ] Test frontend maps/geocoding still work
+- [ ] Test backend Solar API calls still work
+- [ ] Confirm unauthorized domains are blocked
+
+#### 2. Add Rate Limiting (3 hrs)
+- [ ] Install `express-rate-limit` package
+- [ ] Limit public endpoints: `/trpc/portal.*` (10 req/min per IP)
+- [ ] Limit auth endpoints: `/trpc/auth.*` (5 req/min per IP)
+- [ ] Add rate limit headers to responses
+- [ ] Test rate limiting with multiple requests
+- [ ] Document rate limits in API docs
+
+---
+
+## 🎯 Quick Wins (Under 1 Hour Each)
+
+### Fix Missing Null Checks (15 min)
+**Location:** `server/api/routers/users.ts` line 87 and similar patterns
+
+```typescript
+// Before
+const [user] = await db.select()...;
+// Crashes if user not found
+
+// After
+const [user] = await db.select()...;
+if (!user) throw new TRPCError({ code: 'NOT_FOUND', message: 'User not found' });
+```
+
+**Tasks:**
+- [ ] Audit all single-record queries in `server/api/routers/`
+- [ ] Add null checks with proper error messages
+- [ ] Test error handling for non-existent records
+
+### Add Build Validation (10 min)
+**Goal:** Catch TypeScript errors before deployment
+
+```json
+// package.json - add type check to build
+"scripts": {
+  "build": "npm run check && npm run build:server && npm run build:client",
+  "check": "tsc --noEmit"
+}
+```
+
+**Tasks:**
+- [ ] Update `package.json` build script
+- [ ] Test build process catches type errors
+- [ ] Update CI/CD pipeline if needed
+
+### Document Router Structure (20 min)
+**Goal:** Create clear documentation for router organization
+
+**Tasks:**
+- [ ] Create `server/api/routers/README.md`
+- [ ] Document completed routers and their responsibilities
+- [ ] Document legacy routers that need refactoring
+- [ ] Add examples of proper router structure
+- [ ] Include migration guide for moving endpoints
+
+**Template:**
+```markdown
+# Router Organization
+
+## Completed Routers
+- **auth.ts** - Authentication (login, logout, password reset)
+- **solar.ts** - Google Solar API integration
+- **report.ts** - Roof report generation
+- **proposals.ts** - Customer proposals
+- **materials.ts** - Material orders
+- **users.ts** - User management
+- **activities.ts** - Activity logs, notifications
+- **documents.ts** - File uploads
+
+## Legacy (TODO)
+- **jobs.ts** - Main CRM operations (currently in server/routers.ts as 'crm')
+- **portal.ts** - Customer portal (currently in server/routers.ts)
+
+## Router Best Practices
+1. One router per domain concept
+2. Keep routers under 500 lines
+3. Use proper TypeScript types (no @ts-nocheck)
+4. Add input validation with Zod
+5. Include error handling for all edge cases
+```
