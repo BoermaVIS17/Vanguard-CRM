@@ -164,8 +164,15 @@ Jobs router implements role-based data filtering:
 ## 🚀 Next Steps
 
 **To Be Extracted:**
-- [ ] Portal router (customer portal, public job lookup)
-- [ ] Move helper functions to `server/lib/` (filterLeadsByRole, getTeamMemberIds, logEditHistory)
+- [ ] **portal.ts** - Customer portal (currently in `server/routers.ts`)
+  - Public job lookup by phone number
+  - Customer status updates
+  - Timeline view for customers
+  - No authentication required
+- [ ] Move helper functions to `server/lib/`
+  - `filterLeadsByRole` (currently in jobs.ts)
+  - `getTeamMemberIds` (currently in jobs.ts)
+  - `logEditHistory` (currently in jobs.ts)
 
 **Type Safety:**
 - [ ] Remove remaining `@ts-nocheck` from router files
