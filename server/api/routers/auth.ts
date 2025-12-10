@@ -53,7 +53,7 @@ export const authRouter = router({
           if (isFirstUser) targetRole = 'owner';
           console.log(`[Sync] Target role: ${targetRole}`);
           
-          // 3. UPSERT (Insert or Update if Email exists)
+          // 3. UPSERT using openId as conflict target (openId is the Supabase Auth unique identifier)
           console.log('[Sync] Performing upsert...');
           const [result] = await db
             .insert(users)
@@ -67,9 +67,9 @@ export const authRouter = router({
               repCode: input.repCode || null,
             })
             .onConflictDoUpdate({
-              target: users.email,
+              target: users.openId, // Changed from users.email to users.openId
               set: {
-                openId: input.supabaseUserId,
+                email: input.email, // Update email in case it changed in Supabase
                 lastSignedIn: new Date(),
               },
             })
@@ -112,6 +112,7 @@ export const authRouter = router({
         console.error('Message:', error.message);
         console.error('Code:', error.code);
         console.error('Detail:', error.detail);
+        console.error('Constraint:', error.constraint);
         console.error('Stack:', error.stack);
         
         // Always return a proper error response, never hang
