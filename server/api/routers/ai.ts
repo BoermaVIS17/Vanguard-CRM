@@ -337,6 +337,7 @@ Instructions:
           intent: intentResponse,
           toolResult,
           dataFound: toolData !== null,
+          toolData, // Include the actual data for rich media rendering
         };
       } catch (error) {
         console.error("[AI Assistant] Final answer generation failed:", error);
