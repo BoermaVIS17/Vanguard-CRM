@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Main Router Assembly
  * 
@@ -13,6 +12,7 @@
  * - users -> server/api/routers/users.ts
  * - activities -> server/api/routers/activities.ts
  * - documents -> server/api/routers/documents.ts
+ * - jobs -> server/api/routers/jobs.ts (mapped as 'crm' for frontend compatibility)
  * 
  * Note: The 'jobs' router is mapped to 'crm' key in appRouter for frontend backwards compatibility.
  * Frontend code uses trpc.crm.* but the internal router is named 'jobs' for semantic clarity.

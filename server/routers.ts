@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * LEGACY MONOLITHIC ROUTER FILE
  * 
@@ -8,8 +7,9 @@
  * Refactored:
  * - auth -> server/api/routers/auth.ts
  * - solar -> server/api/routers/solar.ts
+ * - jobs (crm) -> server/api/routers/jobs.ts
  * 
- * TODO: Extract CRM and Report routers
+ * TODO: Extract Portal router
  */
 import { COOKIE_NAME } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
@@ -129,7 +129,7 @@ async function filterLeadsByRole(db: any, user: any, leads: any[]): Promise<any[
 // Format: @[userId:userName] or @userName
 function detectMentions(text: string): number[] {
   const mentionRegex = /@\[(\d+):[^\]]+\]/g;
-  const matches = text.matchAll(mentionRegex);
+  const matches = Array.from(text.matchAll(mentionRegex));
   const userIds: number[] = [];
   
   for (const match of matches) {
