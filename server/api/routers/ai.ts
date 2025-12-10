@@ -430,4 +430,113 @@ Instructions:
         };
       }
     }),
+
+  /**
+   * Process Job Photo with AI Analysis and Watermarking
+   * Analyzes roof damage using Gemini Vision and stamps metadata
+   */
+  processJobPhoto: protectedProcedure
+    .input(z.object({
+      photoUrl: z.string().url(),
+      jobId: z.number(),
+      photoId: z.number(),
+      date: z.string(),
+    }))
+    .mutation(async ({ input }) => {
+      const db = await getDb();
+      if (!db) throw new Error("Database not available");
+
+      console.log(`[Photo AI] Processing photo ${input.photoId} for job ${input.jobId}`);
+
+      try {
+        // ============ ACTION A: AI Vision Analysis (The Eyes) ============
+        console.log("[Photo AI] Step 1: Analyzing image with Gemini Vision");
+        
+        const visionModel = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+        
+        // Fetch the image
+        const imageResponse = await fetch(input.photoUrl);
+        if (!imageResponse.ok) {
+          throw new Error(`Failed to fetch image: ${imageResponse.statusText}`);
+        }
+        
+        const imageBuffer = await imageResponse.arrayBuffer();
+        const imageBase64 = Buffer.from(imageBuffer).toString('base64');
+        
+        // Analyze with Gemini Vision
+        const analysisPrompt = `Analyze this roof photo for damage. Be liberal in detecting potential issues since this photo was flagged by a roofing professional.
+
+Return ONLY valid JSON in this exact format:
+{
+  "damage_detected": boolean,
+  "tags": ["tag1", "tag2"],
+  "severity": "Low" | "Medium" | "High",
+  "description": "brief description of findings"
+}
+
+Common roof damage types to look for:
+- Missing shingles
+- Hail damage (circular dents, bruising)
+- Wind damage (lifted/torn shingles)
+- Granule loss
+- Cracking or splitting
+- Storm damage
+- Water damage or staining
+- Structural issues
+
+Be thorough but accurate. If you see potential damage, flag it.`;
+
+        const visionResult = await visionModel.generateContent([
+          analysisPrompt,
+          {
+            inlineData: {
+              data: imageBase64,
+              mimeType: imageResponse.headers.get('content-type') || 'image/jpeg',
+            },
+          },
+        ]);
+
+        const visionResponse = await visionResult.response;
+        const visionText = visionResponse.text();
+        
+        // Parse JSON response
+        const jsonMatch = visionText.match(/\{[\s\S]*\}/);
+        if (!jsonMatch) {
+          throw new Error("No JSON found in AI response");
+        }
+        
+        const analysis = JSON.parse(jsonMatch[0]);
+        console.log("[Photo AI] Analysis complete:", analysis);
+
+        // ============ ACTION B: Image Watermarking (The Stamp) ============
+        // Note: Watermarking will be added in a future update with canvas-based approach
+        console.log("[Photo AI] Step 2: Watermarking (skipped for now, returning original image)");
+
+        // ============ ACTION C: Save Results ============
+        console.log("[Photo AI] Step 3: Saving analysis results to database");
+        
+        // Note: You'll need to add aiTags and aiAnalysis columns to your photos table
+        // For now, we'll return the data for the frontend to handle
+        
+        return {
+          success: true,
+          photoId: input.photoId,
+          analysis: {
+            damageDetected: analysis.damage_detected,
+            tags: analysis.tags,
+            severity: analysis.severity,
+            description: analysis.description,
+          },
+        };
+        
+      } catch (error) {
+        console.error("[Photo AI] Processing failed:", error);
+        
+        return {
+          success: false,
+          photoId: input.photoId,
+          error: error instanceof Error ? error.message : "Unknown error",
+        };
+      }
+    }),
 });

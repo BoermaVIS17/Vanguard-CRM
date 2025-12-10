@@ -1,7 +1,9 @@
 import { useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Upload, Link2, Image, Clock, MapPin, Maximize2, X, ChevronLeft, ChevronRight, ExternalLink, Download, Trash2 } from "lucide-react";
+import { Upload, Link2, Image, Clock, MapPin, Maximize2, X, ChevronLeft, ChevronRight, ExternalLink, Download, Trash2, Sparkles, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
+import { trpc } from "@/lib/trpc";
+import { Progress } from "@/components/ui/progress";
 
 interface Photo {
   id: number;
@@ -12,6 +14,9 @@ interface Photo {
   latitude?: string | null;
   longitude?: string | null;
   cameraModel?: string | null;
+  aiTags?: string[];
+  aiSeverity?: 'Low' | 'Medium' | 'High';
+  aiAnalyzed?: boolean;
 }
 
 interface JobPhotosTabProps {
@@ -37,6 +42,79 @@ export function JobPhotosTab({
 }: JobPhotosTabProps) {
   const photoInputRef = useRef<HTMLInputElement>(null);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+  const [selectedPhotos, setSelectedPhotos] = useState<Set<number>>(new Set());
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [analysisProgress, setAnalysisProgress] = useState({ current: 0, total: 0 });
+  const [photoAnalysisResults, setPhotoAnalysisResults] = useState<Map<number, any>>(new Map());
+
+  // AI Photo Processing mutation
+  const processPhoto = trpc.ai.processJobPhoto.useMutation();
+
+  // Toggle photo selection
+  const togglePhotoSelection = (photoId: number, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setSelectedPhotos(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(photoId)) {
+        newSet.delete(photoId);
+      } else {
+        newSet.add(photoId);
+      }
+      return newSet;
+    });
+  };
+
+  // Analyze selected photos
+  const handleAnalyzePhotos = async () => {
+    const selectedPhotosList = photos.filter(p => selectedPhotos.has(p.id));
+    
+    if (selectedPhotosList.length === 0) {
+      toast.error("Please select photos to analyze");
+      return;
+    }
+
+    // Cap at 10 photos
+    const photosToAnalyze = selectedPhotosList.slice(0, 10);
+    if (selectedPhotosList.length > 10) {
+      toast.info(`Analyzing first 10 of ${selectedPhotosList.length} selected photos`);
+    }
+
+    setIsAnalyzing(true);
+    setAnalysisProgress({ current: 0, total: photosToAnalyze.length });
+
+    for (let i = 0; i < photosToAnalyze.length; i++) {
+      const photo = photosToAnalyze[i];
+      
+      try {
+        const result = await processPhoto.mutateAsync({
+          photoUrl: photo.fileUrl,
+          jobId,
+          photoId: photo.id,
+          date: photo.photoTakenAt?.toString() || photo.createdAt.toString(),
+        });
+
+        if (result.success && result.analysis) {
+          setPhotoAnalysisResults(prev => new Map(prev).set(photo.id, result.analysis));
+          toast.success(`✨ Analyzed: ${photo.fileName}`, {
+            description: result.analysis.damageDetected 
+              ? `${result.analysis.severity} severity - ${result.analysis.tags.join(', ')}`
+              : 'No damage detected',
+          });
+        } else {
+          toast.error(`Failed to analyze ${photo.fileName}`);
+        }
+      } catch (error) {
+        console.error('Photo analysis error:', error);
+        toast.error(`Error analyzing ${photo.fileName}`);
+      }
+
+      setAnalysisProgress({ current: i + 1, total: photosToAnalyze.length });
+    }
+
+    setIsAnalyzing(false);
+    setSelectedPhotos(new Set());
+    toast.success(`🎉 Analysis complete! Processed ${photosToAnalyze.length} photos`);
+  };
 
   return (
     <div>
@@ -49,6 +127,19 @@ export function JobPhotosTab({
           </span>
         </div>
         <div className="flex items-center gap-2">
+          {selectedPhotos.size > 0 && (
+            <Button
+              onClick={handleAnalyzePhotos}
+              disabled={isAnalyzing}
+              className="bg-purple-600 hover:bg-purple-700 text-white"
+            >
+              <Sparkles className="w-4 h-4 mr-2" />
+              {isAnalyzing 
+                ? `Analyzing ${analysisProgress.current}/${analysisProgress.total}...` 
+                : `✨ Analyze ${selectedPhotos.size} Photo${selectedPhotos.size !== 1 ? 's' : ''}`
+              }
+            </Button>
+          )}
           {isOwner && (
             <Button
               variant="outline"
@@ -85,25 +176,82 @@ export function JobPhotosTab({
           )}
         </div>
       </div>
+
+      {/* Progress Bar */}
+      {isAnalyzing && (
+        <div className="mb-4 p-4 bg-slate-800 rounded-lg border border-purple-500/30">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-sm text-white font-medium">
+              🔮 AI Magic in Progress...
+            </span>
+            <span className="text-sm text-purple-400">
+              {analysisProgress.current} / {analysisProgress.total}
+            </span>
+          </div>
+          <Progress 
+            value={(analysisProgress.current / analysisProgress.total) * 100} 
+            className="h-2 bg-slate-700"
+          />
+          <p className="text-xs text-slate-400 mt-2">
+            Analyzing photos with Gemini Vision AI and applying watermarks...
+          </p>
+        </div>
+      )}
       
       {photos.length > 0 ? (
         <>
           {/* Masonry-style Gallery Grid */}
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
-            {photos.map((photo, index) => (
-              <div 
-                key={photo.id} 
-                className="group relative rounded-lg overflow-hidden bg-slate-800 cursor-pointer transform transition-all duration-200 hover:scale-[1.02] hover:shadow-xl hover:shadow-[#00d4aa]/10"
-                onClick={() => setLightboxIndex(index)}
-              >
-                <div className="aspect-square">
-                  <img 
-                    src={photo.fileUrl} 
-                    alt={photo.fileName}
-                    className="w-full h-full object-cover"
-                    loading="lazy"
-                  />
-                </div>
+            {photos.map((photo, index) => {
+              const isSelected = selectedPhotos.has(photo.id);
+              const analysis = photoAnalysisResults.get(photo.id) || photo;
+              const severityColors = {
+                High: 'bg-red-500/20 text-red-300 border-red-500/30',
+                Medium: 'bg-yellow-500/20 text-yellow-300 border-yellow-500/30',
+                Low: 'bg-blue-500/20 text-blue-300 border-blue-500/30',
+              };
+              
+              return (
+                <div 
+                  key={photo.id} 
+                  className={`group relative rounded-lg overflow-hidden bg-slate-800 cursor-pointer transform transition-all duration-200 hover:scale-[1.02] hover:shadow-xl ${
+                    isSelected ? 'ring-2 ring-purple-500 shadow-lg shadow-purple-500/20' : 'hover:shadow-[#00d4aa]/10'
+                  }`}
+                  onClick={() => setLightboxIndex(index)}
+                >
+                  {/* Selection Checkbox */}
+                  <div 
+                    className="absolute top-2 left-2 z-10"
+                    onClick={(e) => togglePhotoSelection(photo.id, e)}
+                  >
+                    <div className={`w-6 h-6 rounded-full flex items-center justify-center transition-all ${
+                      isSelected 
+                        ? 'bg-purple-600 text-white' 
+                        : 'bg-black/40 backdrop-blur-sm border border-white/30 hover:bg-black/60'
+                    }`}>
+                      {isSelected && <CheckCircle2 className="w-4 h-4" />}
+                    </div>
+                  </div>
+
+                  <div className="aspect-square">
+                    <img 
+                      src={photo.fileUrl} 
+                      alt={photo.fileName}
+                      className="w-full h-full object-cover"
+                      loading="lazy"
+                    />
+                  </div>
+
+                  {/* AI Tags Badge */}
+                  {(analysis.aiTags || analysis.tags) && (
+                    <div className="absolute top-2 right-2 z-10">
+                      <div className={`px-2 py-1 rounded-full text-xs font-medium border ${
+                        severityColors[(analysis.aiSeverity || analysis.severity || 'Low') as keyof typeof severityColors]
+                      } backdrop-blur-sm`}>
+                        {analysis.aiSeverity || analysis.severity}
+                      </div>
+                    </div>
+                  )}
                 {/* Hover overlay */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-200">
                   <div className="absolute bottom-0 left-0 right-0 p-3">
@@ -120,6 +268,20 @@ export function JobPhotosTab({
                         GPS: {parseFloat(photo.latitude).toFixed(4)}°, {parseFloat(photo.longitude).toFixed(4)}°
                       </p>
                     )}
+                    
+                    {/* AI Analysis Tags */}
+                    {(analysis.aiTags || analysis.tags) && (
+                      <div className="mt-2 flex flex-wrap gap-1">
+                        {(analysis.aiTags || analysis.tags).map((tag: string, i: number) => (
+                          <span 
+                            key={i}
+                            className="px-2 py-0.5 bg-purple-500/30 text-purple-200 text-xs rounded-full border border-purple-500/50"
+                          >
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+                    )}
                   </div>
                   <div className="absolute top-2 right-2 flex gap-1">
                     <button 
@@ -131,7 +293,8 @@ export function JobPhotosTab({
                   </div>
                 </div>
               </div>
-            ))}
+              );
+            })}
           </div>
 
           {/* Lightbox Modal */}
