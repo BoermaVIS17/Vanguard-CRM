@@ -231,7 +231,7 @@ export const proposalsRouter = router({
       // Save to Supabase storage
       const fileName = `proposal-signed-${input.jobId}-${Date.now()}.pdf`;
       const { data: uploadData, error: uploadError } = await supabaseAdmin.storage
-        .from('documents')
+        .from('Proposal_Bucket')
         .upload(fileName, pdfBuffer, {
           contentType: 'application/pdf',
           upsert: false,
@@ -241,7 +241,7 @@ export const proposalsRouter = router({
 
       // Get public URL
       const { data: { publicUrl } } = supabaseAdmin.storage
-        .from('documents')
+        .from('Proposal_Bucket')
         .getPublicUrl(fileName);
 
       // Save document record to database

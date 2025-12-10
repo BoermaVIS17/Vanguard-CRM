@@ -5,6 +5,7 @@
 
 import { router, protectedProcedure } from "../../_core/trpc";
 import { z } from "zod";
+import { TRPCError } from "@trpc/server";
 import { getDb } from "../../db";
 import { reportRequests, products, companySettings, activities } from "../../../drizzle/schema";
 import { eq, or, ilike, desc } from "drizzle-orm";
@@ -174,10 +175,19 @@ CLOSING:
       jobContext: z.number().optional(), // Optional job ID for context
     }))
     .mutation(async ({ input, ctx }) => {
-      const db = await getDb();
-      if (!db) throw new Error("Database not available");
+      // Verify API key is configured
+      if (!process.env.GEMINI_API_KEY) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Missing GEMINI_API_KEY environment variable",
+        });
+      }
 
-      const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+      try {
+        const db = await getDb();
+        if (!db) throw new Error("Database not available");
+
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
       // ============ STEP 1: Define Available Tools ============
       const toolDefinitions = `
@@ -428,6 +438,13 @@ Instructions:
           dataFound: false,
           error: error instanceof Error ? error.message : "Unknown error"
         };
+      }
+      } catch (error) {
+        console.error("AI CRASH REPORT:", error);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: error instanceof Error ? error.message : "Unknown error occurred in AI assistant",
+        });
       }
     }),
 
