@@ -64,7 +64,7 @@ export const authRouter = router({
               role: targetRole as any,
               isActive: true,
               lastSignedIn: new Date(),
-              repCode: input.repCode,
+              repCode: input.repCode || null,
             })
             .onConflictDoUpdate({
               target: users.email,
