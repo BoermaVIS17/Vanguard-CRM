@@ -258,9 +258,18 @@ export default function JobDetail() {
   
   // Filter by search query
   if (searchQuery) {
-    filteredTimeline = filteredTimeline.filter((activity: ThreadedActivity) =>
-      activity.description.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    const searchLower = searchQuery.toLowerCase();
+    filteredTimeline = filteredTimeline.filter((activity: ThreadedActivity) => {
+      // Check if root activity matches
+      const rootMatches = activity.description.toLowerCase().includes(searchLower);
+      
+      // Check if any reply matches (recursive search)
+      const replyMatches = activity.replies?.some(reply => 
+        reply.description.toLowerCase().includes(searchLower)
+      );
+      
+      return rootMatches || replyMatches;
+    });
   }
   
   const filteredEditHistory = (editHistory || []).filter((edit: any) =>
