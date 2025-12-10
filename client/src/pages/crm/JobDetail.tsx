@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useLocation } from "wouter";
 import { ArrowLeft, Search, Trash2 } from "lucide-react";
 import { Link } from "wouter";
@@ -73,6 +73,14 @@ export default function JobDetail() {
   const { data: job, isLoading, error, refetch } = trpc.crm.getLead.useQuery({ id: jobId });
   const { data: permissions } = trpc.users.getMyPermissions.useQuery();
   const { data: editHistory } = trpc.crm.getEditHistory.useQuery({ jobId });
+
+  // Handle URL parameter changes (e.g., navigating from one job to another via chat widget)
+  useEffect(() => {
+    // Reset active tab when job ID changes
+    setActiveTab("overview");
+    // Refetch data for the new job
+    refetch();
+  }, [jobId, refetch]);
 
   // Mutations
   const updateLead = trpc.crm.updateLead.useMutation({
