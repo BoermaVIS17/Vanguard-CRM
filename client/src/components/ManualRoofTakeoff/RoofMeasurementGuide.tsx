@@ -11,11 +11,11 @@ export function RoofMeasurementGuide() {
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="bg-white rounded-lg p-2">
+        <div className="bg-white rounded-lg p-2 overflow-hidden cursor-zoom-in">
           <img 
-            src="/images/roof-measurement-guide.png" 
+            src="https://gvqfpqgvkqvqxjvqfqxj.supabase.co/storage/v1/object/public/CRM%20files/roof-measurement-guide.png" 
             alt="Roof Measurement Guide showing color-coded roof components"
-            className="w-full h-auto rounded"
+            className="w-full h-auto rounded transition-transform duration-300 ease-in-out hover:scale-150"
           />
         </div>
         <div className="mt-3 space-y-1 text-xs text-slate-300">
