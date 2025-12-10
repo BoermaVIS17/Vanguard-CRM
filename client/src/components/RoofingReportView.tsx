@@ -152,7 +152,6 @@ export function RoofingReportView({ solarApiData, jobData, isGoogleMapsLoaded }:
         console.warn('[RoofingReport] Using fallback satellite image from coordinates');
         const fallbackUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${solarApiData.lat},${solarApiData.lng}&zoom=19&size=600x600&maptype=satellite`;
         const img = new Image();
-        img.crossOrigin = 'anonymous';
         img.onload = () => {
           canvas.width = img.width;
           canvas.height = img.height;
@@ -166,7 +165,6 @@ export function RoofingReportView({ solarApiData, jobData, isGoogleMapsLoaded }:
     }
 
     const img = new Image();
-    img.crossOrigin = 'anonymous';
     img.onload = () => {
       // Set canvas size to match image
       canvas.width = img.width;
