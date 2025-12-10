@@ -6,8 +6,8 @@
 import { router, protectedProcedure } from "../../_core/trpc";
 import { z } from "zod";
 import { getDb } from "../../db";
-import { reportRequests, products, companySettings } from "../../../drizzle/schema";
-import { eq } from "drizzle-orm";
+import { reportRequests, products, companySettings, activities } from "../../../drizzle/schema";
+import { eq, or, ilike, desc } from "drizzle-orm";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 // Initialize Gemini AI
@@ -128,5 +128,228 @@ CLOSING:
         product,
         aiContent
       };
+    }),
+
+  /**
+   * Multi-Tool AI Assistant
+   * Uses intent classification to route requests to appropriate tools
+   */
+  askAssistant: protectedProcedure
+    .input(z.object({
+      question: z.string(),
+      jobContext: z.number().optional(), // Optional job ID for context
+    }))
+    .mutation(async ({ input, ctx }) => {
+      const db = await getDb();
+      if (!db) throw new Error("Database not available");
+
+      const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+
+      // ============ STEP 1: Define Available Tools ============
+      const toolDefinitions = `
+Available Tools:
+1. "lookup_job" - Search for jobs by customer name, phone number, or address
+2. "get_job_summary" - Get the latest 5 activities/updates for a specific job
+3. "general_chat" - General conversation, email writing, or other non-CRM tasks
+`;
+
+      // ============ STEP 2: Intent Classification (AI Pass #1) ============
+      console.log("[AI Assistant] Classifying intent for:", input.question);
+
+      const intentPrompt = `You are a CRM assistant. Analyze the user's question and decide which tool to use.
+
+${toolDefinitions}
+
+Rules:
+- Use "lookup_job" if the user asks about a person, phone number, or address
+- Use "get_job_summary" if the user asks for "latest updates", "recent activity", "catch me up", or "what's happening" with a job
+- Use "general_chat" for everything else (greetings, email writing, general questions)
+
+User Question: "${input.question}"
+${input.jobContext ? `Current Job Context ID: ${input.jobContext}` : ''}
+
+Return ONLY valid JSON in this exact format:
+{
+  "tool": "lookup_job" | "get_job_summary" | "general_chat",
+  "search_term": "extracted search term or null",
+  "reasoning": "brief explanation"
+}`;
+
+      let intentResponse;
+      try {
+        const result = await model.generateContent(intentPrompt);
+        const response = await result.response;
+        const text = response.text();
+        
+        // Extract JSON from response (handle markdown code blocks)
+        const jsonMatch = text.match(/\{[\s\S]*\}/);
+        if (!jsonMatch) {
+          throw new Error("No JSON found in response");
+        }
+        
+        intentResponse = JSON.parse(jsonMatch[0]);
+        console.log("[AI Assistant] Intent classified:", intentResponse);
+      } catch (error) {
+        console.error("[AI Assistant] Intent classification failed:", error);
+        // Fallback to general_chat
+        intentResponse = {
+          tool: "general_chat",
+          search_term: null,
+          reasoning: "Failed to classify intent, defaulting to general chat"
+        };
+      }
+
+      // ============ STEP 3: Tool Execution (Switch Statement) ============
+      let toolData: any = null;
+      let toolResult = "";
+
+      switch (intentResponse.tool) {
+        case "lookup_job": {
+          console.log("[AI Assistant] Executing lookup_job with term:", intentResponse.search_term);
+          
+          if (!intentResponse.search_term) {
+            toolResult = "No search term provided. Please specify a name, phone, or address.";
+            break;
+          }
+
+          const searchTerm = `%${intentResponse.search_term}%`;
+          
+          // Search jobs by name, phone, or address
+          const jobs = await db
+            .select({
+              id: reportRequests.id,
+              fullName: reportRequests.fullName,
+              email: reportRequests.email,
+              phone: reportRequests.phone,
+              address: reportRequests.address,
+              cityStateZip: reportRequests.cityStateZip,
+              status: reportRequests.status,
+              dealType: reportRequests.dealType,
+              totalPrice: reportRequests.totalPrice,
+              createdAt: reportRequests.createdAt,
+            })
+            .from(reportRequests)
+            .where(
+              or(
+                ilike(reportRequests.fullName, searchTerm),
+                ilike(reportRequests.phone, searchTerm),
+                ilike(reportRequests.address, searchTerm)
+              )
+            )
+            .limit(10);
+
+          toolData = jobs;
+          toolResult = jobs.length > 0 
+            ? `Found ${jobs.length} job(s) matching "${intentResponse.search_term}"`
+            : `No jobs found matching "${intentResponse.search_term}"`;
+          
+          console.log("[AI Assistant] Found", jobs.length, "jobs");
+          break;
+        }
+
+        case "get_job_summary": {
+          const jobId = input.jobContext || intentResponse.search_term;
+          console.log("[AI Assistant] Executing get_job_summary for job:", jobId);
+          
+          if (!jobId) {
+            toolResult = "No job ID provided. Please specify which job you want updates for.";
+            break;
+          }
+
+          // Get job details
+          const [job] = await db
+            .select({
+              id: reportRequests.id,
+              fullName: reportRequests.fullName,
+              address: reportRequests.address,
+              status: reportRequests.status,
+              dealType: reportRequests.dealType,
+            })
+            .from(reportRequests)
+            .where(eq(reportRequests.id, Number(jobId)))
+            .limit(1);
+
+          if (!job) {
+            toolResult = `Job #${jobId} not found.`;
+            break;
+          }
+
+          // Get latest 5 activities
+          const recentActivities = await db
+            .select({
+              id: activities.id,
+              activityType: activities.activityType,
+              description: activities.description,
+              createdAt: activities.createdAt,
+            })
+            .from(activities)
+            .where(eq(activities.reportRequestId, Number(jobId)))
+            .orderBy(desc(activities.createdAt))
+            .limit(5);
+
+          toolData = {
+            job,
+            activities: recentActivities
+          };
+          
+          toolResult = `Found job "${job.fullName}" with ${recentActivities.length} recent activities`;
+          console.log("[AI Assistant] Retrieved job summary with", recentActivities.length, "activities");
+          break;
+        }
+
+        case "general_chat":
+        default: {
+          console.log("[AI Assistant] Executing general_chat");
+          toolResult = "No database query needed - general conversation";
+          toolData = null;
+          break;
+        }
+      }
+
+      // ============ STEP 4: Final Answer Generation (AI Pass #2) ============
+      console.log("[AI Assistant] Generating final answer");
+
+      const finalPrompt = `You are a helpful CRM assistant for a roofing company. Answer the user's question naturally and professionally.
+
+User Question: "${input.question}"
+
+Tool Used: ${intentResponse.tool}
+Tool Result: ${toolResult}
+
+${toolData ? `System Data:\n${JSON.stringify(toolData, null, 2)}` : 'No additional data available.'}
+
+Instructions:
+- Answer naturally in a conversational tone
+- If data was found, present it clearly and helpfully
+- If no data was found, acknowledge it and offer to help differently
+- For general chat, just respond naturally
+- Keep responses concise but complete
+- Use proper formatting for readability`;
+
+      try {
+        const finalResult = await model.generateContent(finalPrompt);
+        const finalResponse = await finalResult.response;
+        const answer = finalResponse.text();
+
+        return {
+          success: true,
+          answer,
+          intent: intentResponse,
+          toolResult,
+          dataFound: toolData !== null,
+        };
+      } catch (error) {
+        console.error("[AI Assistant] Final answer generation failed:", error);
+        
+        // Fallback response
+        return {
+          success: false,
+          answer: "I apologize, but I encountered an error processing your request. Please try again or rephrase your question.",
+          intent: intentResponse,
+          toolResult,
+          dataFound: false,
+          error: error instanceof Error ? error.message : "Unknown error"
+        };
+      }
     }),
 });
