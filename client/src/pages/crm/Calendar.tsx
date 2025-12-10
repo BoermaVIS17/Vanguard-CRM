@@ -42,7 +42,7 @@ export default function Calendar() {
     endDate,
   });
 
-  const { data: team } = trpc.crm.getTeam.useQuery();
+  const { data: team } = trpc.users.getTeam.useQuery();
   const { data: leads } = trpc.crm.getLeads.useQuery({ status: "new_lead" });
 
   const scheduleMutation = trpc.crm.scheduleAppointment.useMutation({
@@ -173,7 +173,7 @@ export default function Calendar() {
                       <SelectValue placeholder="Select team member..." />
                     </SelectTrigger>
                     <SelectContent className="bg-slate-700 border-slate-600">
-                      {team?.filter(m => m.role === "sales_rep" || m.role === "project_manager").map((member) => (
+                      {team?.filter((m: any) => m.role === "sales_rep" || m.role === "project_manager").map((member: any) => (
                         <SelectItem key={member.id} value={member.id.toString()} className="text-white hover:bg-slate-600">
                           {member.name || member.email}
                         </SelectItem>

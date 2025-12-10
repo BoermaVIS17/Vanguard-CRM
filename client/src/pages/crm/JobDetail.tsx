@@ -279,7 +279,7 @@ export default function JobDetail() {
               job={job as Job} // Backend returns job with activities/documents arrays
               jobId={jobId}
               canEdit={canEdit}
-              onCustomerSave={(data) => updateCustomerInfo.mutate({ id: jobId, ...data })}
+              onCustomerSave={(data) => updateCustomerInfo.mutate({ id: jobId, ...data } as any)}
               onStatusChange={(newStatus) => updateLead.mutate({ id: jobId, status: newStatus })}
               isSaving={updateCustomerInfo.isPending}
             />

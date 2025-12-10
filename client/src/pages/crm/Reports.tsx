@@ -39,7 +39,7 @@ export default function Reports() {
     salesRep: repFilter !== "all" ? repFilter : undefined,
   });
 
-  const { data: team } = trpc.crm.getTeam.useQuery();
+  const { data: team } = trpc.users.getTeam.useQuery();
 
   const exportToCSV = () => {
     if (!leads || leads.length === 0) {
@@ -293,7 +293,7 @@ export default function Reports() {
                   </SelectTrigger>
                   <SelectContent className="bg-slate-700 border-slate-600">
                     <SelectItem value="all" className="text-white hover:bg-slate-600">All Reps</SelectItem>
-                    {team?.filter(m => m.role === "sales_rep").map(rep => (
+                    {team?.filter((m: any) => m.role === "sales_rep").map((rep: any) => (
                       <SelectItem key={rep.id} value={rep.name || rep.email || 'unknown'} className="text-white hover:bg-slate-600">
                         {rep.name || rep.email}
                       </SelectItem>

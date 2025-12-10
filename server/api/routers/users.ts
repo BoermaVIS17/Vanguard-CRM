@@ -102,7 +102,7 @@ export const usersRouter = router({
   updateTeamMember: protectedProcedure
     .input(z.object({
       userId: z.number(),
-      role: z.enum(["user", "admin", "owner", "office", "sales_rep", "project_manager", "team_lead"]),
+      role: z.enum(["user", "admin", "owner", "office", "sales_rep", "project_manager", "team_lead", "field_crew"]),
       repCode: z.string().optional(),
       isActive: z.boolean().optional(),
       teamLeadId: z.number().nullable().optional(),
