@@ -26,6 +26,7 @@ import { proposalsRouter } from "./api/routers/proposals";
 import { materialsRouter } from "./api/routers/materials";
 import { usersRouter } from "./api/routers/users";
 import { activitiesRouter } from "./api/routers/activities";
+import { documentsRouter } from "./api/routers/documents";
 import { getDb } from "./db";
 import { reportRequests, users, activities, documents, editHistory, jobAttachments, jobMessageReads, notifications, materialOrders, materialKits } from "../drizzle/schema";
 import { PRODUCTS, validatePromoCode } from "./products";
@@ -171,9 +172,10 @@ export const appRouter = router({
   materials: materialsRouter, // Refactored to server/api/routers/materials.ts
   users: usersRouter, // Refactored to server/api/routers/users.ts
   activities: activitiesRouter, // Refactored to server/api/routers/activities.ts
+  documents: documentsRouter, // Refactored to server/api/routers/documents.ts
   
   // CRM procedures (protected - requires login)
-  // TODO: Extract documents, then rename to jobs.ts
+  // TODO: Rename to jobs.ts (core job/lead operations)
   crm: router({
     // Dashboard stats (filtered by role)
     getStats: protectedProcedure.query(async ({ ctx }) => {
@@ -1005,118 +1007,6 @@ export const appRouter = router({
     }),
 
     // ============ DOCUMENT UPLOAD ============
-    
-    // Upload document to a lead
-    uploadDocument: protectedProcedure
-      .input(z.object({
-        leadId: z.number(),
-        fileName: z.string(),
-        fileData: z.string(), // Base64 encoded file data
-        fileType: z.string(),
-        category: z.enum(["drone_photo", "inspection_photo", "report", "contract", "invoice", "other"]),
-      }))
-      .mutation(async ({ input, ctx }) => {
-        const db = await getDb();
-        if (!db) throw new Error("Database not available");
-
-        // Check permission
-        const [lead] = await db.select().from(reportRequests).where(eq(reportRequests.id, input.leadId));
-        if (!lead) throw new Error("Lead not found");
-
-        const user = ctx.user;
-        const teamMemberIds = user && isTeamLead(user) ? await getTeamMemberIds(db, user.id) : [];
-        if (!canEditJob(user, lead, teamMemberIds)) {
-          throw new Error("You don't have permission to upload documents to this job");
-        }
-
-        // Decode base64 file data
-        const buffer = Buffer.from(input.fileData, "base64");
-        const fileSize = buffer.length;
-
-        // Generate unique file path
-        const timestamp = Date.now();
-        const safeName = input.fileName.replace(/[^a-zA-Z0-9.-]/g, "_");
-        const filePath = `jobs/${input.leadId}/documents/${timestamp}_${safeName}`;
-
-        // Upload to Supabase Storage
-        const { url } = await storagePut(filePath, buffer, input.fileType);
-
-        // Save document record
-        const [result] = await db.insert(documents).values({
-          reportRequestId: input.leadId,
-          uploadedBy: ctx.user?.id,
-          fileName: input.fileName,
-          fileUrl: url,
-          fileType: input.fileType,
-          fileSize: fileSize,
-          category: input.category,
-        }).returning({ id: documents.id });
-
-        // Log activity
-        await db.insert(activities).values({
-          reportRequestId: input.leadId,
-          userId: ctx.user?.id,
-          activityType: "document_uploaded",
-          description: `Uploaded ${input.category.replace("_", " ")}: ${input.fileName}`,
-        });
-
-        // Log to edit history for audit trail
-        if (ctx.user?.id) {
-          await logEditHistory(
-            db,
-            input.leadId,
-            ctx.user.id,
-            "document",
-            null,
-            `Uploaded ${input.category}: ${input.fileName} (${(fileSize / 1024).toFixed(1)}KB)`,
-            "create",
-            ctx
-          );
-        }
-
-        return { success: true, documentId: result.id, url };
-      }),
-
-    // Get documents for a lead
-    getDocuments: protectedProcedure
-      .input(z.object({ leadId: z.number() }))
-      .query(async ({ input, ctx }) => {
-        const db = await getDb();
-        if (!db) throw new Error("Database not available");
-
-        // Check permission
-        const [lead] = await db.select().from(reportRequests).where(eq(reportRequests.id, input.leadId));
-        if (!lead) throw new Error("Lead not found");
-
-        const user = ctx.user;
-        const teamMemberIds = user && isTeamLead(user) ? await getTeamMemberIds(db, user.id) : [];
-        if (!canViewJob(user, lead, teamMemberIds)) {
-          throw new Error("You don't have permission to view documents for this job");
-        }
-
-        const docs = await db.select().from(documents)
-          .where(eq(documents.reportRequestId, input.leadId))
-          .orderBy(desc(documents.createdAt));
-
-        return docs;
-      }),
-
-    // Delete document (Owner only)
-    deleteDocument: protectedProcedure
-      .input(z.object({ documentId: z.number() }))
-      .mutation(async ({ input, ctx }) => {
-        const db = await getDb();
-        if (!db) throw new Error("Database not available");
-
-        // Only owners can delete
-        if (!canDeleteJob(ctx.user)) {
-          throw new Error("Only owners can delete documents");
-        }
-
-        await db.delete(documents).where(eq(documents.id, input.documentId));
-        return { success: true };
-      }),
-
     // ============ SCHEDULING / CALENDAR ============
 
     // Get appointments for calendar view (role-based)
