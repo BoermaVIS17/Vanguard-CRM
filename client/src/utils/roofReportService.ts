@@ -1,12 +1,8 @@
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
-// Get Google Maps API key from environment variable
-const GOOGLE_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_KEY;
-
-if (!GOOGLE_API_KEY) {
-  console.error('❌ Missing VITE_GOOGLE_MAPS_KEY environment variable in roofReportService');
-}
+// Get Google Maps API key from environment variable (with fallback)
+const GOOGLE_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_KEY || "AIzaSyA7QSM-fqUn4grHM6OYddNgKzK7uMlBY1I";
 
 // Company branding colors
 const BRAND_BLUE = '#1e40af'; // Deep blue
