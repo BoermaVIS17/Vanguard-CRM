@@ -2071,6 +2071,7 @@ export default function JobDetail() {
                 jobId={jobId}
                 roofArea={(job as any).solarApiData?.totalArea}
                 manualAreaSqFt={(job as any).manualAreaSqFt}
+                solarCoverage={(job as any).solarApiData?.solarCoverage || false}
                 currentPricePerSq={(job as any).pricePerSq}
                 currentTotalPrice={(job as any).totalPrice}
                 currentCounterPrice={(job as any).counterPrice}
@@ -2304,7 +2305,7 @@ export default function JobDetail() {
           open={showMaterialDialog}
           onOpenChange={setShowMaterialDialog}
           jobAddress={`${job.address}, ${job.cityStateZip}`}
-          roofArea={(job as any).solarApiData?.roofArea || 0}
+          roofArea={(job as any).solarApiData?.totalArea || 0}
           perimeter={(job as any).solarApiData?.perimeter}
           ridgeLength={(job as any).solarApiData?.ridgeLength}
           shingleColor={(job as any).solarApiData?.shingleColor}

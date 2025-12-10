@@ -23,6 +23,7 @@ interface ProposalCalculatorProps {
   jobId: number;
   roofArea?: number; // From solarApiData
   manualAreaSqFt?: number; // Manual entry fallback
+  solarCoverage?: boolean; // Whether solar data is available
   currentPricePerSq?: string | null;
   currentTotalPrice?: string | null;
   currentCounterPrice?: string | null;
@@ -35,6 +36,7 @@ export function ProposalCalculator({
   jobId,
   roofArea,
   manualAreaSqFt,
+  solarCoverage = false,
   currentPricePerSq,
   currentTotalPrice,
   currentCounterPrice,
@@ -49,12 +51,15 @@ export function ProposalCalculator({
   const [customerName, setCustomerName] = useState("");
   const [dealType, setDealType] = useState<"insurance" | "cash" | "financed">("cash");
   const [pdfPreviewUrl, setPdfPreviewUrl] = useState<string>();
+  const [manualSqFt, setManualSqFt] = useState<string>(manualAreaSqFt?.toString() || "");
 
   const utils = trpc.useUtils();
 
   // Calculate roof squares (1 square = 100 sq ft)
-  const roofSqFt = roofArea || manualAreaSqFt || 0;
-  const roofSquares = roofSqFt / 100;
+  // Priority: Manual override > Solar data > Manual fallback
+  const manualOverride = parseFloat(manualSqFt) || 0;
+  const finalSqFt = manualOverride > 0 ? manualOverride : (roofArea || manualAreaSqFt || 0);
+  const roofSquares = finalSqFt / 100;
 
   // Calculate total price
   const pricePerSqNum = parseFloat(pricePerSq) || 0;
@@ -251,8 +256,49 @@ export function ProposalCalculator({
     }
   };
 
+  // Determine coverage badge
+  const getCoverageBadge = () => {
+    if (manualOverride > 0) {
+      return {
+        icon: "👤",
+        label: "Manual Override",
+        color: "bg-yellow-500",
+        textColor: "text-yellow-100"
+      };
+    }
+    if (solarCoverage && roofArea) {
+      return {
+        icon: "⚡",
+        label: "Solar Measured",
+        color: "bg-green-500",
+        textColor: "text-green-100"
+      };
+    }
+    return {
+      icon: "📏",
+      label: "Manual Measure Required",
+      color: "bg-red-500",
+      textColor: "text-red-100"
+    };
+  };
+
+  const coverageBadge = getCoverageBadge();
+
+  // Handle manual override change
+  const handleManualSqFtChange = (value: string) => {
+    setManualSqFt(value);
+    const sqFt = parseFloat(value) || 0;
+    if (sqFt > 0) {
+      // Save manual override to database
+      updateProposal.mutate({
+        jobId,
+        manualAreaSqFt: sqFt,
+      });
+    }
+  };
+
   // No roof data available
-  if (!roofSqFt) {
+  if (!finalSqFt) {
     return (
       <Card className="border-slate-700 bg-slate-800">
         <CardHeader>
@@ -287,13 +333,40 @@ export function ProposalCalculator({
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
+          {/* Manual Override Input */}
+          <div className="space-y-2">
+            <Label htmlFor="manualSqFt" className="text-white flex items-center gap-2">
+              Manual Roof Area (sq ft)
+              <Badge className={`${coverageBadge.color} ${coverageBadge.textColor} text-xs`}>
+                {coverageBadge.icon} {coverageBadge.label}
+              </Badge>
+            </Label>
+            <Input
+              id="manualSqFt"
+              type="number"
+              step="1"
+              min="0"
+              value={manualSqFt}
+              onChange={(e) => handleManualSqFtChange(e.target.value)}
+              placeholder={roofArea ? `Auto: ${roofArea.toFixed(0)} sq ft` : "Enter manual area"}
+              className="bg-slate-700 border-slate-600 text-white"
+            />
+            <p className="text-xs text-slate-400">
+              {manualOverride > 0 
+                ? "Using manual override value" 
+                : roofArea 
+                  ? "Leave blank to use solar-measured area" 
+                  : "Manual measurement required"}
+            </p>
+          </div>
+
           {/* Roof Size Display */}
           <div className="p-4 bg-slate-700 rounded-lg border border-slate-600">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-slate-400">Roof Size</p>
                 <p className="text-2xl font-bold text-white">{roofSquares.toFixed(1)} squares</p>
-                <p className="text-xs text-slate-500 mt-1">{roofSqFt.toFixed(0)} sq ft</p>
+                <p className="text-xs text-slate-500 mt-1">{finalSqFt.toFixed(0)} sq ft</p>
               </div>
               <Shield className="w-12 h-12 text-slate-600" />
             </div>

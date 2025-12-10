@@ -73,7 +73,7 @@ export async function fetchSolarApiData(
   solarCoverage: boolean;
   buildingInsights?: SolarData;
   imageryUrl: string;
-  roofArea?: number;
+  roofAreaSqMeters?: number;
   latitude: number;
   longitude: number;
   [key: string]: any;
@@ -128,14 +128,14 @@ export async function fetchSolarApiData(
     // Use Static Maps API for satellite imagery
     const imageryUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${imgLat},${imgLng}&zoom=20&size=800x800&maptype=satellite&key=${apiKey}`;
     
-    // Calculate roof area if available
-    const roofArea = buildingInsights.solarPotential?.wholeRoofStats?.areaMeters2;
+    // Calculate roof area if available (in square meters)
+    const roofAreaSqMeters = buildingInsights.solarPotential?.wholeRoofStats?.areaMeters2;
     
     return {
       solarCoverage: true,
       buildingInsights,
       imageryUrl,
-      roofArea,
+      roofAreaSqMeters,
       latitude: imgLat,
       longitude: imgLng,
     };
