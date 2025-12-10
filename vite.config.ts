@@ -18,7 +18,11 @@ export default defineConfig({
       "@": path.resolve(__dirname, "client", "src"),
       "@shared": path.resolve(__dirname, "shared"),
       "@assets": path.resolve(__dirname, "attached_assets"),
+      buffer: "buffer/",
     },
+  },
+  define: {
+    global: "globalThis",
   },
   envDir: path.resolve(__dirname),
   publicDir: path.resolve(__dirname, "client", "public"),
