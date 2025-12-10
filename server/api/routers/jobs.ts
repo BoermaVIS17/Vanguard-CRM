@@ -443,6 +443,50 @@ export const jobsRouter = router({
         return { success: true };
       }),
 
+    // Update selected product for proposal
+    updateProduct: protectedProcedure
+      .input(z.object({
+        id: z.number(),
+        selectedProductId: z.number().nullable(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const db = await getDb();
+        if (!db) throw new Error("Database not available");
+
+        // Get current lead data
+        const [currentLead] = await db.select().from(reportRequests).where(eq(reportRequests.id, input.id));
+        if (!currentLead) throw new Error("Lead not found");
+
+        // Check permission
+        const user = ctx.user;
+        const teamMemberIds = user && isTeamLead(user) ? await getTeamMemberIds(db, user.id) : [];
+        if (!canEditJob(user, currentLead, teamMemberIds)) {
+          throw new Error("You don't have permission to edit this job");
+        }
+
+        // Update the selected product
+        await db.update(reportRequests)
+          .set({ 
+            selectedProductId: input.selectedProductId,
+            updatedAt: new Date()
+          })
+          .where(eq(reportRequests.id, input.id));
+
+        // Log edit history
+        await logEditHistory(
+          db,
+          input.id,
+          user?.id || 0,
+          "selected_product_id",
+          currentLead.selectedProductId?.toString() || null,
+          input.selectedProductId?.toString() || null,
+          "update",
+          ctx
+        );
+
+        return { success: true };
+      }),
+
     // Update customer info (editable fields with edit history)
     updateCustomerInfo: protectedProcedure
       .input(z.object({

@@ -208,6 +208,7 @@ export interface Job {
   // Pricing & Proposal
   pricePerSq?: string | null; // numeric stored as string
   totalPrice?: string | null; // numeric stored as string
+  selectedProductId?: number | null; // FK to products table
   counterPrice?: string | null; // numeric stored as string
   priceStatus?: PriceStatus | null;
   

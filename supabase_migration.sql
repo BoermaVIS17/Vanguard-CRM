@@ -727,6 +727,10 @@ CREATE POLICY "Allow service role full access to products"
 -- Grant permissions
 GRANT SELECT, INSERT, UPDATE, DELETE ON "products" TO authenticated;
 
+-- Add selected_product_id to report_requests
+ALTER TABLE report_requests ADD COLUMN IF NOT EXISTS selected_product_id INTEGER;
+CREATE INDEX IF NOT EXISTS idx_report_requests_selected_product ON report_requests(selected_product_id);
+
 -- Tamko Titan XT Shingle Products
 INSERT INTO "products" (
   "category", "manufacturer", "product_name", "color", "wind_rating", 

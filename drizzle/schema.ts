@@ -190,6 +190,7 @@ export const reportRequests = pgTable("report_requests", {
   // Pricing & Proposal
   pricePerSq: numeric("price_per_sq", { precision: 10, scale: 2 }),
   totalPrice: numeric("total_price", { precision: 10, scale: 2 }),
+  selectedProductId: integer("selected_product_id"), // FK to products table for selected shingle
   counterPrice: numeric("counter_price", { precision: 10, scale: 2 }),
   priceStatus: priceStatusEnum("price_status").default("draft"),
   
