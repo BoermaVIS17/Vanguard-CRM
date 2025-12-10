@@ -13,7 +13,7 @@ export function RoofMeasurementGuide() {
       <CardContent>
         <div className="bg-white rounded-lg p-2 overflow-hidden cursor-zoom-in">
           <img 
-            src="https://gvqfpqgvkqvqxjvqfqxj.supabase.co/storage/v1/object/public/CRM%20files/roof-measurement-guide.png" 
+            src="https://mkmdffzjkttsklzsrdbv.supabase.co/storage/v1/object/public/Roof%20measurement%20diagram/roof-measurement-guide.png.jpg" 
             alt="Roof Measurement Guide showing color-coded roof components"
             className="w-full h-auto rounded transition-transform duration-300 ease-in-out hover:scale-150"
           />
