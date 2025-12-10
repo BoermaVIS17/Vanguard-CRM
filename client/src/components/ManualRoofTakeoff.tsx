@@ -22,23 +22,7 @@ interface RoofMeasurements {
 }
 
 // Pitch multipliers for roof slope calculations
-const PITCH_MULTIPLIERS: Record<string, number> = {
-  'flat': 1.000,
-  '2/12': 1.014,
-  '3/12': 1.031,
-  '4/12': 1.054,
-  '5/12': 1.083,
-  '6/12': 1.118,
-  '7/12': 1.158,
-  '8/12': 1.202,
-  '9/12': 1.250,
-  '10/12': 1.302,
-  '11/12': 1.357,
-  '12/12': 1.414,
-};
-
-const METERS_TO_SQFT = 10.764;
-const METERS_TO_FEET = 3.28084;
+import { PITCH_MULTIPLIERS, METERS_TO_SQFT, METERS_TO_FEET } from '@/utils/roofingMath';
 
 export function ManualRoofTakeoff({ latitude, longitude, onSave, forceShow = false }: ManualRoofTakeoffProps) {
   const [isDrawing, setIsDrawing] = useState(false);

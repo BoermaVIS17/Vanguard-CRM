@@ -4,6 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { calculateRoofMetrics, calculateMaterialRequirements, formatLinearFeet, RoofMetrics, RoofSegment } from '@/utils/roofMath';
+import { convertSqMetersToSqFeet } from '@/utils/roofingMath';
 import { Download, Ruler, Home, ChevronUp, ChevronDown, Plus, Minus, MapPin, X } from 'lucide-react';
 import { ManualRoofTakeoff } from './ManualRoofTakeoff';
 import { GoogleStreetView } from './GoogleStreetView';
@@ -101,8 +102,8 @@ export function RoofingReportView({ solarApiData, jobData, isGoogleMapsLoaded }:
     // Calculate area in square meters
     const areaInSquareMeters = google.maps.geometry.spherical.computeArea(polygon.getPath());
     
-    // Convert to square feet (1 sq meter = 10.764 sq feet)
-    const areaInSquareFeet = areaInSquareMeters * 10.764;
+    // Convert to square feet using centralized conversion factor
+    const areaInSquareFeet = convertSqMetersToSqFeet(areaInSquareMeters);
     
     // Save measured area
     setMeasuredArea(areaInSquareFeet);
