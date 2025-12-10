@@ -47,37 +47,51 @@ function Router() {
       {/* CRM routes - protected with Supabase Auth */}
       <Route path={"/crm"}>
         <ProtectedRoute>
-          <CRMDashboard />
+          <ErrorBoundary>
+            <CRMDashboard />
+          </ErrorBoundary>
         </ProtectedRoute>
       </Route>
       <Route path={"/crm/leads"}>
         <ProtectedRoute>
-          <CRMLeads />
+          <ErrorBoundary>
+            <CRMLeads />
+          </ErrorBoundary>
         </ProtectedRoute>
       </Route>
       <Route path={"/crm/pipeline"}>
         <ProtectedRoute>
-          <CRMPipeline />
+          <ErrorBoundary>
+            <CRMPipeline />
+          </ErrorBoundary>
         </ProtectedRoute>
       </Route>
       <Route path={"/crm/team"}>
         <ProtectedRoute>
-          <CRMTeam />
+          <ErrorBoundary>
+            <CRMTeam />
+          </ErrorBoundary>
         </ProtectedRoute>
       </Route>
       <Route path={"/crm/calendar"}>
         <ProtectedRoute>
-          <CRMCalendar />
+          <ErrorBoundary>
+            <CRMCalendar />
+          </ErrorBoundary>
         </ProtectedRoute>
       </Route>
       <Route path={"/crm/reports"}>
         <ProtectedRoute>
-          <CRMReports />
+          <ErrorBoundary>
+            <CRMReports />
+          </ErrorBoundary>
         </ProtectedRoute>
       </Route>
       <Route path={"/crm/job/:id"}>
         <ProtectedRoute>
-          <JobDetail />
+          <ErrorBoundary>
+            <JobDetail />
+          </ErrorBoundary>
         </ProtectedRoute>
       </Route>
       
