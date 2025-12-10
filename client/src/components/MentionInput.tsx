@@ -160,9 +160,9 @@ export function MentionInput({
 
       {/* Mention Autocomplete Dropdown */}
       {showMentionList && filteredUsers.length > 0 && (
-        <Card className="absolute bottom-full left-0 mb-2 w-full max-w-md bg-slate-800 border-slate-700 shadow-lg z-50 max-h-60 overflow-y-auto">
+        <Card className="absolute bottom-full left-0 mb-2 min-w-[320px] w-full max-w-md bg-slate-800 border-slate-700 shadow-lg z-50 max-h-60 overflow-y-auto">
           <div className="p-2">
-            <div className="text-xs text-slate-400 px-2 py-1 mb-1">
+            <div className="text-xs text-slate-400 px-2 py-1 mb-1 whitespace-nowrap">
               Mention a team member
             </div>
             {filteredUsers.map((user: User, index: number) => (
@@ -177,7 +177,7 @@ export function MentionInput({
                   index === selectedIndex ? "bg-slate-700" : ""
                 }`}
               >
-                <div className="flex items-center gap-3">
+                <div className="flex flex-row items-center gap-3">
                   <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#00d4aa] to-[#00b894] flex items-center justify-center flex-shrink-0">
                     <span className="font-semibold text-sm text-black">
                       {(user.name || user.email || "?").charAt(0).toUpperCase()}
