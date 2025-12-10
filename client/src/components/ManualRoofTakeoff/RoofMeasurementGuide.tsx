@@ -1,7 +1,35 @@
+import { useState, useRef, MouseEvent } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Info } from 'lucide-react';
 
 export function RoofMeasurementGuide() {
+  const [showMagnifier, setShowMagnifier] = useState(false);
+  const [magnifierPosition, setMagnifierPosition] = useState({ x: 0, y: 0 });
+  const imgRef = useRef<HTMLImageElement>(null);
+
+  const handleMouseMove = (e: MouseEvent<HTMLDivElement>) => {
+    if (!imgRef.current) return;
+
+    const rect = imgRef.current.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    // Keep magnifier within image bounds
+    if (x >= 0 && x <= rect.width && y >= 0 && y <= rect.height) {
+      setMagnifierPosition({ x, y });
+      setShowMagnifier(true);
+    } else {
+      setShowMagnifier(false);
+    }
+  };
+
+  const handleMouseLeave = () => {
+    setShowMagnifier(false);
+  };
+
+  const magnifierSize = 150; // Size of the magnifying glass
+  const zoomLevel = 2.5; // Magnification level
+
   return (
     <Card className="bg-slate-800 border-slate-700">
       <CardHeader>
@@ -11,12 +39,35 @@ export function RoofMeasurementGuide() {
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="bg-white rounded-lg p-2 overflow-hidden cursor-zoom-in">
+        <div 
+          className="bg-white rounded-lg p-2 overflow-hidden relative cursor-crosshair"
+          onMouseMove={handleMouseMove}
+          onMouseLeave={handleMouseLeave}
+        >
           <img 
+            ref={imgRef}
             src="https://mkmdffzjkttsklzsrdbv.supabase.co/storage/v1/object/public/Roof%20measurement%20diagram/roof-measurement-guide.png.jpg" 
             alt="Roof Measurement Guide showing color-coded roof components"
-            className="w-full h-auto rounded transition-transform duration-300 ease-in-out hover:scale-150"
+            className="w-full h-auto rounded select-none"
+            draggable={false}
           />
+          
+          {/* Magnifying Glass */}
+          {showMagnifier && (
+            <div
+              className="absolute pointer-events-none border-4 border-slate-900 rounded-full shadow-2xl overflow-hidden"
+              style={{
+                width: `${magnifierSize}px`,
+                height: `${magnifierSize}px`,
+                left: `${magnifierPosition.x - magnifierSize / 2}px`,
+                top: `${magnifierPosition.y - magnifierSize / 2}px`,
+                backgroundImage: `url(https://mkmdffzjkttsklzsrdbv.supabase.co/storage/v1/object/public/Roof%20measurement%20diagram/roof-measurement-guide.png.jpg)`,
+                backgroundRepeat: 'no-repeat',
+                backgroundSize: `${(imgRef.current?.width || 0) * zoomLevel}px ${(imgRef.current?.height || 0) * zoomLevel}px`,
+                backgroundPosition: `-${magnifierPosition.x * zoomLevel - magnifierSize / 2}px -${magnifierPosition.y * zoomLevel - magnifierSize / 2}px`,
+              }}
+            />
+          )}
         </div>
         <div className="mt-3 space-y-1 text-xs text-slate-300">
           <p className="font-semibold text-slate-200">Quick Reference:</p>
