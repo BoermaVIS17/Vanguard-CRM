@@ -55,6 +55,8 @@ import { RoofingReportView } from "@/components/RoofingReportView";
 import { MaterialEmailDialog } from "@/components/crm/MaterialEmailDialog";
 import { ProposalCalculator } from "@/components/crm/ProposalCalculator";
 import { GoogleMapsLoader } from "@/components/GoogleMapsLoader";
+import { JobProposalTab } from "@/components/crm/job-detail/JobProposalTab";
+import { JobProductionTab } from "@/components/crm/job-detail/JobProductionTab";
 
 // Helper function to format mentions in messages
 const formatMentions = (text: string) => {
@@ -1455,95 +1457,12 @@ export default function JobDetail() {
 
           {/* Production Report Tab */}
           {activeTab === "production_report" && (
-            <div>
-              {job.solarApiData ? (
-                <div className="space-y-4">
-                  {/* Regenerate Button */}
-                  <div className="flex justify-end">
-                    <Button
-                      onClick={() => {
-                        if (confirm("This will re-fetch the Solar API data and may incur API charges. Continue?")) {
-                          generateReport.mutate({ jobId });
-                        }
-                      }}
-                      disabled={generateReport.isPending}
-                      variant="outline"
-                      className="border-slate-600 text-slate-300 hover:bg-slate-700"
-                    >
-                      {generateReport.isPending ? (
-                        <>
-                          <div className="animate-spin w-4 h-4 border-2 border-[#00d4aa] border-t-transparent rounded-full mr-2" />
-                          Regenerating...
-                        </>
-                      ) : (
-                        <>
-                          <Grid3X3 className="w-4 h-4 mr-2" />
-                          Update Report
-                        </>
-                      )}
-                    </Button>
-                  </div>
-                  
-                  <GoogleMapsLoader>
-                    <RoofingReportView
-                      solarApiData={job.solarApiData}
-                      jobData={{
-                        fullName: job.fullName,
-                        address: job.address,
-                        cityStateZip: job.cityStateZip,
-                      }}
-                      isGoogleMapsLoaded={true}
-                    />
-                  </GoogleMapsLoader>
-                </div>
-              ) : (
-                <Card className="bg-slate-800 border-slate-700">
-                  <CardContent className="py-12">
-                    <div className="text-center max-w-md mx-auto">
-                      <Grid3X3 className="w-16 h-16 text-slate-600 mx-auto mb-4" />
-                      <h3 className="text-lg font-semibold text-white mb-2">Production Report Not Generated</h3>
-                      <p className="text-slate-400 mb-4">
-                        Generate a professional roof measurement report using Google Solar API.
-                      </p>
-                      
-                      {job.latitude && job.longitude ? (
-                        <>
-                          <p className="text-sm text-slate-500 mb-6">
-                            Coordinates: {job.latitude.toFixed(6)}, {job.longitude.toFixed(6)}
-                          </p>
-                          <Button
-                            onClick={() => generateReport.mutate({ jobId })}
-                            disabled={generateReport.isPending}
-                            className="bg-[#00d4aa] hover:bg-[#00b894] text-black font-semibold"
-                          >
-                            {generateReport.isPending ? (
-                              <>
-                                <div className="animate-spin w-4 h-4 border-2 border-black border-t-transparent rounded-full mr-2" />
-                                Analyzing Roof...
-                              </>
-                            ) : (
-                              <>
-                                <Grid3X3 className="w-4 h-4 mr-2" />
-                                Generate Report
-                              </>
-                            )}
-                          </Button>
-                          <p className="text-xs text-slate-500 mt-3">
-                            Note: This will make a Google Solar API request
-                          </p>
-                        </>
-                      ) : (
-                        <div className="bg-yellow-900/20 border border-yellow-700/50 rounded-lg p-4 mt-4">
-                          <p className="text-sm text-yellow-400">
-                            ⚠️ This job doesn't have valid coordinates. Please update the address with a valid location to generate a report.
-                          </p>
-                        </div>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
-            </div>
+            <JobProductionTab
+              job={job}
+              jobId={jobId}
+              onGenerateReport={() => generateReport.mutate({ jobId })}
+              isGenerating={generateReport.isPending}
+            />
           )}
 
           {/* Documents Tab */}
@@ -2067,22 +1986,12 @@ export default function JobDetail() {
 
           {/* Proposal Tab */}
           {activeTab === "proposal" && (
-            <div>
-              <ProposalCalculator
-                jobId={jobId}
-                roofArea={job.solarApiData?.totalArea}
-                manualAreaSqFt={undefined}
-                solarCoverage={job.solarApiData?.solarCoverage || false}
-                currentPricePerSq={job.pricePerSq}
-                currentTotalPrice={job.totalPrice}
-                currentCounterPrice={job.counterPrice}
-                currentPriceStatus={job.priceStatus}
-                userRole={permissions?.role || "user"}
-                onUpdate={() => {
-                  refetch();
-                }}
-              />
-            </div>
+            <JobProposalTab
+              jobId={jobId}
+              job={job}
+              userRole={permissions?.role || "user"}
+              onUpdate={() => refetch()}
+            />
           )}
 
           {/* Edit History Tab (Owner/Admin only) */}
