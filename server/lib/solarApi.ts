@@ -82,12 +82,13 @@ export async function fetchSolarApiData(
   
   if (!apiKey) {
     console.warn("[SolarAPI] Missing GOOGLE_MAPS_API_KEY - returning fallback");
+    // Still provide a basic satellite image without API key (will show watermark)
     return {
       solarCoverage: false,
       latitude,
       longitude,
       imageryUrl: `https://maps.googleapis.com/maps/api/staticmap?center=${latitude},${longitude}&zoom=19&size=600x600&maptype=satellite`,
-      message: "Google Maps API key not configured",
+      message: "Maps API key not configured - using fallback imagery",
     };
   }
 

@@ -150,24 +150,16 @@ export function RoofingReportView({ solarApiData, jobData, isGoogleMapsLoaded }:
     if (!ctx) return;
 
     // Get imagery URL from API response with fallback
-    const imageryUrl = solarApiData.imageryUrl;
+    let imageryUrl = solarApiData.imageryUrl;
+    
+    // Fallback: construct imagery URL from coordinates if not provided
+    if (!imageryUrl && solarApiData.lat && solarApiData.lng) {
+      console.log('[RoofingReport] No imagery URL provided, generating from coordinates');
+      imageryUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${solarApiData.lat},${solarApiData.lng}&zoom=19&size=600x600&maptype=satellite&key=${import.meta.env.VITE_GOOGLE_MAPS_KEY}`;
+    }
+    
     if (!imageryUrl) {
-      console.error('[RoofingReport] No imagery URL found in solarApiData:', solarApiData);
-      console.error('[RoofingReport] This should not happen - check server/lib/solarApi.ts');
-      // Construct fallback imagery URL if we have coordinates
-      if (solarApiData.lat && solarApiData.lng) {
-        console.warn('[RoofingReport] Using fallback satellite image from coordinates');
-        const fallbackUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${solarApiData.lat},${solarApiData.lng}&zoom=19&size=600x600&maptype=satellite&key=${import.meta.env.VITE_GOOGLE_MAPS_KEY}`;
-        const img = new Image();
-        img.onload = () => {
-          canvas.width = img.width;
-          canvas.height = img.height;
-          ctx.drawImage(img, 0, 0);
-          setImageLoaded(true);
-        };
-        img.onerror = () => console.error('[RoofingReport] Fallback imagery also failed to load');
-        img.src = fallbackUrl;
-      }
+      console.warn('[RoofingReport] No imagery URL available and no coordinates provided');
       return;
     }
 
