@@ -154,7 +154,8 @@ export interface Job {
   latitude?: number | null;
   longitude?: number | null;
   solarApiData?: SolarApiData | null; // JSONB field with proper typing
-  estimatorData?: any | null; // JSONB field
+  estimatorData?: any; // JSONB field
+  manualAreaSqFt?: number | null;
   roofAge?: string | null;
   roofConcerns?: string | null;
   handsOnInspection: boolean;

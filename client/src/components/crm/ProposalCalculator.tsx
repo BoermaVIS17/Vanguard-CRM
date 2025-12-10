@@ -285,17 +285,26 @@ export function ProposalCalculator({
 
   const coverageBadge = getCoverageBadge();
 
+  // Mutation to save manual area override
+  const updateManualArea = trpc.crm.updateLead.useMutation({
+    onSuccess: () => {
+      toast.success("Manual area saved");
+      onUpdate?.();
+    },
+    onError: (error) => {
+      toast.error(`Failed to save: ${error.message}`);
+    },
+  });
+
   // Handle manual override change
   const handleManualSqFtChange = (value: string) => {
     setManualSqFt(value);
-    const sqFt = parseFloat(value) || 0;
-    if (sqFt > 0) {
-      // Save manual override to database
-      updateProposal.mutate({
-        jobId,
-        manualAreaSqFt: sqFt,
-      });
-    }
+    const sqFt = parseFloat(value) || null;
+    // Save manual override to database (null clears the override)
+    updateManualArea.mutate({
+      id: jobId,
+      manualAreaSqFt: sqFt,
+    });
   };
 
   // No roof data available

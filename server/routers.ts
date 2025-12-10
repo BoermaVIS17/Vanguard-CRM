@@ -450,6 +450,7 @@ export const appRouter = router({
         internalNotes: z.string().optional(),
         scheduledDate: z.string().optional(),
         customerStatusMessage: z.string().optional(),
+        manualAreaSqFt: z.number().nullable().optional(), // Manual roof area override
         attachments: z.array(z.object({
           fileName: z.string(),
           fileData: z.string(), // Base64 encoded file data
@@ -545,6 +546,10 @@ export const appRouter = router({
         if (input.customerStatusMessage !== undefined && input.customerStatusMessage !== currentLead.customerStatusMessage) {
           updateData.customerStatusMessage = input.customerStatusMessage;
           await logEditHistory(db, input.id, user!.id, "customerStatusMessage", currentLead.customerStatusMessage || "", input.customerStatusMessage, "update", ctx);
+        }
+        if (input.manualAreaSqFt !== undefined && input.manualAreaSqFt !== currentLead.manualAreaSqFt) {
+          updateData.manualAreaSqFt = input.manualAreaSqFt;
+          await logEditHistory(db, input.id, user!.id, "manualAreaSqFt", String(currentLead.manualAreaSqFt || ""), String(input.manualAreaSqFt || ""), "update", ctx);
         }
 
         if (Object.keys(updateData).length > 0) {
