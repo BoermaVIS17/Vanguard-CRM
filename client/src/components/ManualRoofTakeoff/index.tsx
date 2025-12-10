@@ -26,6 +26,10 @@ export function ManualRoofTakeoff({ latitude, longitude, onSave, forceShow = fal
   const [tempLine, setTempLine] = useState<google.maps.Polyline | null>(null);
   const [mousePosition, setMousePosition] = useState<google.maps.LatLng | null>(null);
   
+  // Snap-to-vertex state
+  const [snapMarker, setSnapMarker] = useState<google.maps.Marker | null>(null);
+  const [snappedVertex, setSnappedVertex] = useState<google.maps.LatLng | null>(null);
+  
   // Refs
   const mapRef = useRef<google.maps.Map | null>(null);
   const drawingManagerRef = useRef<google.maps.drawing.DrawingManager | null>(null);
@@ -52,16 +56,19 @@ export function ManualRoofTakeoff({ latitude, longitude, onSave, forceShow = fal
       drawingControl: false,
       polygonOptions: {
         fillColor: '#FF0000',
-        fillOpacity: 0.3,
+        fillOpacity: 0.15,
         strokeWeight: 2,
         strokeColor: '#FF0000',
+        strokeOpacity: 0.8,
         editable: true,
         draggable: false,
+        zIndex: 1,
       },
       polylineOptions: {
         strokeWeight: 3,
         strokeColor: '#FF0000',
         editable: true,
+        zIndex: 10,
       },
     });
 
@@ -128,11 +135,54 @@ export function ManualRoofTakeoff({ latitude, longitude, onSave, forceShow = fal
     }
   };
 
+  // Helper function to find nearest vertex for snapping
+  const findNearestVertex = (latLng: google.maps.LatLng): google.maps.LatLng | null => {
+    if (!polygon || !mapRef.current) return null;
+    
+    const path = polygon.getPath();
+    const projection = mapRef.current.getProjection();
+    if (!projection) return null;
+    
+    const point = projection.fromLatLngToPoint(latLng);
+    if (!point) return null;
+    
+    const zoom = mapRef.current.getZoom() || 21;
+    const snapThreshold = 10 / Math.pow(2, zoom); // ~10 pixels in world coordinates
+    
+    let nearestVertex: google.maps.LatLng | null = null;
+    let minDistance = snapThreshold;
+    
+    for (let i = 0; i < path.getLength(); i++) {
+      const vertex = path.getAt(i);
+      const vertexPoint = projection.fromLatLngToPoint(vertex);
+      if (!vertexPoint) continue;
+      
+      const distance = Math.sqrt(
+        Math.pow(point.x - vertexPoint.x, 2) + Math.pow(point.y - vertexPoint.y, 2)
+      );
+      
+      if (distance < minDistance) {
+        minDistance = distance;
+        nearestVertex = vertex;
+      }
+    }
+    
+    return nearestVertex;
+  };
+
   // Handle polygon completion
   const handlePolygonComplete = (newPolygon: google.maps.Polygon) => {
     if (polygon) {
       polygon.setMap(null);
     }
+    
+    // Set polygon options for better visibility
+    newPolygon.setOptions({
+      fillOpacity: 0.15,
+      strokeOpacity: 0.8,
+      zIndex: 1,
+      clickable: false, // Prevent blocking clicks when drawing lines
+    });
     
     setPolygon(newPolygon);
     calculateMeasurements(newPolygon);
@@ -222,13 +272,16 @@ export function ManualRoofTakeoff({ latitude, longitude, onSave, forceShow = fal
   const handleMapClick = (event: google.maps.MapMouseEvent) => {
     if (!event.latLng || !activeTool || activeTool === 'area') return;
     
+    // Use snapped vertex if available, otherwise use click position
+    const clickPosition = snappedVertex || event.latLng;
+    
     if (!tempLineStart) {
       // First click: set start point
-      setTempLineStart(event.latLng);
+      setTempLineStart(clickPosition);
       toast.info(`Click the end point for ${activeTool}`);
     } else {
       // Second click: create line and reset
-      const path = [tempLineStart, event.latLng];
+      const path = [tempLineStart, clickPosition];
       
       const newPolyline = new google.maps.Polyline({
         path,
@@ -236,6 +289,7 @@ export function ManualRoofTakeoff({ latitude, longitude, onSave, forceShow = fal
         strokeColor: MEASUREMENT_COLORS[activeTool],
         editable: true,
         map: mapRef.current,
+        zIndex: 10, // Higher than polygon to allow overlapping
       });
       
       const length = calculatePolylineLength(newPolyline);
@@ -278,21 +332,61 @@ export function ManualRoofTakeoff({ latitude, longitude, onSave, forceShow = fal
   
   // Handle mouse move for temporary line preview
   const handleMapMouseMove = (event: google.maps.MapMouseEvent) => {
-    if (!event.latLng || !activeTool || !tempLineStart || activeTool === 'area') return;
+    if (!event.latLng || !activeTool || activeTool === 'area') return;
     
-    setMousePosition(event.latLng);
+    // Check for nearby vertices to snap to
+    const nearestVertex = findNearestVertex(event.latLng);
+    const positionToUse = nearestVertex || event.latLng;
+    
+    // Update snapped vertex state
+    if (nearestVertex) {
+      setSnappedVertex(nearestVertex);
+      
+      // Show snap indicator
+      if (!snapMarker) {
+        const marker = new google.maps.Marker({
+          position: nearestVertex,
+          map: mapRef.current,
+          icon: {
+            path: google.maps.SymbolPath.CIRCLE,
+            scale: 8,
+            fillColor: '#FFFF00',
+            fillOpacity: 0.6,
+            strokeColor: '#FFA500',
+            strokeWeight: 2,
+          },
+          zIndex: 100,
+          clickable: false,
+        });
+        setSnapMarker(marker);
+      } else {
+        snapMarker.setPosition(nearestVertex);
+      }
+    } else {
+      setSnappedVertex(null);
+      if (snapMarker) {
+        snapMarker.setMap(null);
+        setSnapMarker(null);
+      }
+    }
+    
+    // Only update temp line if we have a start point
+    if (!tempLineStart) return;
+    
+    setMousePosition(positionToUse);
     
     // Update or create temporary line
     if (tempLine) {
-      tempLine.setPath([tempLineStart, event.latLng]);
+      tempLine.setPath([tempLineStart, positionToUse]);
     } else {
       const newTempLine = new google.maps.Polyline({
-        path: [tempLineStart, event.latLng],
+        path: [tempLineStart, positionToUse],
         strokeWeight: 2,
         strokeColor: MEASUREMENT_COLORS[activeTool],
         strokeOpacity: 0.5,
         map: mapRef.current,
         clickable: false,
+        zIndex: 9,
       });
       setTempLine(newTempLine);
     }
@@ -305,9 +399,14 @@ export function ManualRoofTakeoff({ latitude, longitude, onSave, forceShow = fal
       setActiveTool(null);
       setTempLineStart(null);
       setMousePosition(null);
+      setSnappedVertex(null);
       if (tempLine) {
         tempLine.setMap(null);
         setTempLine(null);
+      }
+      if (snapMarker) {
+        snapMarker.setMap(null);
+        setSnapMarker(null);
       }
       toast.info('Tool deselected');
     } else {
@@ -315,9 +414,14 @@ export function ManualRoofTakeoff({ latitude, longitude, onSave, forceShow = fal
       setActiveTool(type);
       setTempLineStart(null);
       setMousePosition(null);
+      setSnappedVertex(null);
       if (tempLine) {
         tempLine.setMap(null);
         setTempLine(null);
+      }
+      if (snapMarker) {
+        snapMarker.setMap(null);
+        setSnapMarker(null);
       }
       toast.info(`${type.charAt(0).toUpperCase() + type.slice(1)} tool selected. Click start point on the map.`);
     }
