@@ -425,12 +425,45 @@
 
 **Estimated Time:** 7 hours
 
-#### 1. Extract CRM Router (4 hrs)
-- [ ] Move `crm` router logic → `server/api/routers/jobs.ts`
-- [ ] Keep backward compatibility mapping: `crm: jobsRouter`
-- [ ] Update imports in `server/_core/index.ts`
-- [ ] Test all CRM endpoints still work
-- [ ] Update frontend imports if needed
+#### 1. Extract CRM Router (4 hrs) ⚠️ **LARGE TASK**
+**Status:** CRM router is **1,635 lines** (lines 179-1814 in `server/routers.ts`)
+
+**Extraction Strategy** (do in phases to avoid errors):
+
+**Phase 1: Create jobs.ts skeleton** (30 min)
+- [ ] Create `server/api/routers/jobs.ts`
+- [ ] Add all imports (Drizzle, Zod, TRPC, helpers)
+- [ ] Add helper functions: `filterLeadsByRole`, `getTeamMemberIds`, `logEditHistory`
+- [ ] Export empty `jobsRouter = router({})`
+
+**Phase 2: Move procedures in groups** (2 hrs)
+- [ ] Group 1: Dashboard & Stats (getStats, getLeads, getLead, getPipeline)
+- [ ] Group 2: CRUD Operations (createJob, updateLead, updateCustomerInfo, updateInsuranceInfo)
+- [ ] Group 3: Reports & Analytics (generateRoofReport, getMonthlyTrends, getReportStats)
+- [ ] Group 4: Scheduling (getAppointments, scheduleAppointment)
+- [ ] Group 5: Job Detail (getJobDetail, addMessage, uploadPhoto, searchJob)
+- [ ] Group 6: Import & Delete (importEstimatorLeads, deleteLead, getEditHistory)
+- [ ] Group 7: Lien Rights (getLienRightsJobs, getLienRightsAlertSummary, sendLienRightsAlert)
+- [ ] Group 8: Field Upload (getJobForUpload, uploadFieldPhoto, getAllUsers)
+
+**Phase 3: Update monolith** (30 min)
+- [ ] In `server/routers.ts`, import: `import { jobsRouter } from "./api/routers/jobs"`
+- [ ] Replace entire `crm: router({...})` block with: `crm: jobsRouter`
+- [ ] Delete the 1,635 lines of moved code
+
+**Phase 4: Test** (1 hr)
+- [ ] Run `npm run build` - fix any TypeScript errors
+- [ ] Test Dashboard loads
+- [ ] Test creating a job
+- [ ] Test updating a job
+- [ ] Test Pipeline view
+- [ ] Test Calendar view
+- [ ] Verify all CRM endpoints work
+
+**Alternative: Keep as-is for now**
+- Current monolith works fine, just hard to maintain
+- Can defer this refactor until after other priorities
+- Document the structure for future reference
 
 #### 2. Extract Portal Router (2 hrs)
 - [ ] Move `portal` router → `server/api/routers/portal.ts`
