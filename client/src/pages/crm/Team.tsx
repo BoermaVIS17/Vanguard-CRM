@@ -86,6 +86,7 @@ export default function CRMTeam() {
   };
 
   const canEditRoles = permissions?.canManageTeam ?? false;
+  const isOwner = currentUser?.role === 'owner';
 
   const handleSaveChanges = () => {
     if (!editingMember) return;
@@ -201,13 +202,14 @@ export default function CRMTeam() {
               <Users className="w-4 h-4" />
               {team?.length || 0} team members
             </span>
-            <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
-              <DialogTrigger asChild>
-                <Button className="bg-[#00d4aa] hover:bg-[#00b894] text-black font-semibold">
-                  <Plus className="w-4 h-4 mr-2" />
-                  Add Team Member
-                </Button>
-              </DialogTrigger>
+            {isOwner && (
+              <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
+                <DialogTrigger asChild>
+                  <Button className="bg-[#00d4aa] hover:bg-[#00b894] text-black font-semibold">
+                    <Plus className="w-4 h-4 mr-2" />
+                    Add Team Member
+                  </Button>
+                </DialogTrigger>
                 <DialogContent className="bg-slate-800 border-slate-700">
                   <DialogHeader>
                     <DialogTitle className="text-white">
@@ -265,6 +267,22 @@ export default function CRMTeam() {
                           Done
                         </Button>
                       </div>
+                    </div>
+                  ) : !isOwner ? (
+                    <div className="p-6 text-center">
+                      <div className="mb-4 text-4xl">🔒</div>
+                      <h3 className="text-lg font-semibold text-white mb-2">Access Restricted</h3>
+                      <p className="text-sm text-slate-300 mb-4">
+                        Only Owners can add new team members.<br />
+                        Please contact an owner to add a teammate.
+                      </p>
+                      <Button 
+                        variant="outline" 
+                        onClick={() => setShowCreateDialog(false)}
+                        className="bg-slate-700 border-slate-600 text-white hover:bg-slate-600"
+                      >
+                        Close
+                      </Button>
                     </div>
                   ) : (
                     <div className="space-y-4 pt-4">
@@ -354,7 +372,8 @@ export default function CRMTeam() {
                     </div>
                   )}
                 </DialogContent>
-            </Dialog>
+              </Dialog>
+            )}
           </div>
         </div>
 
