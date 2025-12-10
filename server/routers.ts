@@ -1091,8 +1091,6 @@ export const appRouter = router({
       return pipeline;
     }),
 
-    // Get team members
-    getTeam: protectedProcedure.query(async ({ ctx }) => {
     // ============ DOCUMENT UPLOAD ============
     
     // Upload document to a lead
