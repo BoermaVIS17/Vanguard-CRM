@@ -53,6 +53,7 @@ import { MentionInput } from "@/components/MentionInput";
 import { RoofingReportView } from "@/components/RoofingReportView";
 import { MaterialEmailDialog } from "@/components/crm/MaterialEmailDialog";
 import { ProposalCalculator } from "@/components/crm/ProposalCalculator";
+import { GoogleMapsLoader } from "@/components/GoogleMapsLoader";
 
 // Helper function to format mentions in messages
 const formatMentions = (text: string) => {
@@ -1482,14 +1483,17 @@ export default function JobDetail() {
                     </Button>
                   </div>
                   
-                  <RoofingReportView
-                    solarApiData={(job as any).solarApiData}
-                    jobData={{
-                      fullName: job.fullName,
-                      address: job.address,
-                      cityStateZip: job.cityStateZip,
-                    }}
-                  />
+                  <GoogleMapsLoader>
+                    <RoofingReportView
+                      solarApiData={(job as any).solarApiData}
+                      jobData={{
+                        fullName: job.fullName,
+                        address: job.address,
+                        cityStateZip: job.cityStateZip,
+                      }}
+                      isGoogleMapsLoaded={true}
+                    />
+                  </GoogleMapsLoader>
                 </div>
               ) : (
                 <Card className="bg-slate-800 border-slate-700">

@@ -8,10 +8,7 @@ import { Download, Ruler, Home, ChevronUp, ChevronDown, Plus, Minus, MapPin, X }
 import { ManualRoofTakeoff } from './ManualRoofTakeoff';
 import { GoogleStreetView } from './GoogleStreetView';
 import { toast } from 'sonner';
-import { GoogleMap, DrawingManager, useLoadScript } from '@react-google-maps/api';
-
-// Google Maps libraries needed for drawing
-const libraries: ("drawing" | "geometry")[] = ["drawing", "geometry"];
+import { GoogleMap, DrawingManager } from '@react-google-maps/api';
 
 interface RoofingReportViewProps {
   solarApiData: any;
@@ -20,15 +17,18 @@ interface RoofingReportViewProps {
     address: string;
     cityStateZip: string;
   };
+  isGoogleMapsLoaded: boolean;
 }
 
-export function RoofingReportView({ solarApiData, jobData }: RoofingReportViewProps) {
-  // Load Google Maps API
-  const { isLoaded, loadError } = useLoadScript({
-    googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_KEY || "AIzaSyA7QSM-fqUn4grHM6OYddNgKzK7uMlBY1I",
-    libraries,
-  });
-
+export function RoofingReportView({ solarApiData, jobData, isGoogleMapsLoaded }: RoofingReportViewProps) {
+  // Check if Google Maps is loaded before rendering
+  if (!isGoogleMapsLoaded) {
+    return (
+      <div className="flex items-center justify-center h-96">
+        <div className="text-slate-400">Loading map tools...</div>
+      </div>
+    );
+  }
   const [metrics, setMetrics] = useState<RoofMetrics | null>(null);
   const [wallFlashingAdder, setWallFlashingAdder] = useState<number>(0);
   const [wasteFactorPercent, setWasteFactorPercent] = useState<number>(10);
@@ -257,23 +257,6 @@ export function RoofingReportView({ solarApiData, jobData }: RoofingReportViewPr
   const handleDownloadPDF = () => {
     console.log('[RoofingReport] Download PDF clicked');
   };
-
-  // Show loading state while Google Maps loads
-  if (loadError) {
-    return (
-      <div className="flex items-center justify-center h-96">
-        <div className="text-red-400">Error loading Google Maps: {loadError.message}</div>
-      </div>
-    );
-  }
-
-  if (!isLoaded) {
-    return (
-      <div className="flex items-center justify-center h-96">
-        <div className="text-slate-400">Loading Google Maps...</div>
-      </div>
-    );
-  }
 
   if (!metrics) {
     return (
