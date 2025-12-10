@@ -2,9 +2,27 @@ import { NOT_ADMIN_ERR_MSG, UNAUTHED_ERR_MSG } from '@shared/const';
 import { initTRPC, TRPCError } from "@trpc/server";
 import superjson from "superjson";
 import type { TrpcContext } from "./context";
+import { logger } from "../lib/logger";
 
 const t = initTRPC.context<TrpcContext>().create({
   transformer: superjson,
+  errorFormatter({ shape, error, ctx }) {
+    // Log all errors with context
+    if (error.code === 'INTERNAL_SERVER_ERROR' || shape.data.httpStatus >= 500) {
+      logger.error(
+        `tRPC Error: ${error.message}`,
+        error.cause || error,
+        {
+          requestId: ctx?.requestId,
+          userId: ctx?.user?.id,
+          code: error.code,
+          path: shape.data.path,
+        }
+      );
+    }
+    
+    return shape;
+  },
 });
 
 export const router = t.router;
