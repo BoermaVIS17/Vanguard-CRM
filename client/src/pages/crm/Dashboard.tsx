@@ -206,7 +206,7 @@ export default function CRMDashboard() {
     return (
       <CRMLayout>
         <div className="flex items-center justify-center h-96 bg-slate-900">
-          <div className="animate-spin w-8 h-8 border-2 border-[#00d4aa] border-t-transparent rounded-full" />
+          <div className="animate-spin w-8 h-8 border-2 border-[#00D4FF] border-t-transparent rounded-full" />
         </div>
       </CRMLayout>
     );
@@ -220,7 +220,7 @@ export default function CRMDashboard() {
           <h1 className="text-2xl font-bold text-white">Dashboard</h1>
           <div className="flex items-center gap-3">
             <Link href="/crm/leads?new=true">
-              <Button className="bg-[#00d4aa] hover:bg-[#00b894] text-black font-semibold">
+              <Button className="bg-[#00D4FF] hover:bg-[#00B8E6] text-black font-semibold">
                 <Plus className="w-4 h-4 mr-2" />
                 New Job
               </Button>
@@ -237,7 +237,7 @@ export default function CRMDashboard() {
                 <h3 className="font-semibold text-white">Lien Rights Critical Alert!</h3>
                 <p className="text-sm text-slate-300">
                   {lienRightsJobs.filter((j: any) => j.urgencyLevel === "critical").length} jobs have less than 14 days remaining on lien rights. 
-                  <Link href="/crm/pipeline" className="text-[#00d4aa] ml-1 hover:underline">View Pipeline →</Link>
+                  <Link href="/crm/pipeline" className="text-[#00D4FF] ml-1 hover:underline">View Pipeline →</Link>
                 </p>
               </div>
             </div>
@@ -253,8 +253,8 @@ export default function CRMDashboard() {
                   <p className="text-sm text-slate-400">Total Leads</p>
                   <p className="text-2xl font-bold text-white">{stats?.totalLeads || 0}</p>
                 </div>
-                <div className="w-12 h-12 rounded-full bg-[#00d4aa]/20 flex items-center justify-center">
-                  <Users className="w-6 h-6 text-[#00d4aa]" />
+                <div className="w-12 h-12 rounded-full bg-[#00D4FF]/20 flex items-center justify-center">
+                  <Users className="w-6 h-6 text-[#00D4FF]" />
                 </div>
               </div>
             </CardContent>
@@ -358,7 +358,7 @@ export default function CRMDashboard() {
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-sm font-semibold text-slate-300">Pipeline Overview</h3>
               <Link href="/crm/pipeline">
-                <Button variant="ghost" size="sm" className="text-[#00d4aa] hover:text-[#00b894]">
+                <Button variant="ghost" size="sm" className="text-[#00D4FF] hover:text-[#00B8E6]">
                   View Full Pipeline <ChevronRight className="w-4 h-4 ml-1" />
                 </Button>
               </Link>
@@ -372,7 +372,7 @@ export default function CRMDashboard() {
           <Button
             variant={activeTab === "all" ? "default" : "outline"}
             className={activeTab === "all" 
-              ? "bg-[#00d4aa] text-black hover:bg-[#00b894]" 
+              ? "bg-[#00D4FF] text-black hover:bg-[#00B8E6]" 
               : "border-slate-600 text-slate-300 hover:bg-slate-700 bg-transparent"}
             onClick={() => setActiveTab("all")}
           >
@@ -401,7 +401,7 @@ export default function CRMDashboard() {
               <Card className="bg-slate-800 border-slate-700">
                 <CardHeader className="pb-2">
                   <CardTitle className="text-lg font-semibold text-white flex items-center gap-2">
-                    <TrendingUp className="w-5 h-5 text-[#00d4aa]" />
+                    <TrendingUp className="w-5 h-5 text-[#00D4FF]" />
                     Lead Trends
                   </CardTitle>
                 </CardHeader>
@@ -432,7 +432,7 @@ export default function CRMDashboard() {
               <CardContent>
                 <div className="flex flex-wrap gap-3">
                   <Link href="/crm/leads?new=true">
-                    <Button className="bg-[#00d4aa] hover:bg-[#00b894] text-black">
+                    <Button className="bg-[#00D4FF] hover:bg-[#00B8E6] text-black">
                       <Plus className="w-4 h-4 mr-2" />
                       Add New Job
                     </Button>
@@ -513,7 +513,7 @@ export default function CRMDashboard() {
                     </div>
                   </div>
                   <Link href="/crm/pipeline">
-                    <Button variant="ghost" size="sm" className="w-full mt-3 text-[#00d4aa] hover:text-[#00b894]">
+                    <Button variant="ghost" size="sm" className="w-full mt-3 text-[#00D4FF] hover:text-[#00B8E6]">
                       View All in Pipeline <ChevronRight className="w-4 h-4 ml-1" />
                     </Button>
                   </Link>
@@ -526,7 +526,7 @@ export default function CRMDashboard() {
               <CardHeader className="pb-2">
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-lg font-semibold text-white flex items-center gap-2">
-                    <Calendar className="w-5 h-5 text-[#00d4aa]" />
+                    <Calendar className="w-5 h-5 text-[#00D4FF]" />
                     Today
                   </CardTitle>
                   <Link href="/crm/calendar">
@@ -542,9 +542,9 @@ export default function CRMDashboard() {
                   <div className="space-y-3">
                     {appointments.slice(0, 5).map((apt: any) => (
                       <Link key={apt.id} href={`/crm/job/${apt.id}`}>
-                        <div className="flex items-center gap-3 p-3 rounded-lg border-l-4 border-l-[#00d4aa] bg-slate-700/50 hover:bg-slate-700 cursor-pointer transition-colors">
-                          <div className="w-10 h-10 rounded-full bg-[#00d4aa]/20 flex items-center justify-center">
-                            <Calendar className="w-5 h-5 text-[#00d4aa]" />
+                        <div className="flex items-center gap-3 p-3 rounded-lg border-l-4 border-l-[#00D4FF] bg-slate-700/50 hover:bg-slate-700 cursor-pointer transition-colors">
+                          <div className="w-10 h-10 rounded-full bg-[#00D4FF]/20 flex items-center justify-center">
+                            <Calendar className="w-5 h-5 text-[#00D4FF]" />
                           </div>
                           <div className="flex-1">
                             <p className="font-medium text-white">{apt.fullName}</p>
@@ -565,7 +565,7 @@ export default function CRMDashboard() {
                     <Calendar className="w-12 h-12 mx-auto mb-3 opacity-50" />
                     <p>No appointments scheduled for today</p>
                     <Link href="/crm/calendar">
-                      <Button variant="link" className="mt-2 text-[#00d4aa]">
+                      <Button variant="link" className="mt-2 text-[#00D4FF]">
                         Schedule an inspection
                       </Button>
                     </Link>
@@ -588,7 +588,7 @@ export default function CRMDashboard() {
                     categoryLeads.slice(0, 5).map((lead: any) => (
                       <Link key={lead.id} href={`/crm/job/${lead.id}`}>
                         <div className="flex items-center gap-3 p-2 rounded hover:bg-slate-700 cursor-pointer transition-colors">
-                          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#00d4aa] to-[#00b894] flex items-center justify-center">
+                          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#00D4FF] to-[#00B8E6] flex items-center justify-center">
                             <span className="text-black font-semibold text-xs">
                               {lead.fullName?.charAt(0) || "?"}
                             </span>

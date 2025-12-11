@@ -122,7 +122,7 @@ export function JobPhotosTab({
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
           <h2 className="text-lg font-semibold text-white">Photo Gallery</h2>
-          <span className="px-2 py-1 bg-[#00d4aa]/20 text-[#00d4aa] text-sm rounded-full">
+          <span className="px-2 py-1 bg-[#00D4FF]/20 text-[#00D4FF] text-sm rounded-full">
             {photos.length} photo{photos.length !== 1 ? 's' : ''}
           </span>
         </div>
@@ -167,7 +167,7 @@ export function JobPhotosTab({
               <Button 
                 onClick={() => photoInputRef.current?.click()}
                 disabled={isUploading}
-                className="bg-[#00d4aa] hover:bg-[#00b894] text-black"
+                className="bg-[#00D4FF] hover:bg-[#00B8E6] text-black"
               >
                 <Upload className="w-4 h-4 mr-2" />
                 {isUploading ? "Uploading..." : "Upload Photos"}
@@ -215,7 +215,7 @@ export function JobPhotosTab({
                 <div 
                   key={photo.id} 
                   className={`group relative rounded-lg overflow-hidden bg-slate-800 cursor-pointer transform transition-all duration-200 hover:scale-[1.02] hover:shadow-xl ${
-                    isSelected ? 'ring-2 ring-purple-500 shadow-lg shadow-purple-500/20' : 'hover:shadow-[#00d4aa]/10'
+                    isSelected ? 'ring-2 ring-purple-500 shadow-lg shadow-purple-500/20' : 'hover:shadow-[#00D4FF]/10'
                   }`}
                   onClick={() => setLightboxIndex(index)}
                 >
@@ -263,7 +263,7 @@ export function JobPhotosTab({
                         : new Date(photo.createdAt).toLocaleDateString()}
                     </p>
                     {photo.latitude && photo.longitude && (
-                      <p className="text-[#00d4aa] text-xs flex items-center gap-1 mt-1">
+                      <p className="text-[#00D4FF] text-xs flex items-center gap-1 mt-1">
                         <MapPin className="w-3 h-3" />
                         GPS: {parseFloat(photo.latitude).toFixed(4)}°, {parseFloat(photo.longitude).toFixed(4)}°
                       </p>
@@ -374,7 +374,7 @@ export function JobPhotosTab({
                         href={`https://www.google.com/maps?q=${photos[lightboxIndex].latitude},${photos[lightboxIndex].longitude}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-[#00d4aa] text-sm flex items-center gap-2 mt-1 hover:underline"
+                        className="text-[#00D4FF] text-sm flex items-center gap-2 mt-1 hover:underline"
                         onClick={(e) => e.stopPropagation()}
                       >
                         <MapPin className="w-4 h-4" />
@@ -401,7 +401,7 @@ export function JobPhotosTab({
                     <a 
                       href={photos[lightboxIndex].fileUrl} 
                       download={photos[lightboxIndex].fileName}
-                      className="px-4 py-2 bg-[#00d4aa] hover:bg-[#00b894] rounded-lg text-black text-sm flex items-center gap-2 transition-colors"
+                      className="px-4 py-2 bg-[#00D4FF] hover:bg-[#00B8E6] rounded-lg text-black text-sm flex items-center gap-2 transition-colors"
                       onClick={(e) => e.stopPropagation()}
                     >
                       <Download className="w-4 h-4" />
@@ -437,7 +437,7 @@ export function JobPhotosTab({
           <p className="text-slate-500 text-sm mb-4">Upload photos to document this job</p>
           {canEdit && (
             <Button 
-              className="bg-[#00d4aa] hover:bg-[#00b894] text-black"
+              className="bg-[#00D4FF] hover:bg-[#00B8E6] text-black"
               onClick={() => photoInputRef.current?.click()}
             >
               <Upload className="w-4 h-4 mr-2" />

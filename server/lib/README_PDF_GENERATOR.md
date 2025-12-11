@@ -201,7 +201,8 @@ const proposalData = {
 Modify color constants:
 
 ```typescript
-private readonly PRIMARY_COLOR = '#00d4aa';  // Teal
+private readonly PRIMARY_COLOR = '#00D4FF';  // Vanguard Cyan
+private readonly NAVY_BG = '#001F3F';        // Navy Blue
 private readonly DARK_BG = '#1e293b';        // Dark slate
 private readonly TEXT_COLOR = '#334155';     // Slate
 private readonly LIGHT_GRAY = '#94a3b8';     // Light slate

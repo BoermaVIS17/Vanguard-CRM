@@ -35,7 +35,7 @@ const formatMentions = (text: string) => {
       parts.push(text.substring(lastIndex, match.index));
     }
     parts.push(
-      <span key={match.index} className="text-[#00d4aa] font-medium">
+      <span key={match.index} className="text-[#00D4FF] font-medium">
         @{match[2]}
       </span>
     );
@@ -209,7 +209,7 @@ export default function JobDetail() {
     return (
       <CRMLayout>
         <div className="flex items-center justify-center h-screen">
-          <div className="animate-spin w-8 h-8 border-4 border-[#00d4aa] border-t-transparent rounded-full" />
+          <div className="animate-spin w-8 h-8 border-4 border-[#00D4FF] border-t-transparent rounded-full" />
         </div>
       </CRMLayout>
     );
@@ -221,7 +221,7 @@ export default function JobDetail() {
         <div className="flex flex-col items-center justify-center h-screen">
           <p className="text-red-400 mb-4">Failed to load job</p>
           <Link href="/crm">
-            <a className="text-[#00d4aa] hover:underline">← Back to CRM</a>
+            <a className="text-[#00D4FF] hover:underline">← Back to CRM</a>
           </Link>
         </div>
       </CRMLayout>
@@ -363,7 +363,7 @@ export default function JobDetail() {
                   onClick={() => setActiveTab(tab.id)}
                   className={`px-4 py-2 rounded-lg font-medium transition-colors whitespace-nowrap ${
                     activeTab === tab.id
-                      ? "bg-[#00d4aa] text-black"
+                      ? "bg-[#00D4FF] text-black"
                       : "text-slate-400 hover:text-white hover:bg-slate-700"
                   }`}
                 >

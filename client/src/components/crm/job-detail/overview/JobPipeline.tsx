@@ -68,12 +68,12 @@ export function JobPipeline({ currentStatus, canEdit, onStatusChange }: JobPipel
               <button
                 className="
                   group relative px-6 py-2.5 rounded-full
-                  bg-gradient-to-r from-[#00d4aa] to-[#00b894]
-                  border-2 border-[#00d4aa]
+                  bg-gradient-to-r from-[#00D4FF] to-[#00B8E6]
+                  border-2 border-[#00D4FF]
                   text-white font-bold text-sm
                   transition-all duration-300 ease-out
                   hover:scale-110 hover:shadow-[0_0_30px_rgba(0,212,170,0.6)]
-                  hover:from-[#00e6bc] hover:to-[#00d4aa]
+                  hover:from-[#00e6bc] hover:to-[#00D4FF]
                   disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100
                   disabled:hover:shadow-none
                   flex items-center gap-2

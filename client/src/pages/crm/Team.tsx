@@ -202,7 +202,7 @@ export default function CRMTeam() {
     return (
       <CRMLayout>
         <div className="flex items-center justify-center h-96 bg-slate-900">
-          <div className="animate-spin w-8 h-8 border-2 border-[#00d4aa] border-t-transparent rounded-full" />
+          <div className="animate-spin w-8 h-8 border-2 border-[#00D4FF] border-t-transparent rounded-full" />
         </div>
       </CRMLayout>
     );
@@ -232,7 +232,7 @@ export default function CRMTeam() {
             {isOwner && (
               <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
                 <DialogTrigger asChild>
-                  <Button className="bg-[#00d4aa] hover:bg-[#00b894] text-black font-semibold">
+                  <Button className="bg-[#00D4FF] hover:bg-[#00B8E6] text-black font-semibold">
                     <Plus className="w-4 h-4 mr-2" />
                     Add Team Member
                   </Button>
@@ -268,7 +268,7 @@ export default function CRMTeam() {
                         </div>
                         <div>
                           <p className="text-xs text-slate-400">Login URL</p>
-                          <code className="text-[#00d4aa] text-sm">{createdAccount.loginUrl || `${window.location.origin}/login`}</code>
+                          <code className="text-[#00D4FF] text-sm">{createdAccount.loginUrl || `${window.location.origin}/login`}</code>
                         </div>
                         {createdAccount.tempPassword && (
                           <div>
@@ -289,7 +289,7 @@ export default function CRMTeam() {
                         </Button>
                         <Button 
                           onClick={resetCreateForm}
-                          className="flex-1 bg-[#00d4aa] hover:bg-[#00b894] text-black"
+                          className="flex-1 bg-[#00D4FF] hover:bg-[#00B8E6] text-black"
                         >
                           Done
                         </Button>
@@ -391,7 +391,7 @@ export default function CRMTeam() {
                         <Button 
                           onClick={handleCreateAccount}
                           disabled={isCreating || !newAccountName.trim() || !newAccountEmail.trim()}
-                          className="bg-[#00d4aa] hover:bg-[#00b894] text-black"
+                          className="bg-[#00D4FF] hover:bg-[#00B8E6] text-black"
                         >
                           {isCreating ? "Creating..." : "Create Account"}
                         </Button>
@@ -527,7 +527,7 @@ export default function CRMTeam() {
                 <p className="text-sm mt-1 mb-4">Add your first team member to get started</p>
                 <Button 
                   onClick={() => setShowCreateDialog(true)}
-                  className="bg-[#00d4aa] hover:bg-[#00b894] text-black font-semibold"
+                  className="bg-[#00D4FF] hover:bg-[#00B8E6] text-black font-semibold"
                 >
                   <Plus className="w-4 h-4 mr-2" />
                   Add Team Member
@@ -664,7 +664,7 @@ export default function CRMTeam() {
                       type="button"
                       onClick={() => setEditIsActive(!editIsActive)}
                       className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                        editIsActive ? 'bg-[#00d4aa]' : 'bg-slate-600'
+                        editIsActive ? 'bg-[#00D4FF]' : 'bg-slate-600'
                       }`}
                     >
                       <span
@@ -701,7 +701,7 @@ export default function CRMTeam() {
                     <Button 
                       onClick={isOwnerUser ? handleOwnerSave : handleSaveChanges}
                       disabled={isOwnerUser ? updateUser.isPending : updateMember.isPending}
-                      className="bg-[#00d4aa] hover:bg-[#00b894] text-black"
+                      className="bg-[#00D4FF] hover:bg-[#00B8E6] text-black"
                     >
                       {(isOwnerUser ? updateUser.isPending : updateMember.isPending) ? "Saving..." : "Save Changes"}
                     </Button>
@@ -746,7 +746,7 @@ function TeamMemberCard({
     <Card className="shadow-sm hover:shadow-md transition-shadow bg-slate-800 border-slate-700">
       <CardContent className="pt-6">
         <div className="flex items-start gap-4">
-          <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#00d4aa] to-[#00b894] flex items-center justify-center flex-shrink-0">
+          <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#00D4FF] to-[#00B8E6] flex items-center justify-center flex-shrink-0">
             <span className="text-black font-bold text-lg">
               {member.name?.charAt(0) || member.email?.charAt(0) || "?"}
             </span>

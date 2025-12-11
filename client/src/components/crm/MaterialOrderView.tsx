@@ -123,7 +123,7 @@ export function MaterialOrderView({
       <Card className="bg-slate-800 border-slate-700">
         <CardHeader>
           <CardTitle className="text-white flex items-center gap-2">
-            <FileText className="w-5 h-5 text-[#00d4aa]" />
+            <FileText className="w-5 h-5 text-[#00D4FF]" />
             Material Order Configuration
           </CardTitle>
         </CardHeader>
@@ -194,43 +194,43 @@ export function MaterialOrderView({
               <tbody>
                 <tr className="border-t border-slate-700">
                   <td className="p-3 text-white">Shingles</td>
-                  <td className="p-3 text-right text-[#00d4aa] font-semibold">{calculatedItems.shingleBundles}</td>
+                  <td className="p-3 text-right text-[#00D4FF] font-semibold">{calculatedItems.shingleBundles}</td>
                   <td className="p-3 text-right text-slate-400">BDL</td>
                   <td className="p-3 text-slate-300">{shingleSystem} - {shingleColor || '[Color]'}</td>
                 </tr>
                 <tr className="border-t border-slate-700">
                   <td className="p-3 text-white">Starter Strip</td>
-                  <td className="p-3 text-right text-[#00d4aa] font-semibold">{calculatedItems.starterBundles}</td>
+                  <td className="p-3 text-right text-[#00D4FF] font-semibold">{calculatedItems.starterBundles}</td>
                   <td className="p-3 text-right text-slate-400">BDL</td>
                   <td className="p-3 text-slate-300">Starter Strip Shingles</td>
                 </tr>
                 <tr className="border-t border-slate-700">
                   <td className="p-3 text-white">Hip Cap</td>
-                  <td className="p-3 text-right text-[#00d4aa] font-semibold">{calculatedItems.hipBundles}</td>
+                  <td className="p-3 text-right text-[#00D4FF] font-semibold">{calculatedItems.hipBundles}</td>
                   <td className="p-3 text-right text-slate-400">BDL</td>
                   <td className="p-3 text-slate-300">Hip Cap Shingles - {shingleColor || '[Color]'}</td>
                 </tr>
                 <tr className="border-t border-slate-700">
                   <td className="p-3 text-white">Ridge Cap</td>
-                  <td className="p-3 text-right text-[#00d4aa] font-semibold">{calculatedItems.ridgeBundles}</td>
+                  <td className="p-3 text-right text-[#00D4FF] font-semibold">{calculatedItems.ridgeBundles}</td>
                   <td className="p-3 text-right text-slate-400">BDL</td>
                   <td className="p-3 text-slate-300">Ridge Cap Shingles - {shingleColor || '[Color]'}</td>
                 </tr>
                 <tr className="border-t border-slate-700">
                   <td className="p-3 text-white">Underlayment</td>
-                  <td className="p-3 text-right text-[#00d4aa] font-semibold">{calculatedItems.underlaymentRolls}</td>
+                  <td className="p-3 text-right text-[#00D4FF] font-semibold">{calculatedItems.underlaymentRolls}</td>
                   <td className="p-3 text-right text-slate-400">ROLL</td>
                   <td className="p-3 text-slate-300">Felt Underlayment (10 SQ/Roll)</td>
                 </tr>
                 <tr className="border-t border-slate-700">
                   <td className="p-3 text-white">Synthetic Underlayment</td>
-                  <td className="p-3 text-right text-[#00d4aa] font-semibold">{calculatedItems.syntheticUnderlaymentRolls}</td>
+                  <td className="p-3 text-right text-[#00D4FF] font-semibold">{calculatedItems.syntheticUnderlaymentRolls}</td>
                   <td className="p-3 text-right text-slate-400">ROLL</td>
                   <td className="p-3 text-slate-300">Synthetic Underlayment (66 LF/Roll)</td>
                 </tr>
                 <tr className="border-t border-slate-700">
                   <td className="p-3 text-white">Roofing Nails</td>
-                  <td className="p-3 text-right text-[#00d4aa] font-semibold">{calculatedItems.nailBoxes}</td>
+                  <td className="p-3 text-right text-[#00D4FF] font-semibold">{calculatedItems.nailBoxes}</td>
                   <td className="p-3 text-right text-slate-400">BOX</td>
                   <td className="p-3 text-slate-300">1-1/4" Coil Roofing Nails (7,200 ct)</td>
                 </tr>
@@ -297,7 +297,7 @@ export function MaterialOrderView({
         <div className="flex justify-end">
           <Button
             onClick={handleOpenEmailDialog}
-            className="bg-[#00d4aa] hover:bg-[#00b894] text-slate-900 font-semibold"
+            className="bg-[#00D4FF] hover:bg-[#00B8E6] text-slate-900 font-semibold"
           >
             <Mail className="w-4 h-4 mr-2" />
             Draft Supplier Order

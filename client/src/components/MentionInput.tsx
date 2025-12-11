@@ -178,7 +178,7 @@ export function MentionInput({
                 }`}
               >
                 <div className="flex flex-row items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#00d4aa] to-[#00b894] flex items-center justify-center flex-shrink-0">
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#00D4FF] to-[#00B8E6] flex items-center justify-center flex-shrink-0">
                     <span className="font-semibold text-sm text-black">
                       {(user.name || user.email || "?").charAt(0).toUpperCase()}
                     </span>

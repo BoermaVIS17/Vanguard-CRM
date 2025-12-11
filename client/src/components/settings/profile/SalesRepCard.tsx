@@ -21,7 +21,7 @@ export default function SalesRepCard() {
     <Card className="bg-slate-900 border-slate-700">
       <CardHeader>
         <CardTitle className="text-white flex items-center gap-2">
-          <Briefcase className="w-5 h-5 text-[#00d4aa]" />
+          <Briefcase className="w-5 h-5 text-[#00D4FF]" />
           Sales Rep Settings
         </CardTitle>
         <CardDescription className="text-slate-400">

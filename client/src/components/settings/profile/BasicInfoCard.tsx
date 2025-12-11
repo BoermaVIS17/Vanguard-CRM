@@ -54,7 +54,7 @@ export default function BasicInfoCard({ user, onUpdate }: BasicInfoCardProps) {
     <Card className="bg-slate-900 border-slate-700">
       <CardHeader>
         <CardTitle className="text-white flex items-center gap-2">
-          <User className="w-5 h-5 text-[#00d4aa]" />
+          <User className="w-5 h-5 text-[#00D4FF]" />
           Basic Information
         </CardTitle>
         <CardDescription className="text-slate-400">
@@ -123,7 +123,7 @@ export default function BasicInfoCard({ user, onUpdate }: BasicInfoCardProps) {
           <Button
             onClick={handleSave}
             disabled={updateUser.isPending}
-            className="bg-[#00d4aa] hover:bg-[#00b894] text-black"
+            className="bg-[#00D4FF] hover:bg-[#00B8E6] text-black"
           >
             <Save className="w-4 h-4 mr-2" />
             {updateUser.isPending ? "Saving..." : "Save Changes"}

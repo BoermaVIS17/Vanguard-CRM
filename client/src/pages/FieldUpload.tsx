@@ -109,7 +109,7 @@ export default function FieldUpload() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-slate-900 flex items-center justify-center">
-        <Loader2 className="w-12 h-12 text-[#00d4aa] animate-spin" />
+        <Loader2 className="w-12 h-12 text-[#00D4FF] animate-spin" />
       </div>
     );
   }
@@ -131,13 +131,13 @@ export default function FieldUpload() {
     <div className="min-h-screen bg-slate-900 p-4 sm:p-6">
       {/* Header */}
       <div className="max-w-lg mx-auto mb-8 text-center">
-        <div className="w-16 h-16 rounded-full bg-[#00d4aa]/20 flex items-center justify-center mx-auto mb-4">
-          <Camera className="w-8 h-8 text-[#00d4aa]" />
+        <div className="w-16 h-16 rounded-full bg-[#00D4FF]/20 flex items-center justify-center mx-auto mb-4">
+          <Camera className="w-8 h-8 text-[#00D4FF]" />
         </div>
         <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2">
           Upload Photos for
         </h1>
-        <p className="text-xl sm:text-2xl font-semibold text-[#00d4aa] mb-2">
+        <p className="text-xl sm:text-2xl font-semibold text-[#00D4FF] mb-2">
           {jobData.fullName}
         </p>
         <p className="text-slate-400 text-sm sm:text-base">
@@ -182,7 +182,7 @@ export default function FieldUpload() {
         <Button
           onClick={() => fileInputRef.current?.click()}
           disabled={uploading}
-          className="w-full h-32 sm:h-40 bg-[#00d4aa] hover:bg-[#00b894] text-black font-bold text-xl sm:text-2xl rounded-2xl shadow-lg shadow-[#00d4aa]/30 transition-all active:scale-95 disabled:opacity-50"
+          className="w-full h-32 sm:h-40 bg-[#00D4FF] hover:bg-[#00B8E6] text-black font-bold text-xl sm:text-2xl rounded-2xl shadow-lg shadow-[#00D4FF]/30 transition-all active:scale-95 disabled:opacity-50"
         >
           <div className="flex flex-col items-center gap-2">
             <ImagePlus className="w-12 h-12 sm:w-16 sm:h-16" />

@@ -227,7 +227,7 @@ export function MaterialOrderBuilder({ jobId, jobAddress }: MaterialOrderBuilder
                   {(latestOrder.lineItems as any[]).map((item, idx) => (
                     <tr key={idx} className="border-t border-slate-700">
                       <td className="p-3 text-white">{item.productName}</td>
-                      <td className="p-3 text-right text-[#00d4aa] font-semibold">{item.quantity}</td>
+                      <td className="p-3 text-right text-[#00D4FF] font-semibold">{item.quantity}</td>
                       <td className="p-3 text-right text-slate-400">{item.unit}</td>
                     </tr>
                   ))}

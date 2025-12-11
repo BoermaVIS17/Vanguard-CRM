@@ -30,7 +30,7 @@ export function JobProductionTab({ job, jobId, onGenerateReport, isGenerating }:
               >
                 {isGenerating ? (
                   <>
-                    <div className="animate-spin w-4 h-4 border-2 border-[#00d4aa] border-t-transparent rounded-full mr-2" />
+                    <div className="animate-spin w-4 h-4 border-2 border-[#00D4FF] border-t-transparent rounded-full mr-2" />
                     Regenerating...
                   </>
                 ) : (
@@ -72,7 +72,7 @@ export function JobProductionTab({ job, jobId, onGenerateReport, isGenerating }:
                     setShowRegenerateDialog(false);
                     onGenerateReport();
                   }}
-                  className="bg-[#00d4aa] hover:bg-[#00b894] text-black font-semibold"
+                  className="bg-[#00D4FF] hover:bg-[#00B8E6] text-black font-semibold"
                 >
                   Yes, Regenerate Report
                 </AlertDialogAction>
@@ -114,7 +114,7 @@ export function JobProductionTab({ job, jobId, onGenerateReport, isGenerating }:
               <Button
                 onClick={onGenerateReport}
                 disabled={isGenerating}
-                className="bg-[#00d4aa] hover:bg-[#00b894] text-black font-semibold"
+                className="bg-[#00D4FF] hover:bg-[#00B8E6] text-black font-semibold"
               >
                 {isGenerating ? (
                   <>

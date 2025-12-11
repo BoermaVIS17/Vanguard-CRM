@@ -59,7 +59,7 @@ export function RichMessage({ data, intent }: RichMessageProps) {
             <div className="flex items-start justify-between gap-2">
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-1">
-                  <h4 className="text-sm font-medium text-white truncate group-hover:text-[#00d4aa]">
+                  <h4 className="text-sm font-medium text-white truncate group-hover:text-[#00D4FF]">
                     {job.fullName}
                   </h4>
                   <span
@@ -79,7 +79,7 @@ export function RichMessage({ data, intent }: RichMessageProps) {
                     <span className="capitalize">{job.dealType}</span>
                   )}
                   {job.totalPrice && (
-                    <span className="font-medium text-[#00d4aa]">
+                    <span className="font-medium text-[#00D4FF]">
                       ${parseFloat(job.totalPrice).toLocaleString()}
                     </span>
                   )}

@@ -16,7 +16,7 @@ interface BrandingCardProps {
 }
 
 export default function BrandingCard({ user, onUpdate }: BrandingCardProps) {
-  const [calendarColor, setCalendarColor] = useState("#00d4aa");
+  const [calendarColor, setCalendarColor] = useState("#00D4FF");
   const [profilePhoto, setProfilePhoto] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
 
@@ -69,7 +69,7 @@ export default function BrandingCard({ user, onUpdate }: BrandingCardProps) {
   };
 
   const colorPresets = [
-    { name: "Teal", value: "#00d4aa" },
+    { name: "Teal", value: "#00D4FF" },
     { name: "Blue", value: "#3b82f6" },
     { name: "Red", value: "#ef4444" },
     { name: "Orange", value: "#f97316" },
@@ -83,7 +83,7 @@ export default function BrandingCard({ user, onUpdate }: BrandingCardProps) {
     <Card className="bg-slate-900 border-slate-700">
       <CardHeader>
         <CardTitle className="text-white flex items-center gap-2">
-          <Palette className="w-5 h-5 text-[#00d4aa]" />
+          <Palette className="w-5 h-5 text-[#00D4FF]" />
           Branding & Identity
         </CardTitle>
         <CardDescription className="text-slate-400">
@@ -110,7 +110,7 @@ export default function BrandingCard({ user, onUpdate }: BrandingCardProps) {
                 type="file"
                 accept="image/*"
                 onChange={handlePhotoChange}
-                className="bg-slate-800 border-slate-600 text-white file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-[#00d4aa] file:text-black hover:file:bg-[#00b894]"
+                className="bg-slate-800 border-slate-600 text-white file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-[#00D4FF] file:text-black hover:file:bg-[#00B8E6]"
               />
               <p className="text-xs text-slate-500 mt-1">
                 Appears in "Meet Your Rep" section of proposals (Max 5MB)
@@ -121,7 +121,7 @@ export default function BrandingCard({ user, onUpdate }: BrandingCardProps) {
             <Button
               onClick={handleUploadPhoto}
               size="sm"
-              className="bg-[#00d4aa] hover:bg-[#00b894] text-black"
+              className="bg-[#00D4FF] hover:bg-[#00B8E6] text-black"
             >
               <Upload className="w-4 h-4 mr-2" />
               Upload Photo
@@ -163,7 +163,7 @@ export default function BrandingCard({ user, onUpdate }: BrandingCardProps) {
               type="text"
               value={calendarColor}
               onChange={(e) => setCalendarColor(e.target.value)}
-              placeholder="#00d4aa"
+              placeholder="#00D4FF"
               className="flex-1 bg-slate-800 border-slate-600 text-white font-mono"
             />
           </div>

@@ -44,7 +44,7 @@ export function ActivityItem({
         {/* Timeline dot (only for root activities) */}
         {!isReply && (
           <div className="w-10 h-10 rounded-full bg-slate-700 border-2 border-slate-600 flex items-center justify-center z-10 flex-shrink-0">
-            <Icon className="w-4 h-4 text-[#00d4aa]" />
+            <Icon className="w-4 h-4 text-[#00D4FF]" />
           </div>
         )}
         
@@ -95,8 +95,8 @@ export function ActivityItem({
                     onClick={() => setIsReplying(!isReplying)}
                     className={`h-8 px-3 ${
                       isReplying 
-                        ? "text-[#00d4aa] bg-slate-700" 
-                        : "text-slate-400 hover:text-[#00d4aa] hover:bg-slate-700"
+                        ? "text-[#00D4FF] bg-slate-700" 
+                        : "text-slate-400 hover:text-[#00D4FF] hover:bg-slate-700"
                     }`}
                   >
                     <MessageCircle className="w-3.5 h-3.5 mr-1.5" />

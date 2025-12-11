@@ -48,10 +48,11 @@
 }
 
 /* 
-  Design Philosophy: "Precision & Trust"
-  - Dark mode base to match the logo (Black/Cyan)
-  - High contrast for readability
-  - Cyan (#00FFF0) as the primary electric accent
+  Vanguard Systems (VIS) Design Philosophy: "Security & Innovation"
+  - Dark mode base to match the shield logo (Navy/Cyan)
+  - High contrast for readability and professionalism
+  - Electric Cyan (#00D4FF) as the primary accent
+  - Navy Blue (#001F3F) as the foundation
 */
 
 :root {
@@ -241,7 +242,7 @@
 }
 
 .pac-item-query {
-  color: #00d4aa !important; /* Brand cyan */
+  color: #00D4FF !important; /* Brand cyan */
   font-weight: 600 !important;
 }
 

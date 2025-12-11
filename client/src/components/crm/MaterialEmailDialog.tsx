@@ -119,7 +119,7 @@ export function MaterialEmailDialog({
       <DialogContent className="max-w-5xl bg-slate-800 border-slate-700">
         <DialogHeader>
           <DialogTitle className="text-white flex items-center gap-2">
-            <Truck className="w-5 h-5 text-[#00d4aa]" />
+            <Truck className="w-5 h-5 text-[#00D4FF]" />
             Draft Supplier Order
           </DialogTitle>
           <p className="text-sm text-slate-400">
@@ -132,7 +132,7 @@ export function MaterialEmailDialog({
           <div className="space-y-4">
             <div className="p-4 bg-slate-900 rounded-lg border border-slate-700">
               <h3 className="text-white font-semibold mb-4 flex items-center gap-2">
-                <Truck className="w-4 h-4 text-[#00d4aa]" />
+                <Truck className="w-4 h-4 text-[#00D4FF]" />
                 Accessories
               </h3>
               
@@ -228,7 +228,7 @@ export function MaterialEmailDialog({
           </Button>
           <Button
             onClick={handleOpenInEmail}
-            className="bg-[#00d4aa] hover:bg-[#00b894] text-slate-900 font-semibold"
+            className="bg-[#00D4FF] hover:bg-[#00B8E6] text-slate-900 font-semibold"
           >
             <Mail className="w-4 h-4 mr-2" />
             Open in Email App

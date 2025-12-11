@@ -68,7 +68,7 @@ export function MeasurementResults({
           </div>
           <div className="flex justify-between items-center">
             <span className="text-slate-400">Pitch Adjustment:</span>
-            <span className="text-[#00d4aa] font-semibold">×{measurements.pitchMultiplier.toFixed(3)}</span>
+            <span className="text-[#00D4FF] font-semibold">×{measurements.pitchMultiplier.toFixed(3)}</span>
           </div>
           <div className="flex justify-between items-center border-t border-slate-700 pt-3">
             <span className="text-slate-400 font-semibold">Total Area:</span>
@@ -76,7 +76,7 @@ export function MeasurementResults({
           </div>
           <div className="flex justify-between items-center">
             <span className="text-slate-400 font-semibold">Squares:</span>
-            <span className="text-[#00d4aa] font-bold text-lg">{measurements.squares}</span>
+            <span className="text-[#00D4FF] font-bold text-lg">{measurements.squares}</span>
           </div>
           <div className="flex justify-between items-center border-t border-slate-700 pt-3">
             <span className="text-slate-400">Perimeter:</span>

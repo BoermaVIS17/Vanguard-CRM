@@ -13,10 +13,10 @@ import autoTable from 'jspdf-autotable';
 // DEPRECATED: This key is restricted and cannot access Solar API
 const GOOGLE_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_KEY || "";
 
-// Company branding colors
-const BRAND_BLUE = '#1e40af'; // Deep blue
-const BRAND_ORANGE = '#ff6b35'; // Orange accent
-const BRAND_CYAN = '#00d4aa'; // Cyan accent
+// Vanguard Systems (VIS) branding colors
+const BRAND_NAVY = '#001F3F'; // Navy Blue - Primary
+const BRAND_DARKBLUE = '#003366'; // Dark Blue - Secondary
+const BRAND_CYAN = '#00D4FF'; // Electric Cyan - Accent
 
 interface BuildingInsights {
   solarPotential: {

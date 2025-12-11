@@ -99,7 +99,7 @@ export function AIChatWidget({ jobContext, className }: AIChatWidgetProps) {
           onClick={() => setIsOpen(true)}
           className={cn(
             "fixed bottom-6 right-6 h-14 w-14 rounded-full shadow-lg",
-            "bg-[#00d4aa] hover:bg-[#00b894] text-slate-900",
+            "bg-[#00D4FF] hover:bg-[#00B8E6] text-slate-900",
             "z-50 transition-transform hover:scale-110",
             className
           )}
@@ -121,7 +121,7 @@ export function AIChatWidget({ jobContext, className }: AIChatWidgetProps) {
           {/* Header */}
           <div className="flex items-center justify-between p-4 border-b border-slate-700">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-[#00d4aa] flex items-center justify-center">
+              <div className="w-8 h-8 rounded-full bg-[#00D4FF] flex items-center justify-center">
                 <Bot className="w-4 h-4 text-slate-900" />
               </div>
               <div>
@@ -159,7 +159,7 @@ export function AIChatWidget({ jobContext, className }: AIChatWidgetProps) {
                   )}
                 >
                   {message.role === "assistant" && (
-                    <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#00d4aa] flex items-center justify-center">
+                    <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#00D4FF] flex items-center justify-center">
                       <Sparkles className="w-4 h-4 text-slate-900" />
                     </div>
                   )}
@@ -168,7 +168,7 @@ export function AIChatWidget({ jobContext, className }: AIChatWidgetProps) {
                     className={cn(
                       "max-w-[80%] rounded-lg p-3",
                       message.role === "user"
-                        ? "bg-[#00d4aa] text-slate-900"
+                        ? "bg-[#00D4FF] text-slate-900"
                         : "bg-slate-800 text-white"
                     )}
                   >
@@ -198,7 +198,7 @@ export function AIChatWidget({ jobContext, className }: AIChatWidgetProps) {
               {/* Loading indicator */}
               {askAssistant.isPending && (
                 <div className="flex gap-2 justify-start">
-                  <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#00d4aa] flex items-center justify-center">
+                  <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#00D4FF] flex items-center justify-center">
                     <Sparkles className="w-4 h-4 text-slate-900" />
                   </div>
                   <div className="bg-slate-800 text-white rounded-lg p-3">
@@ -223,7 +223,7 @@ export function AIChatWidget({ jobContext, className }: AIChatWidgetProps) {
               <Button
                 onClick={handleSend}
                 disabled={!input.trim() || askAssistant.isPending}
-                className="bg-[#00d4aa] hover:bg-[#00b894] text-slate-900"
+                className="bg-[#00D4FF] hover:bg-[#00B8E6] text-slate-900"
                 size="icon"
               >
                 <Send className="w-4 h-4" />

@@ -169,11 +169,11 @@ export default function CRMLayout({ children }: CRMLayoutProps) {
           {/* Logo */}
           <div className="flex items-center gap-8">
             <Link href="/crm" className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-[#00d4aa] flex items-center justify-center">
+              <div className="w-8 h-8 rounded-full bg-[#00D4FF] flex items-center justify-center">
                 <span className="text-black font-bold text-sm">N</span>
               </div>
               <span className="text-white font-semibold text-lg hidden sm:block">
-                NEXTDOOR<span className="text-[#00d4aa]">CRM</span>
+                NEXTDOOR<span className="text-[#00D4FF]">CRM</span>
               </span>
             </Link>
 
@@ -243,7 +243,7 @@ export default function CRMLayout({ children }: CRMLayoutProps) {
                   variant="ghost"
                   className="text-white/90 hover:text-white hover:bg-white/10 gap-2"
                 >
-                  <div className="w-8 h-8 rounded-full bg-[#00d4aa] flex items-center justify-center">
+                  <div className="w-8 h-8 rounded-full bg-[#00D4FF] flex items-center justify-center">
                     <span className="text-black font-semibold text-sm">
                       {displayInitial}
                     </span>
@@ -256,7 +256,7 @@ export default function CRMLayout({ children }: CRMLayoutProps) {
                 <div className="px-3 py-2 border-b">
                   <p className="font-medium">{displayName}</p>
                   {displayRole && (
-                    <p className="text-xs text-[#00d4aa] font-medium">{displayRole}</p>
+                    <p className="text-xs text-[#00D4FF] font-medium">{displayRole}</p>
                   )}
                   <p className="text-sm text-muted-foreground">{userProfile?.email}</p>
                 </div>

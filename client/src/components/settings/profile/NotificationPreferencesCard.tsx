@@ -66,7 +66,7 @@ export default function NotificationPreferencesCard() {
     <Card className="bg-slate-900 border-slate-700">
       <CardHeader>
         <CardTitle className="text-white flex items-center gap-2">
-          <Bell className="w-5 h-5 text-[#00d4aa]" />
+          <Bell className="w-5 h-5 text-[#00D4FF]" />
           Notification Preferences
         </CardTitle>
         <CardDescription className="text-slate-400">
@@ -94,7 +94,7 @@ export default function NotificationPreferencesCard() {
                   <MessageSquare
                     className={`w-5 h-5 transition-colors ${
                       pref.sms
-                        ? "text-[#00d4aa]"
+                        ? "text-[#00D4FF]"
                         : "text-slate-600 group-hover:text-slate-500"
                     }`}
                   />
@@ -110,7 +110,7 @@ export default function NotificationPreferencesCard() {
                   <Mail
                     className={`w-5 h-5 transition-colors ${
                       pref.email
-                        ? "text-[#00d4aa]"
+                        ? "text-[#00D4FF]"
                         : "text-slate-600 group-hover:text-slate-500"
                     }`}
                   />

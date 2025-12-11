@@ -16,7 +16,7 @@ export default function TeamLeadCard({ userId }: TeamLeadCardProps) {
     <Card className="bg-slate-900 border-slate-700">
       <CardHeader>
         <CardTitle className="text-white flex items-center gap-2">
-          <Users className="w-5 h-5 text-[#00d4aa]" />
+          <Users className="w-5 h-5 text-[#00D4FF]" />
           Team Lead Dashboard
         </CardTitle>
         <CardDescription className="text-slate-400">
@@ -68,14 +68,14 @@ export default function TeamLeadCard({ userId }: TeamLeadCardProps) {
         {/* Override Status */}
         <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-4">
           <div className="flex items-center gap-3">
-            <TrendingUp className="w-5 h-5 text-[#00d4aa]" />
+            <TrendingUp className="w-5 h-5 text-[#00D4FF]" />
             <div>
               <p className="text-sm text-slate-300 font-medium">Override Commission</p>
               <p className="text-xs text-slate-500">Your override percentage (Read-Only)</p>
             </div>
           </div>
           <div className="mt-3 flex items-baseline gap-2">
-            <span className="text-2xl font-bold text-[#00d4aa]">2.5%</span>
+            <span className="text-2xl font-bold text-[#00D4FF]">2.5%</span>
             <span className="text-xs text-slate-500">on team sales</span>
           </div>
         </div>

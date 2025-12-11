@@ -49,7 +49,7 @@ export function JobDocumentsTab({
             <Button 
               onClick={() => fileInputRef.current?.click()}
               disabled={isUploading}
-              className="bg-[#00d4aa] hover:bg-[#00b894] text-black"
+              className="bg-[#00D4FF] hover:bg-[#00B8E6] text-black"
             >
               <Upload className="w-4 h-4 mr-2" />
               {isUploading ? "Uploading..." : "Upload Document"}
@@ -63,23 +63,23 @@ export function JobDocumentsTab({
           {documents.map((doc) => (
             <Card 
               key={doc.id} 
-              className="bg-slate-800 border-slate-700 hover:border-[#00d4aa] transition-colors cursor-pointer group"
+              className="bg-slate-800 border-slate-700 hover:border-[#00D4FF] transition-colors cursor-pointer group"
               onClick={() => onPreviewDocument({ url: doc.fileUrl, name: doc.fileName, type: doc.fileType || '' })}
             >
               <CardContent className="pt-4">
                 <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-blue-500/20 flex items-center justify-center flex-shrink-0 group-hover:bg-[#00d4aa]/20 transition-colors">
-                    <FileText className="w-5 h-5 text-blue-400 group-hover:text-[#00d4aa] transition-colors" />
+                  <div className="w-10 h-10 rounded-lg bg-blue-500/20 flex items-center justify-center flex-shrink-0 group-hover:bg-[#00D4FF]/20 transition-colors">
+                    <FileText className="w-5 h-5 text-blue-400 group-hover:text-[#00D4FF] transition-colors" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-medium text-white truncate group-hover:text-[#00d4aa] transition-colors">{doc.fileName}</p>
+                    <p className="font-medium text-white truncate group-hover:text-[#00D4FF] transition-colors">{doc.fileName}</p>
                     <p className="text-sm text-slate-400">
                       {doc.fileSize ? `${(doc.fileSize / 1024).toFixed(1)} KB` : "Unknown size"}
                     </p>
                     <p className="text-xs text-slate-500 mt-1">
                       {new Date(doc.createdAt).toLocaleDateString()}
                     </p>
-                    <p className="text-xs text-[#00d4aa] mt-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <p className="text-xs text-[#00D4FF] mt-1 opacity-0 group-hover:opacity-100 transition-opacity">
                       Click to view
                     </p>
                   </div>
@@ -121,7 +121,7 @@ export function JobDocumentsTab({
             {canEdit && (
               <Button 
                 variant="link" 
-                className="mt-2 text-[#00d4aa]"
+                className="mt-2 text-[#00D4FF]"
                 onClick={() => fileInputRef.current?.click()}
               >
                 Upload your first document

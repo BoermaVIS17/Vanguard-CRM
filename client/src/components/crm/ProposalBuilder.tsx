@@ -159,7 +159,7 @@ export function ProposalBuilder({
       <Card className="border-slate-700 bg-slate-800">
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-white">
-            <DollarSign className="w-5 h-5 text-[#00d4aa]" />
+            <DollarSign className="w-5 h-5 text-[#00D4FF]" />
             Proposal Builder
           </CardTitle>
           <CardDescription className="text-slate-400">
@@ -198,7 +198,7 @@ export function ProposalBuilder({
             <div className="p-4 bg-slate-700 rounded-lg border border-slate-600">
               <div className="flex items-center justify-between">
                 <span className="text-slate-400">Total Job Price</span>
-                <span className="text-2xl font-bold text-[#00d4aa]">
+                <span className="text-2xl font-bold text-[#00D4FF]">
                   ${totalPrice.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </span>
               </div>

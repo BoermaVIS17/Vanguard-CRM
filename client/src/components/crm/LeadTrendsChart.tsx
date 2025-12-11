@@ -23,7 +23,7 @@ const CustomTooltip = ({ active, payload }: any) => {
         </p>
         <div className="space-y-1">
           <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-sm bg-[#00d4aa]" />
+            <div className="w-3 h-3 rounded-sm bg-[#00D4FF]" />
             <span className="text-xs text-slate-600">Leads:</span>
             <span className="text-xs font-semibold text-slate-900">
               {payload[0].value}
@@ -87,7 +87,7 @@ export const LeadTrendsChart = memo(({ data }: LeadTrendsChartProps) => {
         <Bar
           dataKey="leads"
           name="Leads"
-          fill="#00d4aa"
+          fill="#00D4FF"
           radius={[4, 4, 0, 0]}
           maxBarSize={60}
         />

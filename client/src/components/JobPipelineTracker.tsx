@@ -73,7 +73,7 @@ export function JobPipelineTracker({
       if (isClosedDeal) {
         return "bg-amber-500/30 border-amber-400 text-amber-200 shadow-[0_0_30px_rgba(251,191,36,0.6)] font-bold";
       }
-      return "bg-[#00d4aa]/30 border-[#00d4aa] text-white shadow-[0_0_30px_rgba(0,212,170,0.7)] font-bold";
+      return "bg-[#00D4FF]/30 border-[#00D4FF] text-white shadow-[0_0_30px_rgba(0,212,170,0.7)] font-bold";
     }
 
     if (isCompleted) {

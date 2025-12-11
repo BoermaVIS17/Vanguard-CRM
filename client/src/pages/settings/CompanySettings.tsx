@@ -63,7 +63,7 @@ export default function CompanySettings() {
     return (
       <SettingsLayout title="Company Settings" description="Manage your business information">
         <div className="flex items-center justify-center py-12">
-          <div className="animate-spin w-8 h-8 border-2 border-[#00d4aa] border-t-transparent rounded-full" />
+          <div className="animate-spin w-8 h-8 border-2 border-[#00D4FF] border-t-transparent rounded-full" />
         </div>
       </SettingsLayout>
     );
@@ -78,7 +78,7 @@ export default function CompanySettings() {
         {/* Company Identity */}
         <div>
           <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-            <Building2 className="w-5 h-5 text-[#00d4aa]" />
+            <Building2 className="w-5 h-5 text-[#00D4FF]" />
             Company Identity
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -211,7 +211,7 @@ export default function CompanySettings() {
           <Button
             type="submit"
             disabled={updateSettings.isPending}
-            className="bg-[#00d4aa] hover:bg-[#00b894] text-black font-semibold"
+            className="bg-[#00D4FF] hover:bg-[#00B8E6] text-black font-semibold"
           >
             {updateSettings.isPending ? (
               <>

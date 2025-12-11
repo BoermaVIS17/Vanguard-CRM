@@ -273,7 +273,7 @@ export function RoofingReportView({ solarApiData, jobData, isGoogleMapsLoaded }:
   if (!metrics) {
     return (
       <div className="flex items-center justify-center h-96">
-        <div className="animate-spin w-8 h-8 border-2 border-[#00d4aa] border-t-transparent rounded-full" />
+        <div className="animate-spin w-8 h-8 border-2 border-[#00D4FF] border-t-transparent rounded-full" />
       </div>
     );
   }
@@ -402,7 +402,7 @@ export function RoofingReportView({ solarApiData, jobData, isGoogleMapsLoaded }:
                   />
                   {!imageLoaded && (
                     <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="animate-spin w-8 h-8 border-2 border-[#00d4aa] border-t-transparent rounded-full" />
+                      <div className="animate-spin w-8 h-8 border-2 border-[#00D4FF] border-t-transparent rounded-full" />
                     </div>
                   )}
                 </div>
@@ -412,7 +412,7 @@ export function RoofingReportView({ solarApiData, jobData, isGoogleMapsLoaded }:
               {solarApiData?.coverage === false && solarApiData?.lat && solarApiData?.lng && (
                 <div className="mt-6">
                   <h3 className="text-white font-semibold mb-3 flex items-center gap-2">
-                    <Ruler className="w-5 h-5 text-[#00d4aa]" />
+                    <Ruler className="w-5 h-5 text-[#00D4FF]" />
                     Manual Roof Measurement Tool
                   </h3>
                   <ManualRoofTakeoff
@@ -437,7 +437,7 @@ export function RoofingReportView({ solarApiData, jobData, isGoogleMapsLoaded }:
                 <div className="mt-4 bg-slate-800 border border-slate-700 rounded-lg p-4">
                   <h3 className="text-white font-semibold mb-3">Roof Measurement Complete</h3>
                   <p className="text-slate-300 text-sm mb-4">
-                    Measured area: <span className="text-[#00d4aa] font-semibold">{Math.round(measuredArea)} sq ft</span> (flat)
+                    Measured area: <span className="text-[#00D4FF] font-semibold">{Math.round(measuredArea)} sq ft</span> (flat)
                   </p>
                   <div className="space-y-3">
                     <div>
@@ -457,7 +457,7 @@ export function RoofingReportView({ solarApiData, jobData, isGoogleMapsLoaded }:
                     <div className="flex gap-2">
                       <Button
                         onClick={handleSaveManualMeasurement}
-                        className="flex-1 bg-[#00d4aa] hover:bg-[#00b894] text-slate-900 font-semibold"
+                        className="flex-1 bg-[#00D4FF] hover:bg-[#00B8E6] text-slate-900 font-semibold"
                       >
                         Save Measurement
                       </Button>
@@ -569,7 +569,7 @@ export function RoofingReportView({ solarApiData, jobData, isGoogleMapsLoaded }:
               ) : (
                 <>
                   <p className="text-2xl font-bold text-white">{Math.round(metrics.totalArea)} sq ft</p>
-                  <p className="text-xs text-[#00d4aa] mt-1">{(metrics.totalArea / 100).toFixed(1)} squares</p>
+                  <p className="text-xs text-[#00D4FF] mt-1">{(metrics.totalArea / 100).toFixed(1)} squares</p>
                 </>
               )}
             </div>
@@ -670,49 +670,49 @@ export function RoofingReportView({ solarApiData, jobData, isGoogleMapsLoaded }:
                   <td className="py-3 px-4 text-white font-medium">Starter Strip</td>
                   <td className="py-3 px-4 text-slate-300">{materials.starterStrip.source}</td>
                   <td className="py-3 px-4 text-right text-white">{formatLinearFeet(materials.starterStrip.rawFootage)}</td>
-                  <td className="py-3 px-4 text-right text-[#00d4aa] font-semibold">{formatLinearFeet(materials.starterStrip.withWaste)}</td>
+                  <td className="py-3 px-4 text-right text-[#00D4FF] font-semibold">{formatLinearFeet(materials.starterStrip.withWaste)}</td>
                   <td className="py-3 px-4 text-center text-slate-400 text-sm">{materials.starterStrip.unit}</td>
                 </tr>
                 <tr className="border-b border-slate-700/50 hover:bg-slate-700/30">
                   <td className="py-3 px-4 text-white font-medium">Drip Edge</td>
                   <td className="py-3 px-4 text-slate-300">{materials.dripEdge.source}</td>
                   <td className="py-3 px-4 text-right text-white">{formatLinearFeet(materials.dripEdge.rawFootage)}</td>
-                  <td className="py-3 px-4 text-right text-[#00d4aa] font-semibold">{formatLinearFeet(materials.dripEdge.withWaste)}</td>
+                  <td className="py-3 px-4 text-right text-[#00D4FF] font-semibold">{formatLinearFeet(materials.dripEdge.withWaste)}</td>
                   <td className="py-3 px-4 text-center text-slate-400 text-sm">{materials.dripEdge.unit}</td>
                 </tr>
                 <tr className="border-b border-slate-700/50 hover:bg-slate-700/30">
                   <td className="py-3 px-4 text-white font-medium">Hip Cap</td>
                   <td className="py-3 px-4 text-slate-300">Hips</td>
                   <td className="py-3 px-4 text-right text-white">{formatLinearFeet(metrics.hips)}</td>
-                  <td className="py-3 px-4 text-right text-[#00d4aa] font-semibold">{formatLinearFeet(Math.ceil(metrics.hips * (1 + wasteFactorPercent / 100)))}</td>
+                  <td className="py-3 px-4 text-right text-[#00D4FF] font-semibold">{formatLinearFeet(Math.ceil(metrics.hips * (1 + wasteFactorPercent / 100)))}</td>
                   <td className="py-3 px-4 text-center text-slate-400 text-sm">linear feet</td>
                 </tr>
                 <tr className="border-b border-slate-700/50 hover:bg-slate-700/30">
                   <td className="py-3 px-4 text-white font-medium">Ridge Cap</td>
                   <td className="py-3 px-4 text-slate-300">Ridges</td>
                   <td className="py-3 px-4 text-right text-white">{formatLinearFeet(metrics.ridges)}</td>
-                  <td className="py-3 px-4 text-right text-[#00d4aa] font-semibold">{formatLinearFeet(Math.ceil(metrics.ridges * (1 + wasteFactorPercent / 100)))}</td>
+                  <td className="py-3 px-4 text-right text-[#00D4FF] font-semibold">{formatLinearFeet(Math.ceil(metrics.ridges * (1 + wasteFactorPercent / 100)))}</td>
                   <td className="py-3 px-4 text-center text-slate-400 text-sm">linear feet</td>
                 </tr>
                 <tr className="border-b border-slate-700/50 hover:bg-slate-700/30">
                   <td className="py-3 px-4 text-white font-medium">Valley Metal</td>
                   <td className="py-3 px-4 text-slate-300">{materials.valleyMetal.source}</td>
                   <td className="py-3 px-4 text-right text-white">{formatLinearFeet(materials.valleyMetal.rawFootage)}</td>
-                  <td className="py-3 px-4 text-right text-[#00d4aa] font-semibold">{formatLinearFeet(materials.valleyMetal.withWaste)}</td>
+                  <td className="py-3 px-4 text-right text-[#00D4FF] font-semibold">{formatLinearFeet(materials.valleyMetal.withWaste)}</td>
                   <td className="py-3 px-4 text-center text-slate-400 text-sm">{materials.valleyMetal.unit}</td>
                 </tr>
                 <tr className="border-b border-slate-700/50 hover:bg-slate-700/30">
                   <td className="py-3 px-4 text-white font-medium">Synthetic Underlayment</td>
                   <td className="py-3 px-4 text-slate-300">{materials.iceWaterShield.source}</td>
                   <td className="py-3 px-4 text-right text-white">{formatLinearFeet(materials.iceWaterShield.rawFootage)}</td>
-                  <td className="py-3 px-4 text-right text-[#00d4aa] font-semibold">{formatLinearFeet(materials.iceWaterShield.withWaste)}</td>
+                  <td className="py-3 px-4 text-right text-[#00D4FF] font-semibold">{formatLinearFeet(materials.iceWaterShield.withWaste)}</td>
                   <td className="py-3 px-4 text-center text-slate-400 text-sm">{materials.iceWaterShield.unit}</td>
                 </tr>
                 <tr className="border-b border-slate-700/50 hover:bg-slate-700/30 bg-blue-900/20">
                   <td className="py-3 px-4 text-white font-medium">Shingles</td>
                   <td className="py-3 px-4 text-slate-300">{materials.shingles.source}</td>
                   <td className="py-3 px-4 text-right text-white">{Math.round(materials.shingles.rawFootage)} sq ft</td>
-                  <td className="py-3 px-4 text-right text-[#00d4aa] font-semibold">{materials.shingles.squares} squares</td>
+                  <td className="py-3 px-4 text-right text-[#00D4FF] font-semibold">{materials.shingles.squares} squares</td>
                   <td className="py-3 px-4 text-center text-slate-400 text-sm">100 sq ft/square</td>
                 </tr>
                 {/* Section C: Manual Override - Wall Flashing */}

@@ -34,7 +34,7 @@ export function PropertyCard({ job }: PropertyCardProps) {
               href={`https://www.google.com/maps?q=${job.latitude},${job.longitude}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="block rounded-lg overflow-hidden border-2 border-slate-700 hover:border-[#00d4aa] transition-colors"
+              className="block rounded-lg overflow-hidden border-2 border-slate-700 hover:border-[#00D4FF] transition-colors"
             >
               <img
                 src={mapUrl}

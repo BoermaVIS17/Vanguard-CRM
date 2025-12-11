@@ -203,7 +203,7 @@ export default function CRMLeads() {
     return (
       <CRMLayout>
         <div className="flex items-center justify-center h-96 bg-slate-900">
-          <div className="animate-spin w-8 h-8 border-2 border-[#00d4aa] border-t-transparent rounded-full" />
+          <div className="animate-spin w-8 h-8 border-2 border-[#00D4FF] border-t-transparent rounded-full" />
         </div>
       </CRMLayout>
     );
@@ -270,7 +270,7 @@ export default function CRMLeads() {
               </SelectContent>
             </Select>
             <Button 
-              className="bg-[#00d4aa] hover:bg-[#00b894] text-black font-semibold"
+              className="bg-[#00D4FF] hover:bg-[#00B8E6] text-black font-semibold"
               onClick={() => setShowNewJobDialog(true)}
             >
               <Plus className="w-4 h-4 mr-2" />
@@ -332,7 +332,7 @@ export default function CRMLeads() {
                         <div className="text-sm">
                           <p className="text-slate-300">{lead.promoCode || "Direct"}</p>
                           {lead.salesRepCode && (
-                            <p className="text-xs text-[#00d4aa] font-medium">Rep: {lead.salesRepCode}</p>
+                            <p className="text-xs text-[#00D4FF] font-medium">Rep: {lead.salesRepCode}</p>
                           )}
                         </div>
                       </td>
@@ -348,7 +348,7 @@ export default function CRMLeads() {
                             <Button 
                               variant="outline" 
                               size="sm" 
-                              className="border-[#00d4aa] text-[#00d4aa] hover:bg-[#00d4aa]/10 bg-transparent"
+                              className="border-[#00D4FF] text-[#00D4FF] hover:bg-[#00D4FF]/10 bg-transparent"
                             >
                               <ExternalLink className="w-4 h-4 mr-1" />
                               Open
@@ -393,7 +393,7 @@ export default function CRMLeads() {
             <div className="space-y-6 py-4">
               {/* Contact Information Section */}
               <div>
-                <h3 className="text-md font-semibold text-[#00d4aa] mb-3">Contact Information</h3>
+                <h3 className="text-md font-semibold text-[#00D4FF] mb-3">Contact Information</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <label className="text-sm text-slate-300">Full Name *</label>
@@ -445,7 +445,7 @@ export default function CRMLeads() {
                   type="button"
                   variant="ghost"
                   onClick={() => setShowSecondaryContact(!showSecondaryContact)}
-                  className="text-[#00d4aa] hover:text-[#00b894] hover:bg-slate-700 mb-3 p-0"
+                  className="text-[#00D4FF] hover:text-[#00B8E6] hover:bg-slate-700 mb-3 p-0"
                 >
                   {showSecondaryContact ? "− Hide" : "+ Add"} Spouse/Partner Contact
                 </Button>
@@ -503,7 +503,7 @@ export default function CRMLeads() {
 
               {/* Property Details Section */}
               <div>
-                <h3 className="text-md font-semibold text-[#00d4aa] mb-3">Property Details</h3>
+                <h3 className="text-md font-semibold text-[#00D4FF] mb-3">Property Details</h3>
                 <div className="grid grid-cols-1 gap-4">
                   <div className="space-y-2">
                     <label className="text-sm text-slate-300">
@@ -527,7 +527,7 @@ export default function CRMLeads() {
                         toast.success("Address auto-filled with coordinates!");
                       }}
                       placeholder="Start typing address..."
-                      className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-md text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#00d4aa] focus:border-transparent"
+                      className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-md text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#00D4FF] focus:border-transparent"
                     />
                   </div>
                   <div className="space-y-2">
@@ -544,7 +544,7 @@ export default function CRMLeads() {
                     />
                   </div>
                   {newJobForm.latitude && newJobForm.longitude && (
-                    <div className="text-xs text-[#00d4aa] flex items-center gap-2">
+                    <div className="text-xs text-[#00D4FF] flex items-center gap-2">
                       <MapPin className="w-3 h-3" />
                       Coordinates: {newJobForm.latitude.toFixed(6)}, {newJobForm.longitude.toFixed(6)}
                     </div>
@@ -574,7 +574,7 @@ export default function CRMLeads() {
 
               {/* Site Access Section */}
               <div>
-                <h3 className="text-md font-semibold text-[#00d4aa] mb-3">Site Access</h3>
+                <h3 className="text-md font-semibold text-[#00D4FF] mb-3">Site Access</h3>
                 <div className="grid grid-cols-1 gap-4">
                   <div className="space-y-2">
                     <label className="text-sm text-slate-300">Gate Code</label>
@@ -600,7 +600,7 @@ export default function CRMLeads() {
               {/* Insurance Information Section */}
               {newJobForm.dealType === "insurance" && (
                 <div>
-                  <h3 className="text-md font-semibold text-[#00d4aa] mb-3">Insurance Information</h3>
+                  <h3 className="text-md font-semibold text-[#00D4FF] mb-3">Insurance Information</h3>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <label className="text-sm text-slate-300">Insurance Carrier</label>
@@ -632,7 +632,7 @@ export default function CRMLeads() {
               <Button 
                 onClick={handleCreateJob}
                 disabled={createJob.isPending}
-                className="bg-[#00d4aa] hover:bg-[#00b894] text-black font-semibold"
+                className="bg-[#00D4FF] hover:bg-[#00B8E6] text-black font-semibold"
               >
                 {createJob.isPending ? "Creating..." : "Create Job"}
               </Button>

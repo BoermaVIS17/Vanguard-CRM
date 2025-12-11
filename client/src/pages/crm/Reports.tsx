@@ -175,11 +175,11 @@ export default function Reports() {
             <p className="text-sm text-slate-400">Export data and view performance metrics</p>
           </div>
           <div className="flex items-center gap-3">
-            <Button onClick={exportToCSV} variant="outline" className="border-[#00d4aa] text-[#00d4aa] hover:bg-[#00d4aa]/10 bg-transparent">
+            <Button onClick={exportToCSV} variant="outline" className="border-[#00D4FF] text-[#00D4FF] hover:bg-[#00D4FF]/10 bg-transparent">
               <FileSpreadsheet className="w-4 h-4 mr-2" />
               Export CSV
             </Button>
-            <Button onClick={exportToPDF} className="bg-[#00d4aa] hover:bg-[#00b894] text-black font-semibold">
+            <Button onClick={exportToPDF} className="bg-[#00D4FF] hover:bg-[#00B8E6] text-black font-semibold">
               <FileText className="w-4 h-4 mr-2" />
               Export PDF
             </Button>

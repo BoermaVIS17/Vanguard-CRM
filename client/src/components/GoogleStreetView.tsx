@@ -104,7 +104,7 @@ export function GoogleStreetView({
       <Card className="bg-slate-800 border-slate-700">
         <CardContent className="pt-6">
           <div className="flex items-center justify-center h-[500px]">
-            <div className="animate-spin w-8 h-8 border-2 border-[#00d4aa] border-t-transparent rounded-full" />
+            <div className="animate-spin w-8 h-8 border-2 border-[#00D4FF] border-t-transparent rounded-full" />
           </div>
         </CardContent>
       </Card>

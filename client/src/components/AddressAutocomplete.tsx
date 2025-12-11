@@ -152,7 +152,7 @@ export function AddressAutocomplete({
                 className="px-4 py-3 cursor-pointer hover:bg-slate-700 transition-colors border-b border-slate-700 last:border-b-0"
               >
                 <div className="flex flex-col">
-                  <span className="text-[#00d4aa] font-semibold text-sm">
+                  <span className="text-[#00D4FF] font-semibold text-sm">
                     {main_text}
                   </span>
                   <span className="text-slate-400 text-xs mt-0.5">

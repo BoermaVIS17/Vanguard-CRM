@@ -69,7 +69,7 @@ export function JobMessagesTab({
               <Button 
                 onClick={onSendMessage}
                 disabled={!newMessage.trim() || isSending}
-                className="bg-[#00d4aa] hover:bg-[#00b894] text-black self-end"
+                className="bg-[#00D4FF] hover:bg-[#00B8E6] text-black self-end"
               >
                 <Send className="w-4 h-4 mr-2" />
                 Send
@@ -97,7 +97,7 @@ export function JobMessagesTab({
                     <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${
                       isFromCustomer 
                         ? 'bg-gradient-to-br from-amber-500 to-orange-500' 
-                        : 'bg-gradient-to-br from-[#00d4aa] to-[#00b894]'
+                        : 'bg-gradient-to-br from-[#00D4FF] to-[#00B8E6]'
                     }`}>
                       <span className={`font-semibold text-sm ${isFromCustomer ? 'text-white' : 'text-black'}`}>
                         {isFromCustomer ? 'C' : (msg.user?.name?.charAt(0) || msg.user?.email?.charAt(0) || "?")}

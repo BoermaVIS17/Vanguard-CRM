@@ -155,7 +155,7 @@ export function SignaturePad({
       <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto bg-slate-900 border-slate-700">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold text-white flex items-center gap-2">
-            <FileText className="w-6 h-6 text-[#00d4aa]" />
+            <FileText className="w-6 h-6 text-[#00D4FF]" />
             Document Signature
           </DialogTitle>
         </DialogHeader>
@@ -259,7 +259,7 @@ export function SignaturePad({
                   <Button
                     onClick={saveSignature}
                     disabled={!hasSignature}
-                    className="flex-1 bg-[#00d4aa] hover:bg-[#00b894] text-black font-semibold"
+                    className="flex-1 bg-[#00D4FF] hover:bg-[#00B8E6] text-black font-semibold"
                   >
                     <Check className="w-4 h-4 mr-2" />
                     Accept & Sign

@@ -106,7 +106,7 @@ export default function CRMPipeline() {
     return (
       <CRMLayout>
         <div className="flex items-center justify-center h-96 bg-slate-900">
-          <div className="animate-spin w-8 h-8 border-2 border-[#00d4aa] border-t-transparent rounded-full" />
+          <div className="animate-spin w-8 h-8 border-2 border-[#00D4FF] border-t-transparent rounded-full" />
         </div>
       </CRMLayout>
     );
@@ -172,7 +172,7 @@ export default function CRMPipeline() {
           <GripVertical className="w-4 h-4 text-slate-500 mt-1 flex-shrink-0 cursor-grab" />
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#00d4aa] to-[#00b894] flex items-center justify-center flex-shrink-0">
+              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#00D4FF] to-[#00B8E6] flex items-center justify-center flex-shrink-0">
                 <span className="text-black font-semibold text-xs">
                   {lead.fullName?.charAt(0) || "?"}
                 </span>
@@ -209,7 +209,7 @@ export default function CRMPipeline() {
 
           {lead.salesRepCode && (
             <div className="mt-2">
-              <span className="inline-block px-2 py-0.5 bg-[#00d4aa]/20 text-[#00d4aa] text-xs rounded font-medium">
+              <span className="inline-block px-2 py-0.5 bg-[#00D4FF]/20 text-[#00D4FF] text-xs rounded font-medium">
                 Rep: {lead.salesRepCode}
               </span>
             </div>
@@ -300,7 +300,7 @@ export default function CRMPipeline() {
                     <div className="mt-3 flex flex-wrap gap-1">
                       <button
                         onClick={() => setSelectedDealType(null)}
-                        className={`px-2 py-1 text-xs rounded ${!selectedDealType ? 'bg-[#00d4aa] text-black' : 'bg-slate-700 text-slate-300 hover:bg-slate-600'}`}
+                        className={`px-2 py-1 text-xs rounded ${!selectedDealType ? 'bg-[#00D4FF] text-black' : 'bg-slate-700 text-slate-300 hover:bg-slate-600'}`}
                       >
                         All ({(categoryCounts?.insurance || 0) + (categoryCounts?.cash || 0) + (categoryCounts?.financed || 0)})
                       </button>
@@ -308,7 +308,7 @@ export default function CRMPipeline() {
                         <button
                           key={dt.key}
                           onClick={() => setSelectedDealType(selectedDealType === dt.key ? null : dt.key)}
-                          className={`px-2 py-1 text-xs rounded flex items-center gap-1 ${selectedDealType === dt.key ? 'bg-[#00d4aa] text-black' : 'bg-slate-700 text-slate-300 hover:bg-slate-600'}`}
+                          className={`px-2 py-1 text-xs rounded flex items-center gap-1 ${selectedDealType === dt.key ? 'bg-[#00D4FF] text-black' : 'bg-slate-700 text-slate-300 hover:bg-slate-600'}`}
                         >
                           <dt.icon className="w-3 h-3" />
                           {dt.label} ({categoryCounts?.[dt.key as keyof typeof categoryCounts] || 0})
@@ -337,7 +337,7 @@ export default function CRMPipeline() {
         {lienRightsJobs && lienRightsJobs.length > 0 && (
           <div className="mt-8">
             <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-              <Clock className="w-5 h-5 text-[#00d4aa]" />
+              <Clock className="w-5 h-5 text-[#00D4FF]" />
               Lien Rights Tracking (90-Day Window)
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">

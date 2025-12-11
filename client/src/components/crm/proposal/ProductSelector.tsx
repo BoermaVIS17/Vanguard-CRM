@@ -76,7 +76,7 @@ export function ProductSelector({ selectedProductId, onChange }: ProductSelector
                     }}
                     className={`w-full flex items-start gap-3 p-3 rounded-lg transition-colors ${
                       selectedProductId === shingle.id
-                        ? 'bg-[#00d4aa]/20 border border-[#00d4aa]'
+                        ? 'bg-[#00D4FF]/20 border border-[#00D4FF]'
                         : 'hover:bg-slate-700 border border-transparent'
                     }`}
                   >
@@ -105,7 +105,7 @@ export function ProductSelector({ selectedProductId, onChange }: ProductSelector
                           </div>
                         </div>
                         {selectedProductId === shingle.id && (
-                          <Check className="h-4 w-4 text-[#00d4aa] flex-shrink-0" />
+                          <Check className="h-4 w-4 text-[#00D4FF] flex-shrink-0" />
                         )}
                       </div>
                       

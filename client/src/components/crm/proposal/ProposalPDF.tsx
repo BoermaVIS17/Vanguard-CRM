@@ -43,7 +43,7 @@ const styles = StyleSheet.create({
   coverName: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#00d4aa',
+    color: '#00D4FF',
     marginBottom: 60,
     textAlign: 'center',
   },
@@ -53,7 +53,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     height: 80,
-    backgroundColor: '#00d4aa',
+    backgroundColor: '#00D4FF',
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
@@ -69,7 +69,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 30,
     paddingBottom: 20,
-    borderBottom: '2 solid #00d4aa',
+    borderBottom: '2 solid #00D4FF',
   },
   logo: {
     width: 120,
@@ -121,7 +121,7 @@ const styles = StyleSheet.create({
   specBadge: {
     paddingHorizontal: 10,
     paddingVertical: 4,
-    backgroundColor: '#00d4aa',
+    backgroundColor: '#00D4FF',
     borderRadius: 4,
   },
   specText: {
@@ -135,10 +135,10 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#00d4aa',
+    color: '#00D4FF',
     marginBottom: 10,
     paddingBottom: 5,
-    borderBottom: '2 solid #00d4aa',
+    borderBottom: '2 solid #00D4FF',
   },
   paragraph: {
     fontSize: 11,
@@ -173,7 +173,7 @@ const styles = StyleSheet.create({
     padding: 25,
     backgroundColor: '#f1f5f9',
     borderRadius: 8,
-    border: '2 solid #00d4aa',
+    border: '2 solid #00D4FF',
   },
   priceLabel: {
     fontSize: 14,
@@ -184,7 +184,7 @@ const styles = StyleSheet.create({
   priceValue: {
     fontSize: 40,
     fontWeight: 'bold',
-    color: '#00d4aa',
+    color: '#00D4FF',
   },
   footer: {
     marginTop: 30,

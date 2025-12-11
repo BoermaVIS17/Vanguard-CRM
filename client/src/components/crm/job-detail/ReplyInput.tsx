@@ -39,7 +39,7 @@ export function ReplyInput({ parentId, onSubmit, onCancel }: ReplyInputProps) {
         value={replyText}
         onChange={(e) => setReplyText(e.target.value)}
         placeholder="Write a reply... (Ctrl+Enter to send, Esc to cancel)"
-        className="bg-slate-800 border-slate-600 text-white min-h-[80px] mb-2 resize-none focus:ring-[#00d4aa] focus:border-[#00d4aa]"
+        className="bg-slate-800 border-slate-600 text-white min-h-[80px] mb-2 resize-none focus:ring-[#00D4FF] focus:border-[#00D4FF]"
         onKeyDown={handleKeyDown}
         autoFocus
       />
@@ -57,7 +57,7 @@ export function ReplyInput({ parentId, onSubmit, onCancel }: ReplyInputProps) {
           size="sm"
           onClick={handleSubmit}
           disabled={!replyText.trim()}
-          className="bg-[#00d4aa] hover:bg-[#00b894] text-slate-900 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+          className="bg-[#00D4FF] hover:bg-[#00B8E6] text-slate-900 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <Send className="w-4 h-4 mr-1" />
           Send Reply

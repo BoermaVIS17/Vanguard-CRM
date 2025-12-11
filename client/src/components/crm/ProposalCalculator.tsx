@@ -329,7 +329,7 @@ export function ProposalCalculator({
       <Card className="border-slate-700 bg-slate-800">
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-white">
-            <Calculator className="w-5 h-5 text-[#00d4aa]" />
+            <Calculator className="w-5 h-5 text-[#00D4FF]" />
             Proposal Calculator
           </CardTitle>
         </CardHeader>
@@ -351,7 +351,7 @@ export function ProposalCalculator({
       <Card className={`border-slate-700 bg-slate-800 ${pricePerSqNum > 0 ? `border-l-4 ${pricingZone.borderColor}` : ''}`}>
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-white">
-            <Calculator className="w-5 h-5 text-[#00d4aa]" />
+            <Calculator className="w-5 h-5 text-[#00D4FF]" />
             Proposal Calculator
           </CardTitle>
           <CardDescription className="text-slate-400">
@@ -516,7 +516,7 @@ export function ProposalCalculator({
                   )}
                 </div>
               </div>
-              <div className="text-3xl font-bold text-[#00d4aa]">
+              <div className="text-3xl font-bold text-[#00D4FF]">
                 ${totalPrice.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </div>
               <div className="text-xs text-slate-500 mt-1">
@@ -826,7 +826,7 @@ export function ProposalCalculator({
           <Button
             onClick={() => generateProposal.mutate({ jobId })}
             disabled={generateProposal.isPending}
-            className="w-full bg-[#00d4aa] hover:bg-[#00b894] text-black font-semibold"
+            className="w-full bg-[#00D4FF] hover:bg-[#00B8E6] text-black font-semibold"
           >
             <FileText className="w-4 h-4 mr-2" />
             {generateProposal.isPending ? "Generating..." : "Generate Contract"}

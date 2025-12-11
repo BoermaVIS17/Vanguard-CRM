@@ -67,7 +67,7 @@ export default function CRMLogin() {
                   placeholder="Enter your email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="pl-10 bg-slate-900/50 border-slate-600 text-white placeholder:text-slate-500 focus:border-[#00d4aa] focus:ring-[#00d4aa]"
+                  className="pl-10 bg-slate-900/50 border-slate-600 text-white placeholder:text-slate-500 focus:border-[#00D4FF] focus:ring-[#00D4FF]"
                   disabled={loginMutation.isPending}
                 />
               </div>
@@ -83,7 +83,7 @@ export default function CRMLogin() {
                   placeholder="Enter your password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="pl-10 pr-10 bg-slate-900/50 border-slate-600 text-white placeholder:text-slate-500 focus:border-[#00d4aa] focus:ring-[#00d4aa]"
+                  className="pl-10 pr-10 bg-slate-900/50 border-slate-600 text-white placeholder:text-slate-500 focus:border-[#00D4FF] focus:ring-[#00D4FF]"
                   disabled={loginMutation.isPending}
                 />
                 <button
@@ -99,7 +99,7 @@ export default function CRMLogin() {
             <Button 
               type="submit"
               disabled={loginMutation.isPending}
-              className="w-full bg-gradient-to-r from-[#00d4aa] to-[#00b894] hover:from-[#00e6bc] hover:to-[#00d4aa] text-black font-semibold py-6 shadow-lg shadow-[#00d4aa]/20"
+              className="w-full bg-gradient-to-r from-[#00D4FF] to-[#00B8E6] hover:from-[#00e6bc] hover:to-[#00D4FF] text-black font-semibold py-6 shadow-lg shadow-[#00D4FF]/20"
             >
               {loginMutation.isPending ? (
                 <>

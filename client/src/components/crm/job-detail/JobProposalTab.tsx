@@ -165,7 +165,7 @@ export function JobProposalTab({ jobId, job, userRole, onUpdate }: JobProposalTa
             <Button
               onClick={handleGenerateProposal}
               disabled={isGenerating}
-              className="bg-[#00d4aa] hover:bg-[#00b894] text-slate-900 font-medium"
+              className="bg-[#00D4FF] hover:bg-[#00B8E6] text-slate-900 font-medium"
             >
               {isGenerating ? (
                 <>
@@ -184,7 +184,7 @@ export function JobProposalTab({ jobId, job, userRole, onUpdate }: JobProposalTa
               <Button
                 onClick={handleSaveProposal}
                 disabled={isSaving}
-                className="bg-[#00d4aa] hover:bg-[#00b894] text-slate-900 font-medium"
+                className="bg-[#00D4FF] hover:bg-[#00B8E6] text-slate-900 font-medium"
               >
                 {isSaving ? (
                   <>

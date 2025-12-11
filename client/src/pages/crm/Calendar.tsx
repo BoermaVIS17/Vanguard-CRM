@@ -123,7 +123,7 @@ export default function Calendar() {
           </div>
           <Dialog open={showScheduleDialog} onOpenChange={setShowScheduleDialog}>
             <DialogTrigger asChild>
-              <Button className="bg-[#00d4aa] hover:bg-[#00b894] text-black font-semibold">
+              <Button className="bg-[#00D4FF] hover:bg-[#00B8E6] text-black font-semibold">
                 <Plus className="w-4 h-4 mr-2" />
                 Schedule Inspection
               </Button>
@@ -182,7 +182,7 @@ export default function Calendar() {
                   </Select>
                 </div>
                 <Button 
-                  className="w-full bg-[#00d4aa] hover:bg-[#00b894] text-black font-semibold" 
+                  className="w-full bg-[#00D4FF] hover:bg-[#00B8E6] text-black font-semibold" 
                   onClick={handleSchedule}
                   disabled={!selectedLead || !selectedDate || scheduleMutation.isPending}
                 >
@@ -231,7 +231,7 @@ export default function Calendar() {
                     key={idx}
                     className={`min-h-[100px] p-1 border rounded-md cursor-pointer transition-colors ${
                       isCurrentMonthDay ? "bg-slate-700/50 hover:bg-slate-700" : "bg-slate-800/50"
-                    } ${isTodayDate ? "border-[#00d4aa] border-2" : "border-slate-600"}`}
+                    } ${isTodayDate ? "border-[#00D4FF] border-2" : "border-slate-600"}`}
                     onClick={() => {
                       setSelectedDate(date);
                       if (dayAppointments.length === 0) {
@@ -240,7 +240,7 @@ export default function Calendar() {
                     }}
                   >
                     <div className={`text-sm font-medium mb-1 ${
-                      isTodayDate ? "text-[#00d4aa]" : isCurrentMonthDay ? "text-white" : "text-slate-500"
+                      isTodayDate ? "text-[#00D4FF]" : isCurrentMonthDay ? "text-white" : "text-slate-500"
                     }`}>
                       {date.getDate()}
                     </div>
@@ -250,7 +250,7 @@ export default function Calendar() {
                       {dayAppointments.slice(0, 2).map((apt: any) => (
                         <div
                           key={apt.id}
-                          className="text-xs p-1 rounded bg-[#00d4aa]/20 text-[#00d4aa] truncate font-medium"
+                          className="text-xs p-1 rounded bg-[#00D4FF]/20 text-[#00D4FF] truncate font-medium"
                           title={apt.title}
                         >
                           {new Date(apt.scheduledDate).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
@@ -273,7 +273,7 @@ export default function Calendar() {
         <Card className="mt-6 shadow-sm bg-slate-800 border-slate-700">
           <CardHeader>
             <CardTitle className="text-lg text-white flex items-center gap-2">
-              <CalendarIcon className="w-5 h-5 text-[#00d4aa]" />
+              <CalendarIcon className="w-5 h-5 text-[#00D4FF]" />
               Today's Schedule
             </CardTitle>
           </CardHeader>
@@ -281,9 +281,9 @@ export default function Calendar() {
             {appointmentsByDate[new Date().toDateString()]?.length ? (
               <div className="space-y-3">
                 {appointmentsByDate[new Date().toDateString()]?.map((apt: any) => (
-                  <div key={apt.id} className="flex items-center gap-4 p-3 rounded-lg border-l-4 border-l-[#00d4aa] bg-slate-700/50">
-                    <div className="w-12 h-12 rounded-full bg-[#00d4aa]/20 flex items-center justify-center">
-                      <Clock className="w-5 h-5 text-[#00d4aa]" />
+                  <div key={apt.id} className="flex items-center gap-4 p-3 rounded-lg border-l-4 border-l-[#00D4FF] bg-slate-700/50">
+                    <div className="w-12 h-12 rounded-full bg-[#00D4FF]/20 flex items-center justify-center">
+                      <Clock className="w-5 h-5 text-[#00D4FF]" />
                     </div>
                     <div className="flex-1">
                       <p className="font-medium text-white">{apt.title}</p>

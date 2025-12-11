@@ -72,7 +72,7 @@ export default function SettingsLayout({ children, title, description }: Setting
                     <div
                       className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors cursor-pointer ${
                         isActive(item.href)
-                          ? "bg-[#00d4aa]/20 text-[#00d4aa] border border-[#00d4aa]/30"
+                          ? "bg-[#00D4FF]/20 text-[#00D4FF] border border-[#00D4FF]/30"
                           : "text-slate-300 hover:bg-slate-800 hover:text-white"
                       }`}
                     >

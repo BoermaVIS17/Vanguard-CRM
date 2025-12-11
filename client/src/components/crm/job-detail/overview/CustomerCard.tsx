@@ -53,7 +53,7 @@ export function CustomerCard({ job, canEdit, onSave, isSaving }: CustomerCardPro
       <CardHeader>
         <div className="flex items-center justify-between">
           <CardTitle className="text-white flex items-center gap-2">
-            <User className="w-5 h-5 text-[#00d4aa]" />
+            <User className="w-5 h-5 text-[#00D4FF]" />
             Customer Information
           </CardTitle>
           {canEdit && !isEditing && (
@@ -181,13 +181,13 @@ export function CustomerCard({ job, canEdit, onSave, isSaving }: CustomerCardPro
             {job.email && (
               <div className="flex items-center gap-2 text-slate-300">
                 <Mail className="w-4 h-4 text-slate-400" />
-                <a href={`mailto:${job.email}`} className="hover:text-[#00d4aa]">{job.email}</a>
+                <a href={`mailto:${job.email}`} className="hover:text-[#00D4FF]">{job.email}</a>
               </div>
             )}
             {job.phone && (
               <div className="flex items-center gap-2 text-slate-300">
                 <Phone className="w-4 h-4 text-slate-400" />
-                <a href={`tel:${job.phone}`} className="hover:text-[#00d4aa]">{job.phone}</a>
+                <a href={`tel:${job.phone}`} className="hover:text-[#00D4FF]">{job.phone}</a>
               </div>
             )}
             <div className="flex items-start gap-2 text-slate-300">

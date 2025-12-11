@@ -33,7 +33,7 @@ export function TagSelector({ selectedTags, onChange }: TagSelectorProps) {
           <Tag className="w-4 h-4 mr-2" />
           Add Tags
           {selectedTags.length > 0 && (
-            <span className="ml-2 px-1.5 py-0.5 bg-[#00d4aa] text-slate-900 rounded-full text-xs font-medium">
+            <span className="ml-2 px-1.5 py-0.5 bg-[#00D4FF] text-slate-900 rounded-full text-xs font-medium">
               {selectedTags.length}
             </span>
           )}

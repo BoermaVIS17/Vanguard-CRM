@@ -104,7 +104,7 @@ export function InsuranceInfoCard({
                 size="sm"
                 onClick={handleSave}
                 disabled={updateInsurance.isPending}
-                className="bg-[#00d4aa] hover:bg-[#00b894] text-black"
+                className="bg-[#00D4FF] hover:bg-[#00B8E6] text-black"
               >
                 <Save className="w-4 h-4 mr-2" />
                 {updateInsurance.isPending ? "Saving..." : "Save"}
