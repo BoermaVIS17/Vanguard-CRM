@@ -1,15 +1,14 @@
 -- ============================================
--- CONSOLIDATED SUPABASE MIGRATION
--- NextDoor Exterior Solutions CRM Database
--- Generated: December 10, 2024
+-- VANGUARD SYSTEMS (VIS) CRM DATABASE
+-- Complete Supabase Migration Schema
+-- Updated: December 11, 2024
 -- ============================================
--- ⚠️ STATUS: ALREADY APPLIED TO SUPABASE
--- This migration was successfully run on December 10, 2024
--- DO NOT re-run this file - it's for reference only
--- See SUPABASE_APPLIED.md for details
+-- This file contains all SQL migrations needed for a fresh Supabase instance.
+-- Run this entire file in your Supabase SQL Editor to set up the database.
+-- All tables, enums, indexes, RLS policies, and permissions included.
 -- ============================================
--- This file contains all SQL migrations needed for Supabase.
--- All tables, enums, indexes, RLS policies, and permissions are live.
+-- Company: Vanguard Systems (VIS)
+-- Purpose: Roofing CRM with job tracking, proposals, and team management
 -- ============================================
 
 -- ============================================
@@ -251,7 +250,7 @@ CREATE TABLE IF NOT EXISTS "company_settings" (
   "id" SERIAL PRIMARY KEY,
   
   -- Identity & Branding
-  "company_name" VARCHAR(255) NOT NULL DEFAULT 'NextDoor Exterior Solutions',
+  "company_name" VARCHAR(255) NOT NULL DEFAULT 'Vanguard Systems',
   "legal_entity_type" legal_entity_type,
   "dba_name" VARCHAR(255),
   "logo_url" VARCHAR(500),
@@ -410,13 +409,13 @@ INSERT INTO "company_settings" (
 )
 VALUES (
   1,
-  'NextDoor Exterior Solutions',
+  'Vanguard Systems',
   30,
   10,
   25,
   50.00,
   'Beacon',
-  'GAF Timberline HDZ'
+  'Tamko Titan XT'
 )
 ON CONFLICT (id) DO NOTHING;
 
@@ -434,7 +433,7 @@ COMMENT ON COLUMN "company_settings"."terms_and_conditions" IS 'Minimum 50 chara
 COMMENT ON COLUMN "company_settings"."default_deposit_percent" IS 'Typical range: 25-50% for residential roofing';
 
 COMMENT ON COLUMN "report_requests"."solar_api_data" IS 'Google Solar API response data for roof measurements. Includes solarCoverage flag if API returns 404.';
-COMMENT ON COLUMN "report_requests"."estimator_data" IS 'Imported estimate data from NextDoor Exterior Solutions roofing estimator';
+COMMENT ON COLUMN "report_requests"."estimator_data" IS 'Imported estimate data from Vanguard Systems roofing estimator';
 COMMENT ON COLUMN "report_requests"."price_per_sq" IS 'Price per square foot for the roofing job';
 COMMENT ON COLUMN "report_requests"."total_price" IS 'Total calculated price for the job';
 COMMENT ON COLUMN "report_requests"."counter_price" IS 'Owner counter-offer price per square';
