@@ -69,10 +69,10 @@ export const documentsRouter = router({
       const buffer = Buffer.from(input.fileData, "base64");
       const fileSize = buffer.length;
 
-      // Generate unique file path
+      // Generate unique file path organized by job ID
       const timestamp = Date.now();
       const safeName = input.fileName.replace(/[^a-zA-Z0-9.-]/g, "_");
-      const filePath = `jobs/${input.leadId}/documents/${timestamp}_${safeName}`;
+      const filePath = `job-${input.leadId}/${timestamp}_${safeName}`;
 
       // Upload to Supabase Storage in private 'documents' bucket
       const { url } = await storagePut(filePath, buffer, input.fileType, 'documents');

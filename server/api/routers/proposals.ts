@@ -229,7 +229,9 @@ export const proposalsRouter = router({
       const pdfBuffer = await generateProposalPDF(proposalData);
 
       // Save to Supabase storage in private 'documents' bucket
-      const fileName = `proposals/proposal-signed-${input.jobId}-${Date.now()}.pdf`;
+      // Organize by job ID with customer name in filename
+      const safeCustomerName = job.fullName.replace(/[^a-zA-Z0-9\s-]/g, '').replace(/\s+/g, '_');
+      const fileName = `job-${input.jobId}/Proposal - ${safeCustomerName}.pdf`;
       const { data: uploadData, error: uploadError } = await supabaseAdmin.storage
         .from('documents')
         .upload(fileName, pdfBuffer, {
