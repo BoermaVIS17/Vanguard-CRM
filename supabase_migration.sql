@@ -489,7 +489,7 @@ TO authenticated
 USING (
   EXISTS (
     SELECT 1 FROM "users" 
-    WHERE "users"."open_id" = auth.uid()
+    WHERE "users"."open_id" = auth.uid()::text
     AND (
       -- Owners and Admins see everything
       "users"."role" IN ('owner', 'admin', 'office')
@@ -517,7 +517,7 @@ TO authenticated
 USING (
   EXISTS (
     SELECT 1 FROM "users" 
-    WHERE "users"."open_id" = auth.uid()
+    WHERE "users"."open_id" = auth.uid()::text
     AND (
       -- Owners and Admins can update everything
       "users"."role" IN ('owner', 'admin', 'office')
@@ -545,7 +545,7 @@ TO authenticated
 USING (
   EXISTS (
     SELECT 1 FROM "users" 
-    WHERE "users"."open_id" = auth.uid()
+    WHERE "users"."open_id" = auth.uid()::text
     AND "users"."role" = 'owner'
   )
 );
@@ -570,7 +570,7 @@ USING (
     WHERE "report_requests"."id" = "activities"."report_request_id"
     AND EXISTS (
       SELECT 1 FROM "users" 
-      WHERE "users"."open_id" = auth.uid()
+      WHERE "users"."open_id" = auth.uid()::text
       AND (
         "users"."role" IN ('owner', 'admin', 'office')
         OR ("users"."role" = 'sales_rep' AND "report_requests"."assigned_to" = "users"."id")
@@ -603,7 +603,7 @@ USING (
     WHERE "report_requests"."id" = "documents"."report_request_id"
     AND EXISTS (
       SELECT 1 FROM "users" 
-      WHERE "users"."open_id" = auth.uid()
+      WHERE "users"."open_id" = auth.uid()::text
       AND (
         "users"."role" IN ('owner', 'admin', 'office')
         OR ("users"."role" = 'sales_rep' AND "report_requests"."assigned_to" = "users"."id")
@@ -624,7 +624,7 @@ TO authenticated
 USING (
   EXISTS (
     SELECT 1 FROM "users" 
-    WHERE "users"."open_id" = auth.uid()
+    WHERE "users"."open_id" = auth.uid()::text
     AND (
       "users"."role" = 'owner'
       OR "documents"."uploaded_by" = "users"."id"
@@ -652,7 +652,7 @@ USING (
     WHERE "report_requests"."id" = "edit_history"."report_request_id"
     AND EXISTS (
       SELECT 1 FROM "users" 
-      WHERE "users"."open_id" = auth.uid()
+      WHERE "users"."open_id" = auth.uid()::text
       AND (
         "users"."role" IN ('owner', 'admin', 'office')
         OR ("users"."role" = 'sales_rep' AND "report_requests"."assigned_to" = "users"."id")
