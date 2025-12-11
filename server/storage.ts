@@ -24,19 +24,26 @@ export async function storagePut(
     ? Buffer.from(data, 'base64')
     : data;
 
+  console.log(`[STORAGE] Uploading to bucket '${bucket}': ${key}`);
   const result = await uploadToSupabase(key, buffer as Buffer, contentType, bucket);
   
   if (!result) {
+    console.error(`[STORAGE] Upload failed for ${key} in bucket ${bucket}`);
     throw new Error(`Storage upload failed for ${key}`);
   }
+  console.log(`[STORAGE] Upload successful: ${result.url}`);
 
   // For private 'documents' bucket, generate signed URL (valid for 1 year)
   // For other buckets, use public URL
   let url = result.url;
   if (bucket === 'documents') {
+    console.log(`[STORAGE] Generating signed URL for private bucket: ${key}`);
     const signedUrl = await getSignedUrl(key, 365 * 24 * 60 * 60, bucket);
     if (signedUrl) {
+      console.log(`[STORAGE] Signed URL generated successfully`);
       url = signedUrl;
+    } else {
+      console.error(`[STORAGE] Failed to generate signed URL for ${key}`);
     }
   }
 

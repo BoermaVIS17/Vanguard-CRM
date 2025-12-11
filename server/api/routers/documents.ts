@@ -75,7 +75,9 @@ export const documentsRouter = router({
       const filePath = `job-${input.leadId}/${timestamp}_${safeName}`;
 
       // Upload to Supabase Storage in private 'documents' bucket
+      console.log(`[UPLOAD] Attempting to upload to documents bucket: ${filePath}`);
       const { url } = await storagePut(filePath, buffer, input.fileType, 'documents');
+      console.log(`[UPLOAD] Successfully uploaded to: ${url}`);
 
       // Save document record
       const [result] = await db.insert(documents).values({
