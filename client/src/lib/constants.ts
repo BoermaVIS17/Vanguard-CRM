@@ -3,7 +3,7 @@
  * Centralized brand assets and colors for consistent styling
  */
 
-export const BRAND_LOGO_URL = 'https://mkmdffzjkttsklzsrdbv.supabase.co/storage/v1/object/public/Proposal_Bucket/vanguard-logo.png';
+export const BRAND_LOGO_URL = 'https://yqcmzujqdouoarmvkynh.supabase.co/storage/v1/object/public/Proposal_Bucket/vanguard-logo.png';
 
 export const BRAND_COLORS = {
   cyan: '#00D4FF',        // Primary - Electric Cyan from logo

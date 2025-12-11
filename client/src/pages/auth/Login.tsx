@@ -52,18 +52,18 @@ export default function Login() {
         <CardHeader className="text-center space-y-4">
           {/* Logo */}
           <div className="flex justify-center">
-            <div className="w-32 h-32 rounded-lg border-2 border-cyan-500/50 flex items-center justify-center bg-black shadow-[0_0_20px_rgba(0,255,240,0.3)] overflow-hidden">
+            <div className="w-32 h-32 rounded-lg border-2 border-[#00D4FF]/50 flex items-center justify-center bg-[#001F3F] shadow-[0_0_20px_rgba(0,212,255,0.3)] overflow-hidden">
               <img 
-                src="/images/logo.jpg" 
-                alt="NextDoor Exterior Solutions Logo" 
-                className="w-full h-full object-cover"
+                src="https://yqcmzujqdouoarmvkynh.supabase.co/storage/v1/object/public/Proposal_Bucket/vanguard-logo.png" 
+                alt="Vanguard Systems Logo" 
+                className="w-full h-full object-contain p-2"
               />
             </div>
           </div>
           
           <div>
             <CardTitle className="text-2xl font-bold text-white">
-              NextDoor <span className="text-cyan-400">CRM</span>
+              Vanguard <span className="text-[#00D4FF]">Systems</span>
             </CardTitle>
             <CardDescription className="text-slate-400 mt-2">
               Sign in to access your dashboard
@@ -149,7 +149,7 @@ export default function Login() {
 
       {/* Footer */}
       <div className="absolute bottom-4 text-center text-slate-500 text-sm">
-        <p>© {new Date().getFullYear()} NextDoor Exterior Solutions</p>
+        <p>© {new Date().getFullYear()} Vanguard Systems (VIS)</p>
       </div>
     </div>
   );

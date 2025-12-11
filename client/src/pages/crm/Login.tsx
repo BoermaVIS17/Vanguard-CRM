@@ -38,10 +38,10 @@ export default function CRMLogin() {
       <Card className="w-full max-w-md bg-slate-800/50 border-slate-700 backdrop-blur-sm">
         <CardHeader className="text-center">
           <div className="mx-auto mb-6 flex justify-center">
-            <div className="bg-white rounded-lg p-4 shadow-lg">
+            <div className="bg-[#001F3F] rounded-lg p-4 shadow-lg border-2 border-[#00D4FF]/30">
               <img 
-                src="/images/logo.jpg" 
-                alt="Next Door Exterior Solutions" 
+                src="https://yqcmzujqdouoarmvkynh.supabase.co/storage/v1/object/public/Proposal_Bucket/vanguard-logo.png" 
+                alt="Vanguard Systems" 
                 className="h-20 w-auto max-w-[250px] object-contain"
                 onError={(e) => {
                   console.error('Logo failed to load');
@@ -50,9 +50,9 @@ export default function CRMLogin() {
               />
             </div>
           </div>
-          <CardTitle className="text-2xl text-white">NextDoor CRM</CardTitle>
+          <CardTitle className="text-2xl text-white">Vanguard Systems CRM</CardTitle>
           <CardDescription className="text-slate-400">
-            Storm Documentation Management System
+            Roofing Project Management System
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -116,7 +116,7 @@ export default function CRMLogin() {
           </form>
 
           <p className="text-xs text-center text-slate-500 mt-6">
-            Only authorized NextDoor Exterior Solutions team members can access this system.
+            Only authorized Vanguard Systems team members can access this system.
             Contact your administrator if you need access.
           </p>
         </CardContent>
